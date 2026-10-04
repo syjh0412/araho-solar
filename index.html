@@ -316,7 +316,7 @@ body.deckmode .toast{bottom:110px}
   <button data-v="learn"><span class="ic">📚</span>미션 학습</button>
   <button data-v="wanted"><span class="ic">🔭</span>수배 파일</button>
   <button data-v="exam"><span class="ic">✍️</span>논술 시험</button>
-  <button data-v="teacher"><span class="ic">📋</span>선생님</button>
+  <button data-v="teacher"><span class="ic">📋</span>센터장</button>
 </nav>
 
 <script>
@@ -357,12 +357,53 @@ function save(){
     post({action:'save',...me,pts:S.pts,rank:rank().r,prog:CH.map(c=>{const p=chapProg(c);return p.d+'/'+p.total;}).join(' '),state:JSON.stringify(S)})
      .then(()=>setSync('on')).catch(()=>setSync('err')); },1500); }
 }
-function setSync(s){syncState=s;const el=document.querySelector('.hud .sync');if(el){el.className='sync '+(s==='on'?'on':'');el.textContent=s==='on'?'● 선생님 시트에 저장됨':s==='pending'?'○ 저장 중…':s==='err'?'! 저장 실패(다시 시도 중)':API?'○ 연결 대기':'기기에만 저장';}}
+function setSync(s){syncState=s;const el=document.querySelector('.hud .sync');if(el){el.className='sync '+(s==='on'?'on':'');el.textContent=s==='on'?'● 센터장 시트에 저장됨':s==='pending'?'○ 저장 중…':s==='err'?'! 저장 실패(다시 시도 중)':API?'○ 연결 대기':'기기에만 저장';}}
 function logSrv(type,item,text,score,ai){ if(API&&me) post({action:'log',...me,type,item,text,score,ai}).catch(()=>{}); }
-function addPts(n){S.pts+=n;save();toast("+"+n+"점!");}
+function addPts(n){const b=S.pts;S.pts+=n;save();toast("+"+n+"점!");checkUnlock(b,S.pts);}
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),400);},1500);}
-const RANKS=[[0,"훈련생 🌱"],[40,"3등 관제사 🥉"],[100,"2등 관제사 🥈"],[170,"1등 관제사 🥇"],[240,"수석 관제사 ⭐"]];
+/* 등급: 우주 비행사 경력 순서 */
+const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[100,"우주 비행사"],[170,"미션 스페셜리스트"],[240,"커맨더"]];
 function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length;i++){if(S.pts>=RANKS[i][0]){r=RANKS[i][1];next=RANKS[i+1]||null;}}return{r,next};}
+/* 장비: 점수를 모으면 우주복이 한 점씩 갖춰진다 */
+const ITEMS=[
+ {k:"gloves",at:15,n:"장갑·부츠",e:"🧤",d:"지상 훈련 통과 기념. 손끝이 따뜻해졌다."},
+ {k:"suit",at:30,n:"우주복",e:"👨‍🚀",d:"고천 관제센터 지급품. 색은 네가 고른다."},
+ {k:"helmet",at:50,n:"헬멧",e:"🪖",d:"이제 선외 활동(EVA) 자격이 생겼다."},
+ {k:"pack",at:75,n:"생명유지 배낭",e:"🎒",d:"산소·물·냉각수. 8시간 버틸 수 있다."},
+ {k:"jet",at:100,n:"제트팩",e:"🚀",d:"우주 공간에서 방향을 바꾸는 추진 장치."},
+ {k:"patch",at:130,n:"고천 미션 패치",e:"🏷️",d:"고천중 관제센터 공식 패치. 가슴에 단다."},
+ {k:"robot",at:165,n:"반려 로봇 '아라'",e:"🤖",d:"아라호가 보내준 작은 친구. 계산이 빠르다."},
+ {k:"visor",at:200,n:"황금 바이저",e:"✨",d:"태양빛을 막는 금 코팅. 베테랑의 상징."},
+ {k:"cmd",at:240,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
+const have=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&S.pts>=it.at;};
+const SUITS={white:["#eef1ff","#c9d0ea"],orange:["#ff9a3c","#d9741b"],blue:["#6fb6ff","#3b7fd8"],mint:["#8df0d2","#4cc7a6"]};
+function astronautSVG(pts,suit,size){
+  const p=pts==null?S.pts:pts; const H=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&p>=it.at;};
+  const [c1,c2]=SUITS[suit||S.suit||"white"]||SUITS.white; const sz=size||200;
+  const suitOn=H("suit"); const body=suitOn?c1:"#5b6b9a", bodyD=suitOn?c2:"#3f4c74";
+  return `<svg viewBox="0 0 200 240" width="${sz}" height="${sz*1.2}" style="display:block;max-width:100%;height:auto">
+  ${H("jet")?`<g><rect x="52" y="110" width="22" height="60" rx="8" fill="#8891b8"/><rect x="126" y="110" width="22" height="60" rx="8" fill="#8891b8"/><path d="M57 170 q6 22 12 0z" fill="#ffb13b"><animate attributeName="d" values="M57 170 q6 22 12 0z;M57 170 q6 34 12 0z;M57 170 q6 22 12 0z" dur="0.5s" repeatCount="indefinite"/></path><path d="M131 170 q6 22 12 0z" fill="#ffb13b"><animate attributeName="d" values="M131 170 q6 30 12 0z;M131 170 q6 18 12 0z;M131 170 q6 30 12 0z" dur="0.45s" repeatCount="indefinite"/></path></g>`:""}
+  ${H("pack")?`<rect x="58" y="95" width="84" height="80" rx="16" fill="#9aa4cf" stroke="#6d78b3" stroke-width="3"/><rect x="92" y="100" width="16" height="70" rx="6" fill="#7f8ab8"/>`:""}
+  <!-- 다리 -->
+  <rect x="72" y="160" width="24" height="48" rx="10" fill="${body}"/><rect x="104" y="160" width="24" height="48" rx="10" fill="${body}"/>
+  <rect x="68" y="200" width="32" height="20" rx="8" fill="${H("gloves")?"#2d3561":"#8891b8"}"/><rect x="100" y="200" width="32" height="20" rx="8" fill="${H("gloves")?"#2d3561":"#8891b8"}"/>
+  <!-- 몸통 -->
+  <rect x="58" y="92" width="84" height="84" rx="26" fill="${body}" stroke="${bodyD}" stroke-width="3"/>
+  ${suitOn?`<rect x="78" y="120" width="44" height="34" rx="8" fill="${bodyD}" opacity=".55"/><circle cx="88" cy="130" r="4" fill="#3fe6a6"/><circle cx="100" cy="130" r="4" fill="#ffb13b"/><circle cx="112" cy="130" r="4" fill="#5fe3ff"/>`:`<path d="M80 100 h40 v12 h-40z" fill="#3f4c74"/>`}
+  ${H("patch")?`<circle cx="124" cy="110" r="10" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><text x="124" y="114" text-anchor="middle" font-size="9" fill="#ffb13b" font-weight="700">고천</text>`:""}
+  <!-- 팔 -->
+  <rect x="34" y="98" width="26" height="62" rx="12" fill="${body}" stroke="${bodyD}" stroke-width="3" transform="rotate(12 47 98)"/><rect x="140" y="98" width="26" height="62" rx="12" fill="${body}" stroke="${bodyD}" stroke-width="3" transform="rotate(-12 153 98)"/>
+  <circle cx="40" cy="162" r="12" fill="${H("gloves")?"#2d3561":"#f1c9a5"}"/><circle cx="160" cy="162" r="12" fill="${H("gloves")?"#2d3561":"#f1c9a5"}"/>
+  ${H("cmd")?`<rect x="60" y="94" width="22" height="9" rx="3" fill="#ffd166"/><rect x="118" y="94" width="22" height="9" rx="3" fill="#ffd166"/>`:""}
+  <!-- 머리 -->
+  <circle cx="100" cy="60" r="34" fill="#f1c9a5"/><path d="M68 54 q6 -30 32 -30 q26 0 32 30 q-10 -14 -32 -14 q-22 0 -32 14z" fill="#3b2a22"/>
+  <circle cx="88" cy="62" r="3.2" fill="#2a1f1a"/><circle cx="112" cy="62" r="3.2" fill="#2a1f1a"/><path d="M90 76 q10 8 20 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  ${H("helmet")?`<circle cx="100" cy="60" r="44" fill="${H("visor")?"#ffd166":"#bfe8ff"}" opacity="${H("visor")?".55":".28"}" stroke="#e6ecff" stroke-width="4"/><path d="M66 48 q34 -30 68 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/>`:""}
+  ${H("robot")?`<g><rect x="4" y="150" width="30" height="34" rx="8" fill="#9aa4cf" stroke="#5fe3ff" stroke-width="2"/><circle cx="13" cy="164" r="3" fill="#5fe3ff"/><circle cx="25" cy="164" r="3" fill="#5fe3ff"/><rect x="12" y="174" width="14" height="3" rx="1.5" fill="#0a0f2c"/><line x1="19" y1="150" x2="19" y2="140" stroke="#5fe3ff" stroke-width="2"/><circle cx="19" cy="138" r="3" fill="#ffb13b"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle></g>`:""}
+  </svg>`;
+}
+function checkUnlock(before,after){ITEMS.forEach(it=>{if(before<it.at&&after>=it.at)setTimeout(()=>toast(`${it.e} 장비 획득: ${it.n}!`),600);});
+  const rb=RANKS.filter(r=>before>=r[0]).length,ra=RANKS.filter(r=>after>=r[0]).length; if(ra>rb)setTimeout(()=>toast(`🎖️ 승급! ${RANKS[ra-1][1]}`),1400);}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 const IMG=(n,cap,cls)=>`<div class="fig ${cls||'tall'}"><img src="img/${n}.jpg" alt="${esc(cap||n)}" loading="lazy">${cap?`<div class="cap">${cap}</div>`:""}</div>`;
 
@@ -492,7 +533,7 @@ const videoBlock=(ids)=>`<div class="figs c${ids.length}">${ids.map(i=>`<div><di
 /* ═══════ 학습 콘텐츠 ═══════ */
 const CH=[
 {id:"c1",cover:"solarsys",title:"태양계 가족을 찾아라",no:"MISSION 01",sub:"태양계 구성원 · 7분",slides:[
- {t:"hero",log:"통신 로그 · D-1 · 발사 전 브리핑",h:"태양계 가족을 찾아라",sub:"관제사, 아라호가 내일 떠난다. 첫 임무는 간단하다 — 태양계에 누가 사는지 한 명도 빠짐없이 파악하라.",scene:"orbit"},
+ {t:"hero",log:"통신 로그 · D-1 · 발사 전 브리핑",h:"태양계 가족을 찾아라",sub:"훈련생, 아라호가 내일 떠난다. 첫 임무는 간단하다 — 태양계에 누가 사는지 한 명도 빠짐없이 파악하라. — 센터장",scene:"orbit"},
  {t:"learn",h:"태양계란 무엇일까",img:"solarsys",cap:"<b>태양계</b> — 태양과, 태양 주위를 도는 모든 천체의 세계 (교과서 그림)",b:`<p>태양계는 <b>태양</b>과, 태양의 영향 안에서 <em>태양을 중심으로 도는(공전하는)</em> 모든 천체를 말해요.</p>${FAMILY_FIG}<div class="key"><span class="kt">판단 기준은 단 하나</span>행성이냐 아니냐가 아니라, <b>공전으로 태양과 이어져 있는가</b>!</div>`},
  {t:"learn",h:"태양 — 태양계의 유일한 별",img:"sun_full",cap:"<b>태양</b> — 지름이 지구의 109배, 표면 온도 약 6000℃",b:`<p>태양은 태양계에서 <b>스스로 빛을 내는 유일한 천체</b>, 즉 <em>별(항성)</em>이에요.</p><p>행성과 달이 밝게 보이는 건? 태양 빛을 <b>반사</b>하기 때문!</p><div class="key"><span class="kt">한 줄 정리</span>스스로 빛을 낸다 → 별 · 빛을 반사한다 → 행성, 위성, 소행성, 혜성</div>`},
  {t:"learn",h:"행성 8형제",img:"solarsys2",cap:"태양에서 가까운 순서 — <b>수·금·지·화·목·토·천·해</b>",b:`<p>태양 주위를 공전하는 8개의 행성.</p><p style="font-family:var(--disp);font-size:1.4em;text-align:center;letter-spacing:.04em">수성 · 금성 · 지구 · 화성<br>목성 · 토성 · 천왕성 · 해왕성</p><div class="key"><span class="kt">외우기</span>"수·금·지·화·목·토·천·해" — 태양에서 가까운 순서! 행성 하나하나의 얼굴은 2장에서 만나요.</div>`},
@@ -505,7 +546,7 @@ const CH=[
  {t:"clear",vids:[0],pts:["태양계 = 태양 + 공전하는 모든 천체","태양은 유일한 별(스스로 빛)","행성 8개: 수금지화목토천해","위성·소행성·혜성·왜소행성도 구성원 (공전!)","혜성 꼬리: 태양 가까이, 태양 반대쪽"]}
 ]},
 {id:"c2",cover:"jupiter",title:"쌍둥이가 아니야",no:"MISSION 02",sub:"행성의 특징과 분류 · 9분",slides:[
- {t:"hero",log:"통신 로그 · D+12 · 행성 관측 자료 수신",h:"쌍둥이가 아니야",sub:"아라호가 8개 행성의 사진과 자료를 보내왔다. 겉모습은 제각각이지만 두 팀으로 나뉜다 — 분류 기준을 마스터하라.",art:SIZE_FIG,img:"planets4"},
+ {t:"hero",log:"통신 로그 · D+12 · 행성 관측 자료 수신",h:"쌍둥이가 아니야",sub:"아라호가 8개 행성의 사진과 자료를 보내왔다. 겉모습은 제각각이지만 두 팀으로 나뉜다 — 분류 기준을 마스터하라. — 센터장",art:SIZE_FIG,img:"planets4"},
  {t:"learn",h:"지구형 행성 — 수·금·지·화",wide:true,b:planetGallery("rock")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>작다</em> · 단단한 <b>암석</b> → 밀도 <em>크다</em> · 위성이 <em>없거나 적다</em> · 고리 <em>없음</em></div>`},
  {t:"learn",h:"지구형 행성의 표면",wide:true,b:planetSurf("rock")+`<p style="margin-top:12px">네 행성 모두 <b>단단한 땅</b>이 있어요. 수성의 충돌구, 금성의 화산, 지구의 바다, 화성의 극관 — 모두 <em>암석 표면</em> 위에서 벌어지는 일.</p>`},
  {t:"learn",h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>크다</em> · 주로 <b>기체</b> → 밀도 <em>작다</em> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
@@ -520,7 +561,7 @@ const CH=[
  {t:"clear",vids:[1],pts:["지구형(수금지화): 작다·밀도 크다·위성 적다·고리 없다","목성형(목토천해): 크다·밀도 작다·위성 많다·고리 있다","클수록 밀도는 작다 (솜사탕!)","행성마다 얼굴이 있다: 대적점·고리·극관·누운 자전축…","서술은 '…보다 ~하기 때문이다' + 근거 2가지"]}
 ]},
 {id:"c3",cover:"prominence",title:"태양의 얼굴",no:"MISSION 03",sub:"태양의 표면·대기와 태양 활동 · 8분",slides:[
- {t:"hero",log:"통신 로그 · D+40 · 태양 카메라 가동",h:"태양의 얼굴",sub:"아라호가 태양 전용 필터를 열었다. 표면과 대기에서 벌어지는 거대한 쇼 — 하나도 놓치지 말고 기록하라.",scene:"sun",img:"sun_full"},
+ {t:"hero",log:"통신 로그 · D+40 · 태양 카메라 가동",h:"태양의 얼굴",sub:"아라호가 태양 전용 필터를 열었다. 표면과 대기에서 벌어지는 거대한 쇼 — 하나도 놓치지 말고 기록하라. — 센터장",scene:"sun",img:"sun_full"},
  {t:"learn",h:"표면: 광구와 흑점",figs:[["sun2014","<b>광구</b> 위의 <b>흑점</b> (2014년, 활발한 시기)"],["sunspot_earth","흑점 하나에 <b>지구</b>가 쏙 들어간다"]],b:`<ul><li><b>광구</b> — 우리가 보는 태양의 둥근 표면. 온도 약 <em>6000℃</em></li><li><b>흑점</b> — 주위보다 온도가 <em>낮아서(약 4000℃)</em> 어둡게 보이는 점</li></ul><div class="key"><span class="kt">오개념 교정</span>흑점도 빛을 내요! 다만 주위가 더 밝아서 <b>상대적으로</b> 어두워 보일 뿐.</div>`},
  {t:"learn",h:"쌀알 무늬, 그리고 자전",figs:[["granule","<b>쌀알 무늬</b> — 하나 크기가 약 1000 km"],["sunspot_close","흑점 주변의 쌀알 무늬 (고해상도)"]],b:`<ul><li><b>쌀알 무늬</b> — 광구 아래에서 뜨거운 물질이 끓어오르며(대류) 생기는 무늬</li><li>흑점이 며칠에 걸쳐 동→서로 <b>이동하는 것처럼</b> 보이는 까닭? 태양이 <em>자전</em>하기 때문!</li></ul>`},
  {t:"learn",h:"대기: 채층과 코로나",figs:[["chromo","<b>채층</b> — 광구 바로 위 붉은 테"],["corona","<b>코로나</b> — 개기 일식 때 드러나는 진주빛 대기"]],b:`<p>태양의 대기는 평소엔 광구가 너무 밝아 안 보이고, <em>개기 일식</em> 때 볼 수 있어요.</p><ul><li><b>채층</b> — 광구 바로 위의 붉은 대기층</li><li><b>코로나</b> — 바깥으로 멀리 뻗은 진주색 대기. 온도가 <em>100만 ℃ 이상!</em></li></ul>`},
@@ -533,7 +574,7 @@ const CH=[
  {t:"clear",pts:["표면: 광구(6000℃)·흑점(온도 낮아 어둡게)·쌀알 무늬(대류)","흑점 이동 = 태양의 자전 · 흑점 수 주기 약 11년","대기: 채층·코로나(100만℃↑) — 개기 일식 때","홍염(불기둥)·플레어(폭발)","활발 신호: 흑점↑·홍염/플레어↑·코로나↑·태양풍↑"]}
 ]},
 {id:"c4",cover:"aurora",title:"태양이 보낸 신호",no:"MISSION 04",sub:"태양 활동이 지구에 미치는 영향 · 8분",slides:[
- {t:"hero",log:"통신 로그 · D+58 · 우주기상 경보 발령",h:"태양이 보낸 신호",sub:"플레어 폭발 확인. 1억 5천만 km 떨어진 지구가 어떻게 흔들리는지 밝혀라 — 아라호의 통신이 끊기기 전에.",scene:"sim"},
+ {t:"hero",log:"통신 로그 · D+58 · 우주기상 경보 발령",h:"태양이 보낸 신호",sub:"플레어 폭발 확인. 1억 5천만 km 떨어진 지구가 어떻게 흔들리는지 밝혀라 — 아라호의 통신이 끊기기 전에. — 센터장",scene:"sim"},
  {t:"learn",h:"태양풍 — 태양이 부는 바람",img:"flare2",cap:"플레어와 함께 뿜어져 나오는 <b>전기를 띤 입자</b>들",b:`<p>태양은 빛만 보내는 게 아니에요. <b>전기를 띤 입자</b>들을 사방으로 내뿜는데, 이것이 <em>태양풍</em>!</p><div class="key"><span class="kt">핵심 연결</span>태양 활동이 활발해지면 → 태양풍도 <b>강해진다</b></div>`},
  {t:"learn",h:"지구의 방패, 그리고 오로라",img:"aurora",cap:"우주정거장에서 본 <b>오로라</b> — 태양풍 입자가 대기와 부딪혀 빛난다",b:`<p>지구의 <b>자기장</b>이 태양풍을 막아 주는 방패 역할을 해요.</p><p>일부 입자가 극지방 하늘로 들어와 공기와 부딪히면 — <b>오로라</b>가 빛나요!</p><div class="key"><span class="kt">활발할 때의 오로라</span><b>더 자주</b>, 그리고 평소보다 <b>낮은 위도</b>에서도 나타나요.</div>`},
  {t:"learn",h:"활발해지면 생기는 문제들",img:"earth_effects",cap:"교과서 그림 — 통신·GPS·인공위성·송전망이 흔들린다",b:`<p>강해진 태양풍이 지구 자기장을 뒤흔들면(자기 폭풍) —</p><ul><li>📡 장거리 <b>무선 통신 장애</b>(델린저 현상)</li><li>🛰️ <b>인공위성 고장</b>, <b>GPS 수신 오류</b></li><li>💡 송전 시설 고장으로 <b>대규모 정전</b></li><li>👨‍🚀 우주 비행사 피폭 위험</li></ul>`},
@@ -544,8 +585,8 @@ const CH=[
  {t:"write",key:"w_c4",h:"관제 일지 · 한 줄 논술",img:"earth_effects",prompt:`"태양 활동이 활발해지면 지구의 통신이 왜 위험해질까?"<br><b>태양풍</b>이라는 말을 꼭 넣어, 원인→결과가 이어지는 한 문단으로 쓰세요.`,frame:"태양 활동이 활발해지면 <b>___이/가 강해지고</b>, 이것이 지구의 ___을/를 교란하여 <b>___ 현상</b>이 나타날 수 있다.",spec:{min:45,groups:[{name:"태양풍 언급",words:["태양풍"]},{name:"지구에서 나타나는 현상(통신 장애·GPS·오로라·정전·위성 등)",words:["통신","GPS","지피에스","오로라","정전","위성","델린저"]}]},ai:"태양 활동↑→태양풍 강해짐→자기장 교란→통신 장애 등 지구 영향으로 이어지는 인과 사슬을 빠짐없이 썼는지 평가"},
  {t:"clear",vids:[2],pts:["태양풍 = 전기를 띤 입자의 흐름","활발 → 태양풍 강해짐 → 자기장 교란","오로라: 더 자주, 낮은 위도까지","통신 장애·GPS 오류·정전·위성 고장 → 우주 기상 예보로 대비","글의 뼈대 = 인과 사슬 ①→⑤"]}
 ]},
-{id:"c5",cover:"telescope_girl",title:"관제사의 눈",no:"BONUS",sub:"천체 망원경과 천체 관측 · 6분 (평가 범위 밖)",slides:[
- {t:"hero",log:"통신 로그 · 지상 관제 · 보조 임무",h:"관제사의 눈",sub:"아라호만 우주를 보는 게 아니다. 관제사도 직접 하늘을 봐야 한다 — 천체 망원경을 조립하고 달과 행성, 태양을 관측하라.",img:"telescope_girl"},
+{id:"c5",cover:"telescope_girl",title:"승무원의 눈",no:"BONUS",sub:"천체 망원경과 천체 관측 · 6분 (평가 범위 밖)",slides:[
+ {t:"hero",log:"통신 로그 · 지상 관제 · 보조 임무",h:"승무원의 눈",sub:"아라호만 우주를 보는 게 아니다. 승무원도 직접 하늘을 봐야 한다 — 천체 망원경을 조립하고 달과 행성, 태양을 관측하라. — 센터장",img:"telescope_girl"},
  {t:"learn",h:"천체 망원경의 구조",figs:[["tele_parts","<b>경통</b> · <b>파인더</b>"],["tele_eyepiece","<b>접안렌즈</b> — 배율을 바꾼다"],["tele_mount","<b>가대</b> · <b>균형추</b>"],["tele_tripod","<b>삼각대</b>"]],b:`<ul><li><b>경통</b> — 빛을 모으는 몸통 (앞쪽 대물렌즈)</li><li><b>파인더</b> — 넓게 보며 천체를 먼저 찾는 작은 망원경</li><li><b>접안렌즈</b> — 눈을 대고 보는 렌즈</li><li><b>가대·균형추</b> — 경통을 받치고 균형을 맞춤</li><li><b>삼각대</b> — 전체를 떠받침</li></ul>`},
  {t:"learn",h:"설치 순서",img:"telescope_girl",cap:"어둡고 사방이 트인 곳에서, 보호자와 함께",b:`<ol class="steps"><li>평평한 곳에 <b>삼각대</b>를 세운다</li><li>삼각대 위에 <b>가대</b>를 고정하고 <b>균형추</b>를 단다</li><li>가대 위에 <b>경통</b>을 고정하고 <b>파인더</b>·<b>접안렌즈</b>를 끼운다</li><li>균형추와 경통 위치를 조절해 <b>균형</b>을 맞춘다</li><li><b>파인더</b>로 천체를 먼저 찾은 뒤 <b>접안렌즈</b>로 관측한다</li></ol>`},
  {t:"learn",h:"달과 행성 관측하기",figs:[["telescope_phone","접안렌즈에 <b>스마트 기기</b>를 대면 촬영도 OK"],["moon","망원경으로 본 <b>달</b> — 충돌구가 또렷하다"]],b:`<p>맨눈으로는 점으로 보이던 행성이 망원경에서는 <b>둥근 원반</b>으로 보여요. 토성의 고리, 목성의 줄무늬와 위성까지!</p><div class="key"><span class="kt">관측 팁</span>구름 없는 날, 천체 관측 앱으로 뜨는 시각을 확인하고, 자정 넘어서까지 관측하지 않기.</div>`},
@@ -594,7 +635,7 @@ const EXAM=[
 const app=document.getElementById("app"), stage=document.getElementById("stage"), gate=document.getElementById("gate");
 let view="home", deck=null, examPage=0;
 function drawHud(){const h=document.getElementById("hud");if(!h)return;const{r,next}=rank();const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
- h.innerHTML=`<span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span>`; setSync(syncState);}
+ h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${astronautSVG(null,null,34)}</span><span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span>`; setSync(syncState);}
 const hudBlock=()=>`<div id="hud" class="hud"></div>`;
 function slideDone(c,sl,idx){const k=c.id+"_"+idx;
  if(sl.t==="learn"||sl.t==="hero"||sl.t==="clear")return !!S.seen[k];
@@ -614,12 +655,12 @@ function render(){
 
 /* ═══════ 로그인 게이트 ═══════ */
 function renderGate(){
- gate.innerHTML=`<div class="gatebox"><div class="comms">ARAHO MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1><p class="sub">관제사 신분을 확인합니다. 반·번호·이름을 입력하세요.</p>
+ gate.innerHTML=`<div class="gatebox"><div class="comms">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1><p class="sub">승무원 신분을 확인합니다. 반·번호·이름을 입력하세요.</p>
   <div class="row2"><div><label>반</label><input type="text" id="gCls" inputmode="numeric" placeholder="예) 3"></div><div><label>번호</label><input type="text" id="gNum" inputmode="numeric" placeholder="예) 12"></div></div>
   <label>이름</label><input type="text" id="gName" placeholder="이름">
   <button class="btn-p" id="gGo" style="width:100%;margin-top:16px">관제센터 입장</button>
   <div id="gMsg" class="small" style="margin-top:10px">${API?"기록은 선생님의 구글 시트에 자동 저장됩니다.":"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
-  <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">선생님으로 입장</button></div>`;
+  <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장(선생님)으로 입장</button></div>`;
  const go=async()=>{const cls=gate.querySelector("#gCls").value.trim(),num=gate.querySelector("#gNum").value.trim(),name=gate.querySelector("#gName").value.trim();
    if(!cls||!num||!name)return gate.querySelector("#gMsg").textContent="반·번호·이름을 모두 입력하세요.";
    const b=gate.querySelector("#gGo");b.disabled=true;b.textContent="확인 중…";
@@ -628,28 +669,37 @@ function renderGate(){
         const sv=r.state; if((sv.pts||0)>=(S.pts||0)) S={...freshState(),...sv}; } setSync('on');}
      catch(e){ setSync('err'); toast("서버 연결 실패 — 기기에 저장합니다"); }}
    try{localStorage.setItem(LS_ME,JSON.stringify(me));}catch(e){}
-   save(); view="home"; render(); toast("환영합니다, "+name+" 관제사! 🫡");};
+   save(); view="home"; render(); toast("환영합니다, "+name+" 훈련생! 🫡");};
  gate.querySelector("#gGo").onclick=go;
  gate.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter")go();});
- gate.querySelector("#gT").onclick=()=>{me={cls:"T",num:"0",name:"선생님"};loadLocal();view="teacher";render();};
+ gate.querySelector("#gT").onclick=()=>{me={cls:"T",num:"0",name:"센터장"};loadLocal();view="teacher";render();};
 }
 
 /* ═══════ 홈 ═══════ */
 function renderHome(){
+ const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at);
  app.innerHTML=`${hudBlock()}
- <div class="hero" style="margin-top:14px"><div><div class="log">ARAHO MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1>
-  <p class="lead">대한민국 최초의 태양계 탐사선 <b style="color:var(--sun)">아라호</b>가 발사대에 섰다. 너는 신입 관제사. 탐사선이 보내오는 자료를 읽고, 판단하고, 글로 보고하라. 미션을 완수하면 <b style="color:var(--cyan)">수석 관제사</b>가 된다.</p>
+ <div class="hero" style="margin-top:14px"><div><div class="log">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1>
+  <p class="lead"><b style="color:var(--sun)">아라</b>는 '바다'를 뜻하는 옛 우리말. 고천(古川), 오래된 냇물은 흘러 바다에 닿는다 — 그리고 별들의 바다, 우주로. 고천중학교 관제센터가 쏘아 올린 태양계 탐사선 <b style="color:var(--sun)">아라호</b>가 발사대에 섰다. 너는 신입 훈련생. 탐사선이 보내오는 자료를 읽고, 판단하고, 글로 보고하라. 임무를 완수할수록 장비가 갖춰지고, 마지막엔 <b style="color:var(--cyan)">커맨더</b>가 된다.</p>
   <div class="flow"><span>📚 <b>미션 학습</b> 5개 장</span><span>🔭 <b>수배 파일</b> 추리</span><span>✍️ <b>자격 논술 시험</b></span></div></div><div></div></div>
  <div class="row2">
-  <div class="card"><div class="idcard"><div class="av">👩‍🚀</div><div><div class="nm">${esc(me.name)} <span class="small">${esc(me.cls)}반 ${esc(me.num)}번</span></div><div class="small">${rank().r} · ⭐ ${S.pts}점</div></div><button class="btn-g" id="logout" style="margin-left:auto;min-height:42px">다른 관제사</button></div>
-   <h3 style="margin-top:16px">나의 훈장</h3>
+  <div class="card"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    <div id="avatar" style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008)">${astronautSVG(null,null,190)}</div>
+    <div style="flex:1;min-width:220px"><div class="comms">CREW ID</div><div class="nm" style="font-family:var(--disp);font-size:1.6rem">${esc(me.name)}</div><div class="small">${esc(me.cls)}반 ${esc(me.num)}번 · 고천 관제센터</div>
+     <div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
+     <div class="small" style="margin-top:8px">우주복 색</div><div style="display:flex;gap:8px;margin-top:4px">${Object.entries(SUITS).map(([k,v])=>`<button class="suitbtn" data-s="${k}" title="${k}" style="min-height:0;width:34px;height:34px;padding:0;border-radius:50%;background:${v[0]};border:3px solid ${(S.suit||'white')===k?'var(--sun)':'#0000'}"></button>`).join("")}</div>
+     <button class="btn-g" id="logout" style="margin-top:12px;min-height:40px;font-size:.95rem">다른 승무원으로</button></div></div>
+   <h3 style="margin-top:18px">장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
+   <div class="badgerow">${ITEMS.map(it=>`<span class="badge ${have(it.k)?'on':''}" title="${esc(it.d)}" style="${have(it.k)?'':'opacity:.45'}">${it.e} ${it.n}${have(it.k)?'':` <span class="small">${it.at}</span>`}</span>`).join("")}</div></div>
+  <div class="card"><h3>오늘의 임무 순서</h3><ol class="steps"><li><b>미션 학습</b> — 장을 열면 전체 화면 슬라이드. 읽고, 퀴즈 풀고, 한 줄 논술까지</li><li><b>수배 파일</b> — 단서로 천체의 정체를 추리</li><li><b>논술 시험</b> — 실제 평가와 같은 3문항, 자동 점검 + AI 코치</li></ol>
+   <h3 style="margin-top:14px">훈장</h3>
    <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.no} ${p.d}/${p.total}</span>`;}).join("")}
    <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
-   <span class="badge ${[1,2,3].every(n=>S.exam[n])?'on':''}">✍️ 시험 ${[1,2,3].filter(n=>S.exam[n]).length}/3</span></div></div>
-  <div class="card"><h3>오늘의 임무 순서</h3><ol class="steps"><li><b>미션 학습</b> — 장을 열면 전체 화면 슬라이드. 읽고, 퀴즈 풀고, 한 줄 논술까지</li><li><b>수배 파일</b> — 단서로 천체의 정체를 추리</li><li><b>논술 시험</b> — 실제 평가와 같은 3문항, 자동 점검 + AI 코치</li></ol>
-   <p class="small">${API?"모든 기록은 자동으로 선생님께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
+   <span class="badge ${[1,2,3].every(n=>S.exam[n])?'on':''}">✍️ 시험 ${[1,2,3].filter(n=>S.exam[n]).length}/3</span></div>
+   <p class="small" style="margin-top:10px">${API?"모든 기록은 자동으로 센터장(선생님)께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
  </div>`;
  drawHud();
+ document.querySelectorAll(".suitbtn").forEach(b=>b.onclick=()=>{S.suit=b.dataset.s;save();render();});
  document.getElementById("logout").onclick=()=>{me=null;try{localStorage.removeItem(LS_ME);}catch(e){}S=freshState();render();};
 }
 
@@ -756,7 +806,7 @@ function renderExam(){
  const steps=`<div class="exam-steps">${pages.map((p,i)=>`<button class="btn-s ${i===examPage?'on':''}" data-ep="${i}">${p.title}${i>0&&S.exam[i]?' ✓':''}</button>`).join("")}</div>`;
  let body="";
  if(examPage===0){
-   body=`<div class="exam-wrap"><div>${DOC_INTRO}</div><div class="card" style="margin:0"><h3>✍️ 관제사 자격 논술 시험</h3><p class="s-body" style="font-size:1.1rem">실제 평가와 같은 방식, 다른 자료. 총 <b>10점</b>(2+2+6). 각 문항 페이지에 그 문항에 필요한 자료만 함께 보여줘요 — 스크롤하지 않아도 됩니다.</p>
+   body=`<div class="exam-wrap"><div>${DOC_INTRO}</div><div class="card" style="margin:0"><h3>✍️ 우주 비행사 자격 논술 시험</h3><p class="s-body" style="font-size:1.1rem">실제 평가와 같은 방식, 다른 자료. 총 <b>10점</b>(2+2+6). 각 문항 페이지에 그 문항에 필요한 자료만 함께 보여줘요 — 스크롤하지 않아도 됩니다.</p>
     <div class="chain"><span class="nd"><b>①</b>판단·분류<br><span class="small">(주장)</span></span><span class="ar">→</span><span class="nd"><b>②</b>자료 속 근거<br><span class="small">(왜냐하면~)</span></span><span class="ar">→</span><span class="nd"><b>③</b>연결·결론<br><span class="small">(따라서~)</span></span></div>
     <div class="figs c3">${IMG('earth','','sq')}${IMG('comet','','sq')}${IMG('aurora','','sq')}</div>
     <button class="btn-p" id="exStart" style="width:100%;margin-top:14px">문항 1부터 시작 ▶</button></div></div>`;
@@ -766,10 +816,10 @@ function renderExam(){
    <div class="card" style="margin:0"><span class="tag">문항 ${e.no} · ${e.pts}점</span><h3 style="margin:8px 0;font-size:1.4rem">${e.no}. ${e.title}</h3><p class="s-body" style="font-size:clamp(1.05rem,1.3vw,1.25rem)">${e.q}</p>
     <textarea id="et" style="min-height:${e.no===3?260:180}px" placeholder="자료의 숫자·내용을 근거로, '왜냐하면/따라서'로 이어지는 완전한 문장으로.">${esc(sv.t||"")}</textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn-p" id="echk" style="flex:1">자동 점검</button><button class="btn-s aibtn" id="eai" style="flex:1" hidden>🤖 AI 코치 피드백</button><button class="btn-s" id="esub" style="flex:1">제출 ${sv.t?"(재제출)":""}</button></div>
-    <div id="eout">${sv.t?'<div class="fb ok"><b>📨 제출됨</b> — '+(API?'선생님 시트에 저장되었습니다.':'이 기기에 저장되었습니다.')+'</div>':""}</div>
+    <div id="eout">${sv.t?'<div class="fb ok"><b>📨 제출됨</b> — '+(API?'센터장 시트에 저장되었습니다.':'이 기기에 저장되었습니다.')+'</div>':""}</div>
     <div style="display:flex;gap:8px;margin-top:14px"><button class="btn-g" id="eprev" style="flex:1">◀ 이전</button><button class="btn-s" id="enext" style="flex:1" ${examPage>=EXAM.length?"disabled":""}>다음 문항 ▶</button></div></div></div>`;
  }
- app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">✍️ 관제사 자격 논술 시험</h2>${steps}${body}`;
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">✍️ 우주 비행사 자격 논술 시험</h2>${steps}${body}`;
  drawHud();
  document.querySelectorAll("[data-ep]").forEach(b=>b.onclick=()=>{examPage=+b.dataset.ep;render();});
  const st=document.getElementById("exStart"); if(st)st.onclick=()=>{examPage=1;render();};
@@ -781,16 +831,16 @@ function renderExam(){
    document.getElementById("esub").onclick=()=>{const t=document.getElementById("et").value;if(!t.trim())return toast("먼저 답을 써 주세요!");
      const first=!S.exam[e.no];const r=checkWrite(t,e.spec);S.exam[e.no]={t,g:r.got+"/"+r.need,ts:Date.now()};
      logSrv('시험','문항'+e.no,t,r.got+"/"+r.need,''); if(first)addPts(8);else save();
-     document.getElementById("eout").innerHTML='<div class="fb ok"><b>📨 제출 완료!</b> '+(API?'선생님 시트에 저장되었습니다.':'이 기기에 저장되었습니다.')+'</div>';};}
+     document.getElementById("eout").innerHTML='<div class="fb ok"><b>📨 제출 완료!</b> '+(API?'센터장 시트에 저장되었습니다.':'이 기기에 저장되었습니다.')+'</div>';};}
 }
 
 /* ═══════ 선생님 ═══════ */
 let TPIN="", TROWS=null, TLOGS=null, TSEL=null;
 function renderTeacher(){
  if(!TPIN){
-  app.innerHTML=`${hudBlock()}<div class="card" style="max-width:520px;margin:40px auto"><h3>📋 선생님 전용</h3><p class="small">교사 코드를 입력하세요. ${API?"(시트 '설정' 탭의 PIN)":"(서버 미연결: 임시 코드)"}</p>
+  app.innerHTML=`${hudBlock()}<div class="card" style="max-width:520px;margin:40px auto"><h3>📋 센터장(선생님) 전용</h3><p class="small">교사 코드를 입력하세요. ${API?"(시트 '설정' 탭의 PIN)":"(서버 미연결: 임시 코드)"}</p>
   <input type="password" id="tc" inputmode="numeric" placeholder="교사 코드"><button class="btn-p" id="tgo" style="width:100%;margin-top:10px">입장</button><div id="terr"></div>
-  <button class="btn-g" id="tback" style="width:100%;margin-top:14px;min-height:44px">← 학생으로 돌아가기</button></div>`;
+  <button class="btn-g" id="tback" style="width:100%;margin-top:14px;min-height:44px">← 승무원 입장으로 돌아가기</button></div>`;
   drawHud();
   document.getElementById("tgo").onclick=async()=>{const v=document.getElementById("tc").value.trim();
     if(API){try{const r=await call({action:'tlogin',pin:v});TPIN=v;AI_ON=!!r.ai;render();}catch(e){document.getElementById("terr").innerHTML='<div class="fb no">'+esc(e)+'</div>';}}
@@ -804,11 +854,11 @@ function renderTeacher(){
   <p class="small">이후 학생이 로그인·학습·제출하면 <b>학생</b> 탭(현재 상태)과 <b>기록</b> 탭(모든 글·AI 피드백)에 자동으로 쌓이고, 아래 대시보드에서 바로 보입니다.</p>
   <p><a href="Code.gs" target="_blank" rel="noopener">Code.gs 열기 ↗</a> · <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Gemini API 키 발급 ↗</a> · <a href="https://script.google.com" target="_blank" rel="noopener">Apps Script ↗</a></p></div></div>`;
  if(!API){
-  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 6px;font-size:1.9rem">📋 선생님</h2><div class="card"><div class="fb no"><b>서버가 아직 연결되지 않았어요.</b> 아래 안내대로 5분이면 학급 전체 기록이 실시간으로 모입니다.</div>${setup}</div>
+  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 6px;font-size:1.9rem">📋 센터장 콘솔</h2><div class="card"><div class="fb no"><b>서버가 아직 연결되지 않았어요.</b> 아래 안내대로 5분이면 학급 전체 기록이 실시간으로 모입니다.</div>${setup}</div>
   <div class="card"><h3>이 기기의 학생 기록</h3><div id="mine"></div></div><button class="btn-g" id="tlock" style="width:100%">선생님 모드 잠그기</button>`;
   drawHud(); bindSec(app); document.getElementById("mine").innerHTML=localRecordHTML(); document.getElementById("tlock").onclick=()=>{TPIN="";render();}; return;
  }
- app.innerHTML=`${hudBlock()}<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 4px 6px"><h2 style="font-size:1.9rem">📋 학급 학습 현황</h2><span class="pill ${AI_ON?'g':'w'}">${AI_ON?'AI 코치 켜짐':'AI 키 없음 (시트 설정 탭)'}</span>
+ app.innerHTML=`${hudBlock()}<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 4px 6px"><h2 style="font-size:1.9rem">📋 센터장 콘솔 — 학급 학습 현황</h2><span class="pill ${AI_ON?'g':'w'}">${AI_ON?'AI 코치 켜짐':'AI 키 없음 (시트 설정 탭)'}</span>
   <select id="tcls" style="width:auto;min-width:120px;padding:8px 12px"><option value="">전체 반</option>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option ${TCLS==String(n)?'selected':''}>${n}</option>`).join("")}</select>
   <button class="btn-s" id="treload" style="min-height:44px">새로고침</button><button class="btn-g" id="tlock" style="min-height:44px;margin-left:auto">잠그기</button></div>
   ${setup}<div class="card" style="padding:0;overflow:hidden"><div style="overflow:auto;max-height:52vh"><table class="r" id="rtable"><tr><th>반</th><th>번호</th><th>이름</th><th class="c">점수</th><th>등급</th><th>진도 (01·02·03·04·보너스)</th><th class="c">논술 통과</th><th class="c">시험 제출</th><th>최근</th></tr><tr><td colspan="9" class="small">불러오는 중…</td></tr></table></div></div>
