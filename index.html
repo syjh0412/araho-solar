@@ -280,7 +280,7 @@ input[type=range]{width:100%;accent-color:var(--sun);height:40px}
 .news{border-left:6px solid var(--violet);background:#151040;border-radius:12px;padding:12px 16px;margin:10px 0;font-size:1.08rem}
 .news .src{color:var(--mut);font-size:.9rem}
 
-/* 선생님 */
+/* 센터장 */
 .sec{border:1.5px solid var(--line);border-radius:16px;margin:12px 0;overflow:hidden}
 .sec>button{width:100%;text-align:left;background:var(--panel2);border:0;border-radius:0;font-size:1.08rem;font-weight:700}
 .sec>div{padding:14px 18px;background:#080c24}
@@ -327,7 +327,7 @@ body.deckmode .toast{bottom:110px}
       비워 두면 기록이 이 기기에만 저장됩니다.
    ═══════════════════════════════════════════════════════════ */
 const API = '';
-const LOCAL_TEACHER_CODE = '0726';   // 서버가 없을 때만 쓰는 임시 교사 코드
+const LOCAL_TEACHER_CODE = '0726';   // 서버가 없을 때만 쓰는 임시 센터장 코드
 
 /* ───────── 서버 통신 (힘탐정과 같은 방식: 읽기 JSONP, 쓰기 POST) ───────── */
 let seq=0;
@@ -659,8 +659,8 @@ function renderGate(){
   <div class="row2"><div><label>반</label><input type="text" id="gCls" inputmode="numeric" placeholder="예) 3"></div><div><label>번호</label><input type="text" id="gNum" inputmode="numeric" placeholder="예) 12"></div></div>
   <label>이름</label><input type="text" id="gName" placeholder="이름">
   <button class="btn-p" id="gGo" style="width:100%;margin-top:16px">관제센터 입장</button>
-  <div id="gMsg" class="small" style="margin-top:10px">${API?"기록은 선생님의 구글 시트에 자동 저장됩니다.":"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
-  <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장(선생님)으로 입장</button></div>`;
+  <div id="gMsg" class="small" style="margin-top:10px">${API?"기록은 센터장의 구글 시트에 자동 저장됩니다.":"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
+  <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장으로 입장</button></div>`;
  const go=async()=>{const cls=gate.querySelector("#gCls").value.trim(),num=gate.querySelector("#gNum").value.trim(),name=gate.querySelector("#gName").value.trim();
    if(!cls||!num||!name)return gate.querySelector("#gMsg").textContent="반·번호·이름을 모두 입력하세요.";
    const b=gate.querySelector("#gGo");b.disabled=true;b.textContent="확인 중…";
@@ -696,7 +696,7 @@ function renderHome(){
    <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.no} ${p.d}/${p.total}</span>`;}).join("")}
    <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
    <span class="badge ${[1,2,3].every(n=>S.exam[n])?'on':''}">✍️ 시험 ${[1,2,3].filter(n=>S.exam[n]).length}/3</span></div>
-   <p class="small" style="margin-top:10px">${API?"모든 기록은 자동으로 센터장(선생님)께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
+   <p class="small" style="margin-top:10px">${API?"모든 기록은 자동으로 센터장께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
  </div>`;
  drawHud();
  document.querySelectorAll(".suitbtn").forEach(b=>b.onclick=()=>{S.suit=b.dataset.s;save();render();});
@@ -856,12 +856,12 @@ function renderExam(){
      document.getElementById("eout").innerHTML='<div class="fb ok"><b>📨 제출 완료!</b> '+(API?'센터장 시트에 저장되었습니다.':'이 기기에 저장되었습니다.')+'</div>';};}
 }
 
-/* ═══════ 선생님 ═══════ */
+/* ═══════ 센터장 ═══════ */
 let TPIN="", TROWS=null, TLOGS=null, TSEL=null;
 function renderTeacher(){
  if(!TPIN){
-  app.innerHTML=`${hudBlock()}<div class="card" style="max-width:520px;margin:40px auto"><h3>📋 센터장(선생님) 전용</h3><p class="small">교사 코드를 입력하세요. ${API?"(시트 '설정' 탭의 PIN)":"(서버 미연결: 임시 코드)"}</p>
-  <input type="password" id="tc" inputmode="numeric" placeholder="교사 코드"><button class="btn-p" id="tgo" style="width:100%;margin-top:10px">입장</button><div id="terr"></div>
+  app.innerHTML=`${hudBlock()}<div class="card" style="max-width:520px;margin:40px auto"><h3>📋 센터장 전용</h3><p class="small">센터장 코드를 입력하세요. ${API?"(시트 '설정' 탭의 PIN)":"(서버 미연결: 임시 코드)"}</p>
+  <input type="password" id="tc" inputmode="numeric" placeholder="센터장 코드"><button class="btn-p" id="tgo" style="width:100%;margin-top:10px">입장</button><div id="terr"></div>
   <button class="btn-g" id="tback" style="width:100%;margin-top:14px;min-height:44px">← 승무원 입장으로 돌아가기</button></div>`;
   drawHud();
   document.getElementById("tgo").onclick=async()=>{const v=document.getElementById("tc").value.trim();
@@ -872,12 +872,12 @@ function renderTeacher(){
   return;
  }
  const setup=`<div class="sec"><button data-sec>▶ ⚙️ 처음 설정 안내 (구글 시트 + Apps Script, 5분)</button><div hidden>
-  <ol class="steps"><li>새 <b>구글 시트</b> 만들기 → 메뉴 <b>확장 프로그램 → Apps Script</b></li><li>열린 편집기의 내용을 모두 지우고, 저장소의 <b>Code.gs</b> 내용을 붙여넣기 → 저장(💾)</li><li><b>배포 → 새 배포 → 유형 선택(⚙️) → 웹 앱</b> · 실행 사용자: <b>나</b> · 액세스: <b>모든 사용자</b> → 배포 → 권한 허용</li><li>나온 <b>웹 앱 URL</b>(…/exec)을 복사해 <b>index.html 맨 위 API = ''</b> 안에 붙여넣기 (깃허브에서 연필 아이콘으로 바로 편집 가능)</li><li>시트에 자동으로 생긴 <b>설정</b> 탭: <b>GEMINI_KEY</b>에 AI Studio 키, <b>PIN</b>에 교사 코드 입력 — 끝!</li></ol>
+  <ol class="steps"><li>새 <b>구글 시트</b> 만들기 → 메뉴 <b>확장 프로그램 → Apps Script</b></li><li>열린 편집기의 내용을 모두 지우고, 저장소의 <b>Code.gs</b> 내용을 붙여넣기 → 저장(💾)</li><li><b>배포 → 새 배포 → 유형 선택(⚙️) → 웹 앱</b> · 실행 사용자: <b>나</b> · 액세스: <b>모든 사용자</b> → 배포 → 권한 허용</li><li>나온 <b>웹 앱 URL</b>(…/exec)을 복사해 <b>index.html 맨 위 API = ''</b> 안에 붙여넣기 (깃허브에서 연필 아이콘으로 바로 편집 가능)</li><li>시트에 자동으로 생긴 <b>설정</b> 탭: <b>GEMINI_KEY</b>에 AI Studio 키, <b>PIN</b>에 센터장 코드 입력 — 끝!</li></ol>
   <p class="small">이후 학생이 로그인·학습·제출하면 <b>학생</b> 탭(현재 상태)과 <b>기록</b> 탭(모든 글·AI 피드백)에 자동으로 쌓이고, 아래 대시보드에서 바로 보입니다.</p>
   <p><a href="Code.gs" target="_blank" rel="noopener">Code.gs 열기 ↗</a> · <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Gemini API 키 발급 ↗</a> · <a href="https://script.google.com" target="_blank" rel="noopener">Apps Script ↗</a></p></div></div>`;
  if(!API){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 6px;font-size:1.9rem">📋 센터장 콘솔</h2><div class="card"><div class="fb no"><b>서버가 아직 연결되지 않았어요.</b> 아래 안내대로 5분이면 학급 전체 기록이 실시간으로 모입니다.</div>${setup}</div>
-  <div class="card"><h3>이 기기의 학생 기록</h3><div id="mine"></div></div><button class="btn-g" id="tlock" style="width:100%">선생님 모드 잠그기</button>`;
+  <div class="card"><h3>이 기기의 학생 기록</h3><div id="mine"></div></div><button class="btn-g" id="tlock" style="width:100%">센터장 콘솔 잠그기</button>`;
   drawHud(); bindSec(app); document.getElementById("mine").innerHTML=localRecordHTML(); document.getElementById("tlock").onclick=()=>{TPIN="";render();}; return;
  }
  app.innerHTML=`${hudBlock()}<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 4px 6px"><h2 style="font-size:1.9rem">📋 센터장 콘솔 — 학급 학습 현황</h2><span class="pill ${AI_ON?'g':'w'}">${AI_ON?'AI 코치 켜짐':'AI 키 없음 (시트 설정 탭)'}</span>

@@ -10,9 +10,9 @@
  *     → 배포 → 권한 허용 → "웹 앱 URL" 복사 (…/exec 로 끝남)
  *  4) index.html 맨 위 API = '여기에 붙여넣기'
  *  5) 시트에 자동으로 생기는 '설정' 탭에서
- *       GEMINI_KEY 칸에 Google AI Studio 키,  PIN 칸에 교사 코드 입력
+ *       GEMINI_KEY 칸에 Google AI Studio 키,  PIN 칸에 센터장 코드 입력
  * 이후 학생 기록은 '학생' / '기록' 탭에 자동으로 쌓이고,
- * 앱의 선생님 탭에서 실시간으로 볼 수 있습니다.
+ * 앱의 센터장 탭에서 실시간으로 볼 수 있습니다.
  */
 
 var SHEET_STUDENTS = '학생';
@@ -32,7 +32,7 @@ function conf(key){
   var v = s.getDataRange().getValues();
   if(v.length < 2){
     s.appendRow(['GEMINI_KEY','', 'Google AI Studio(aistudio.google.com)에서 발급한 키를 B열에 붙여넣기']);
-    s.appendRow(['PIN','0726','선생님 탭 입장 코드']);
+    s.appendRow(['PIN','0726','센터장 탭 입장 코드']);
     s.appendRow(['MODEL','gemini-2.5-flash','피드백에 쓸 모델 (안 되면 gemini-2.0-flash)']);
     v = s.getDataRange().getValues();
   }
@@ -190,8 +190,8 @@ function feedback(p){
   return {ok:false, error:'AI 응답 실패 '+lastErr};
 }
 
-/* ───────── 선생님 ───────── */
-function checkPin(p){ var pin = conf('PIN'); if(!pin || String(p.pin)!==pin) throw new Error('교사 코드가 달라요'); }
+/* ───────── 센터장 ───────── */
+function checkPin(p){ var pin = conf('PIN'); if(!pin || String(p.pin)!==pin) throw new Error('센터장 코드가 달라요'); }
 
 function tlogin(p){ checkPin(p); return {ok:true, ai: !!conf('GEMINI_KEY')}; }
 
