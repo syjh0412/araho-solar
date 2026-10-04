@@ -671,7 +671,7 @@ const DOC_T1=`<div class="doc"><h4>【자료 1-가】 천체 가·나 관측 결
 const DOC_T2=`<div class="doc"><h4>【자료 1-나】 천체 다·라·마 관측 결과</h4><div class="twrap"><table class="t"><tr><th>천체</th><th>관측 결과</th></tr><tr><td>다</td><td style="text-align:left">어느 행성 주위를 공전한다.</td></tr><tr><td>라</td><td style="text-align:left">태양 주위를 공전하며 화성과 목성 사이에서 주로 관측된다. 작고 불규칙한 암석 천체이다.</td></tr><tr><td>마</td><td style="text-align:left">얼음과 먼지로 이루어져 있고 긴 궤도로 태양 주위를 공전한다. 태양에 가까워지면 꼬리가 나타난다.</td></tr></table></div></div>`;
 const DOC_T3=`<div class="doc"><h4>【자료 2】 우주기상센터의 관측 기록</h4><div class="twrap"><table class="t"><tr><th>항목</th><th>A 시기</th><th>B 시기</th></tr><tr><td>태양의 흑점 수</td><td>많음</td><td>적음</td></tr><tr><td>홍염과 플레어</td><td>자주 발생</td><td>드물게 발생</td></tr><tr><td>태양풍</td><td>강함</td><td>비교적 약함</td></tr><tr><td>오로라</td><td>평소보다 낮은 위도에서도 관측</td><td>극지방에서 드물게 관측</td></tr><tr><td>GPS 수신 오류 신고</td><td>크게 증가</td><td>거의 없음</td></tr></table></div><p>우주기상센터는 기록을 검토한 뒤, 태양 활동을 지속적으로 관측하면서 <b>인공위성·송전 설비 등 중요 설비 보호 조치</b>를 하고 <b>우주기상 예보를 강화</b>하기로 하였다.</p></div>`;
 const EXAM=[
- {no:1,pts:2,title:"행성의 특징 비교하기",docs:DOC_T1,imgs:["earth","jupiter"],
+ {no:1,pts:2,title:"행성의 특징 비교하기",docs:DOC_T1,imgs:["earth","jupiter"],scale:[34,300],labels:["천체 가 (상대 지름 0.9)","천체 나 (상대 지름 11.2)"],
   q:`【자료 1-가】를 근거로 천체 <b>가</b>와 <b>나</b>를 각각 지구형 행성과 목성형 행성으로 분류하고, 두 천체의 특징을 <b>두 가지 이상 비교</b>하여 분류한 까닭을 서술하시오.`,
   spec:{min:60,groups:[{name:"지구형 분류",words:["지구형"]},{name:"목성형 분류",words:["목성형"]},{name:"비교 근거 ① 지름 또는 밀도",words:["지름","밀도","크기"]},{name:"비교 근거 ② 위성 또는 고리",words:["위성","고리"]}],compare:true},
   ai:"[문항 1 · 2점] 자료: 가(상대 지름 0.9, 밀도 5.2, 위성 없음, 고리 없음) / 나(상대 지름 11.2, 밀도 1.3, 위성 많음, 고리 있음). 채점 기준: 상(2점)=가를 지구형, 나를 목성형으로 정확히 분류하고, 자료에 제시된 특징 두 가지 이상을 비교하여 분류 근거를 구체적으로 설명 / 중(1점)=두 천체의 유형은 정확히 분류했으나 비교한 특징이 한 가지이거나 자료와 분류 근거의 연결이 부족 / 하(0점)=유형을 정확히 분류하지 못하거나 근거 없음. 근거는 반드시 표의 숫자·내용에서 나와야 함."},
@@ -944,7 +944,8 @@ function renderExam(){
     <button class="btn-p" id="exStart" style="width:100%;margin-top:14px">문항 1부터 시작 ▶</button></div></div>`;
  }else{
    const e=EXAM[examPage-1], sv=S.exam[e.no]||{};
-   body=`<div class="exam-wrap"><div>${e.docs}<div class="figs c${e.imgs.length}" style="margin-top:12px">${e.imgs.map(i=>IMG(i,'','sq')).join("")}</div></div>
+   const imgBlock=e.scale?`<div style="display:flex;align-items:center;justify-content:center;gap:22px;margin-top:12px;background:#000;border:1.5px solid var(--line);border-radius:20px;padding:18px">${e.imgs.map((i,j)=>`<div style="text-align:center;flex:0 0 auto"><img src="img/${i}.jpg" alt="" style="width:${e.scale[j]}px;max-width:40vw;border-radius:50%;display:block;margin:0 auto"><div class="small" style="margin-top:6px">${e.labels?e.labels[j]:""}</div></div>`).join("")}</div>`:`<div class="figs c${e.imgs.length}" style="margin-top:12px">${e.imgs.map(i=>IMG(i,'','sq')).join("")}</div>`;
+   body=`<div class="exam-wrap"><div>${e.docs}${imgBlock}</div>
    <div class="card" style="margin:0"><span class="tag">문항 ${e.no} · ${e.pts}점</span><h3 style="margin:8px 0;font-size:1.4rem">${e.no}. ${e.title}</h3><p class="s-body" style="font-size:clamp(1.05rem,1.3vw,1.25rem)">${e.q}</p>
     <textarea id="et" style="min-height:${e.no===3?260:180}px" placeholder="자료의 숫자·내용을 근거로, '왜냐하면/따라서'로 이어지는 완전한 문장으로.">${esc(sv.t||"")}</textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn-p" id="echk" style="flex:1">자동 점검</button><button class="btn-s aibtn" id="eai" style="flex:1" hidden>🤖 AI 코치 피드백</button><button class="btn-s" id="esub" style="flex:1">제출 ${sv.t?"(재제출)":""}</button></div>
