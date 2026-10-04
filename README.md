@@ -20,5 +20,6 @@
 ## 폴더
 
 - `index.html` — 앱 전체
-- `Code.gs` — Apps Script 백엔드 (시트 저장 + Gemini 피드백 중계)
+- `Code.gs` — Apps Script 백엔드 (시트 저장 + 교신 게시판 + Gemini 피드백 중계)
+- `GEM_PROMPT.md` — Gemini Gem을 따로 만들고 싶을 때 쓰는 논술 코치 프롬프트 (앱 내 코치와 동일 규칙)
 - `img/` — 교과서에서 추출한 수업용 사진 (NASA 등 공개 자료 위주)

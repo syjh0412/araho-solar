@@ -316,6 +316,7 @@ body.deckmode .toast{bottom:110px}
   <button data-v="learn"><span class="ic">📚</span>미션 학습</button>
   <button data-v="wanted"><span class="ic">🔭</span>수배 파일</button>
   <button data-v="exam"><span class="ic">✍️</span>논술 시험</button>
+  <button data-v="comms"><span class="ic">📡</span>교신</button>
   <button data-v="teacher"><span class="ic">📋</span>센터장</button>
 </nav>
 
@@ -542,7 +543,7 @@ const CH=[
  {t:"learn",h:"왜소 행성 — 행성이 되지 못한 이유",img:"pluto",cap:"<b>명왕성</b> — 2006년 행성에서 왜소 행성으로 (뉴허라이즌스 촬영)",b:`<p>명왕성, 세레스 같은 <b>왜소 행성</b>은 태양 주위를 공전하고 모양도 둥글어요. 그런데 왜 행성이 아닐까요?</p><div class="key"><span class="kt">차이점</span>자기 <b>궤도 주변의 천체들을 흡수하지 못해</b> 궤도가 깨끗하지 않기 때문. 그래도 태양을 도니까 <b>태양계 구성원</b>이에요.</div>`},
  {t:"quiz",q:"혜성의 꼬리가 생기는 때와 방향으로 옳은 것은?",o:["태양에서 멀어질 때, 태양 쪽","태양에 가까워질 때, 태양 반대쪽","언제나 꼬리가 있고 방향은 제멋대로"],a:1,ex:"태양에 가까워지면 얼음이 승화해 꼬리가 생기고, 태양풍에 밀려 꼬리는 태양 반대쪽을 향해요."},
  {t:"quiz",q:"다음 중 태양계 구성원이 <b>아닌</b> 것은?",o:["달(위성)","소행성","태양계 밖의 다른 별"],a:2,ex:"위성·소행성·혜성·왜소 행성도 모두 태양계 구성원! 태양계 밖의 별은 구성원이 아니에요."},
- {t:"write",key:"w_c1",h:"관제 일지 · 한 줄 논술",img:"comet",prompt:`우주 신문에 <b>"행성이 아닌 혜성은 태양계 구성원이 아니다"</b>라는 기사가 실렸어요. 이 기사가 잘못된 까닭을 한두 문장으로 반박해 보세요.`,frame:"혜성은 행성은 아니지만 <b>______을/를 공전</b>하기 때문에 <b>______</b>이다.",spec:{min:25,groups:[{name:"'공전'이라는 말",words:["공전","주위를 돌","주위를 도는","태양 주위"]},{name:"'태양계 구성원'이라는 판단",words:["구성원","태양계에 포함","태양계이다","태양계에 속"]}]},ai:"혜성이 행성이 아니어도 태양 주위를 공전하므로 태양계 구성원이라는 점을 근거-주장 구조로 썼는지 평가"},
+ {t:"write",key:"w_c1",h:"관제 일지 · 한 줄 논술",img:"comet",prompt:`우주 신문에 <b>"행성이 아닌 혜성은 태양계 구성원이 아니다"</b>라는 기사가 실렸어요. 이 기사가 잘못된 까닭을 한두 문장으로 반박해 보세요.`,frame:"혜성은 행성은 아니지만 <b>______을/를 공전</b>하기 때문에 <b>______</b>이다.",spec:{min:25,groups:[{name:"'공전'이라는 말",words:["공전","주위를 돌","주위를 도는","태양 주위"]},{name:"'태양계 구성원'이라는 판단",words:["구성원","태양계에 포함","태양계이다","태양계에 속"]}]},ai:"평가 요소: ① 혜성이 태양 주위를 공전한다는 사실을 근거로 들었는가 ② 그러므로 (행성이 아니어도) 태양계 구성원이라고 판단했는가 ③ 신문 기사가 틀렸다고 분명히 말했는가. 수준: 상=①②③ 모두, 근거→결론 연결어 사용 / 중=판단은 맞으나 공전 근거가 없거나 흐릿함 / 하=판단이 틀리거나 근거 없음. 중1 범위: 태양계=태양+태양 주위를 공전하는 천체."},
  {t:"clear",vids:[0],pts:["태양계 = 태양 + 공전하는 모든 천체","태양은 유일한 별(스스로 빛)","행성 8개: 수금지화목토천해","위성·소행성·혜성·왜소행성도 구성원 (공전!)","혜성 꼬리: 태양 가까이, 태양 반대쪽"]}
 ]},
 {id:"c2",cover:"jupiter",title:"쌍둥이가 아니야",no:"MISSION 02",sub:"행성의 특징과 분류 · 9분",slides:[
@@ -557,7 +558,7 @@ const CH=[
  {t:"learn",h:"서술 공식",img:"planets4",cap:"수성 · 금성 · 지구 · 화성 — 실제 비율",b:`<div class="key"><span class="kt">서술 공식</span>"A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>."</div><p>⚠️ 근거는 반드시 <b>두 가지 이상</b> — 한 가지만 쓰면 감점!</p><div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>크기·질량</td><td>작다</td><td>크다</td></tr><tr><td>평균 밀도</td><td>크다</td><td>작다</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div>`},
  {t:"quiz",q:"평균 밀도가 크고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"밀도가 크다 = 암석 행성 = 지구형! 지구형은 위성이 없거나 적어요."},
  {t:"quiz",q:"자전축이 거의 누워 있어 굴러가듯 공전하는 청록색 행성은?",o:["해왕성","천왕성","토성"],a:1,ex:"천왕성! 메테인 때문에 청록색이고 자전축이 공전 궤도면과 거의 나란해요."},
- {t:"write",key:"w_c2",h:"관제 일지 · 한 줄 논술",img:"uranus",prompt:`아라호가 관측한 <b>천체 P</b> — 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음.<br>P를 지구형/목성형으로 <b>분류</b>하고, 자료에서 <b>근거 두 가지 이상</b>을 들어 까닭을 쓰세요.`,frame:"P는 <b>___형 행성</b>이다. 왜냐하면 지구형 행성보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:40,groups:[{name:"'목성형'이라는 분류",words:["목성형"]},{name:"밀도 근거",words:["밀도"]},{name:"위성 또는 고리 근거",words:["위성","고리"]}],compare:true},ai:"천체 P(밀도 작음, 위성 많음, 고리 있음)를 목성형으로 분류하고 자료의 특징 2가지 이상을 비교해 근거로 들었는지 평가"},
+ {t:"write",key:"w_c2",h:"관제 일지 · 한 줄 논술",img:"uranus",prompt:`아라호가 관측한 <b>천체 P</b> — 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음.<br>P를 지구형/목성형으로 <b>분류</b>하고, 자료에서 <b>근거 두 가지 이상</b>을 들어 까닭을 쓰세요.`,frame:"P는 <b>___형 행성</b>이다. 왜냐하면 지구형 행성보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:40,groups:[{name:"'목성형'이라는 분류",words:["목성형"]},{name:"밀도 근거",words:["밀도"]},{name:"위성 또는 고리 근거",words:["위성","고리"]}],compare:true},ai:"자료: 천체 P 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음. 평가 요소: ① P를 목성형 행성으로 분류 ② 자료의 특징 두 가지 이상(지름 큼, 밀도 작음, 위성 많음, 고리 있음)을 지구형과 비교(…보다)하여 근거로 제시 ③ 분류와 근거를 ‘때문이다’로 연결. 수준: 상=①②③ / 중=분류는 맞으나 근거 1개이거나 비교 표현 없음 / 하=분류 틀림. 오개념 주의: ‘크니까 밀도도 크다’."},
  {t:"clear",vids:[1],pts:["지구형(수금지화): 작다·밀도 크다·위성 적다·고리 없다","목성형(목토천해): 크다·밀도 작다·위성 많다·고리 있다","클수록 밀도는 작다 (솜사탕!)","행성마다 얼굴이 있다: 대적점·고리·극관·누운 자전축…","서술은 '…보다 ~하기 때문이다' + 근거 2가지"]}
 ]},
 {id:"c3",cover:"prominence",title:"태양의 얼굴",no:"MISSION 03",sub:"태양의 표면·대기와 태양 활동 · 8분",slides:[
@@ -570,7 +571,7 @@ const CH=[
  {t:"learn",h:"'활발하다'의 신호 세트",img:"sun_uv",cap:"자외선으로 본 활발한 태양 — 밝게 빛나는 곳이 <b>활동 영역</b>",b:`<div class="key"><span class="kt">태양 활동이 활발할 때 (세트로 외우기!)</span>① <b>흑점 수 증가</b> ② <b>홍염·플레어 잦아짐</b> ③ <b>코로나 커짐</b> ④ <b>태양풍 강해짐</b></div><p>논술형은 "어느 시기가 활발한가? <em>근거는?</em>"을 꼭 물어요. 근거는 <b>흑점 수</b>와 <b>홍염·플레어</b> 자료에서 찾으세요!</p>`},
  {t:"quiz",q:"흑점이 어둡게 보이는 까닭은?",o:["빛을 전혀 내지 않아서","주위(광구)보다 온도가 낮아서","구멍이 뚫려 있어서"],a:1,ex:"흑점도 빛을 내지만, 약 4000℃로 주위(6000℃)보다 온도가 낮아 상대적으로 어둡게 보여요."},
  {t:"quiz",q:"개기 일식 때만 볼 수 있는, 100만 ℃가 넘는 태양의 바깥 대기는?",o:["광구","채층","코로나"],a:2,ex:"코로나! 평소엔 광구가 너무 밝아 보이지 않아요."},
- {t:"write",key:"w_c3",h:"관제 일지 · 한 줄 논술",img:"flare2",prompt:`관측 기록 — <b>(가) 시기</b>: 흑점 수 적음, 플레어 드묾 / <b>(나) 시기</b>: 흑점 수 많음, 플레어 자주 발생.<br>태양 활동이 더 활발한 시기를 <b>판단</b>하고, 자료에서 <b>근거 두 가지</b>를 들어 쓰세요.`,frame:"태양 활동은 <b>___ 시기</b>에 더 활발하다. 왜냐하면 (가) 시기보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:35,groups:[{name:"'(나) 시기' 판단",words:["나"]},{name:"흑점 근거",words:["흑점"]},{name:"플레어(홍염) 근거",words:["플레어","홍염"]}]},ai:"흑점 수와 플레어 발생 자료를 근거로 (나) 시기에 태양 활동이 활발하다고 판단했는지, 근거 2가지를 들었는지 평가"},
+ {t:"write",key:"w_c3",h:"관제 일지 · 한 줄 논술",img:"flare2",prompt:`관측 기록 — <b>(가) 시기</b>: 흑점 수 적음, 플레어 드묾 / <b>(나) 시기</b>: 흑점 수 많음, 플레어 자주 발생.<br>태양 활동이 더 활발한 시기를 <b>판단</b>하고, 자료에서 <b>근거 두 가지</b>를 들어 쓰세요.`,frame:"태양 활동은 <b>___ 시기</b>에 더 활발하다. 왜냐하면 (가) 시기보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:35,groups:[{name:"'(나) 시기' 판단",words:["나"]},{name:"흑점 근거",words:["흑점"]},{name:"플레어(홍염) 근거",words:["플레어","홍염"]}]},ai:"자료: (가) 흑점 적음·플레어 드묾 / (나) 흑점 많음·플레어 자주. 평가 요소: ① (나) 시기가 더 활발하다고 판단 ② 근거로 흑점 수 증가 ③ 근거로 홍염·플레어 잦음 ④ (가)와 비교하는 표현. 수준: 상=①②③④ / 중=판단 맞고 근거 하나 / 하=판단만 또는 틀림. 중1 범위: 흑점 수↑, 홍염·플레어↑ = 태양 활동 활발."},
  {t:"clear",pts:["표면: 광구(6000℃)·흑점(온도 낮아 어둡게)·쌀알 무늬(대류)","흑점 이동 = 태양의 자전 · 흑점 수 주기 약 11년","대기: 채층·코로나(100만℃↑) — 개기 일식 때","홍염(불기둥)·플레어(폭발)","활발 신호: 흑점↑·홍염/플레어↑·코로나↑·태양풍↑"]}
 ]},
 {id:"c4",cover:"aurora",title:"태양이 보낸 신호",no:"MISSION 04",sub:"태양 활동이 지구에 미치는 영향 · 8분",slides:[
@@ -582,7 +583,7 @@ const CH=[
  {t:"learn",h:"우주 기상 예보",img:"earth_effects2",cap:"<b>우주 기상</b> — 태양 활동을 예보해 위성·통신·전력을 지킨다",b:`<p>날씨 예보처럼 <b>우주 기상 예보</b>도 있어요. 우리나라 <b>우주전파센터</b>는 태양을 24시간 관측해 경보를 내려요.</p><div class="key"><span class="kt">그래서 관제센터는</span>태양 활동이 활발할 땐 중요한 자료 전송을 미루고, 위성을 안전 모드로 돌리고, 전력망을 점검해요. 논술 3번의 '결정이 타당한 까닭'이 바로 이것!</div>`},
  {t:"quiz",q:"태양 활동이 활발할 때 지구에서 나타날 수 있는 현상이 <b>아닌</b> 것은?",o:["오로라가 더 자주 나타난다","GPS 수신에 오류가 생긴다","태양풍이 완전히 사라진다"],a:2,ex:"활발할수록 태양풍은 오히려 강해져요!"},
  {t:"quiz",q:"오로라에 대한 설명으로 옳은 것은?",o:["태양풍 입자가 공기와 부딪혀 빛을 낸다","지구 내부의 용암이 비친 것이다","달빛이 구름에 반사된 것이다"],a:0,ex:"태양풍의 전기를 띤 입자가 극지방 대기와 충돌하며 빛을 내는 현상이에요."},
- {t:"write",key:"w_c4",h:"관제 일지 · 한 줄 논술",img:"earth_effects",prompt:`"태양 활동이 활발해지면 지구의 통신이 왜 위험해질까?"<br><b>태양풍</b>이라는 말을 꼭 넣어, 원인→결과가 이어지는 한 문단으로 쓰세요.`,frame:"태양 활동이 활발해지면 <b>___이/가 강해지고</b>, 이것이 지구의 ___을/를 교란하여 <b>___ 현상</b>이 나타날 수 있다.",spec:{min:45,groups:[{name:"태양풍 언급",words:["태양풍"]},{name:"지구에서 나타나는 현상(통신 장애·GPS·오로라·정전·위성 등)",words:["통신","GPS","지피에스","오로라","정전","위성","델린저"]}]},ai:"태양 활동↑→태양풍 강해짐→자기장 교란→통신 장애 등 지구 영향으로 이어지는 인과 사슬을 빠짐없이 썼는지 평가"},
+ {t:"write",key:"w_c4",h:"관제 일지 · 한 줄 논술",img:"earth_effects",prompt:`"태양 활동이 활발해지면 지구의 통신이 왜 위험해질까?"<br><b>태양풍</b>이라는 말을 꼭 넣어, 원인→결과가 이어지는 한 문단으로 쓰세요.`,frame:"태양 활동이 활발해지면 <b>___이/가 강해지고</b>, 이것이 지구의 ___을/를 교란하여 <b>___ 현상</b>이 나타날 수 있다.",spec:{min:45,groups:[{name:"태양풍 언급",words:["태양풍"]},{name:"지구에서 나타나는 현상(통신 장애·GPS·오로라·정전·위성 등)",words:["통신","GPS","지피에스","오로라","정전","위성","델린저"]}]},ai:"평가 요소(인과 사슬): ① 태양 활동이 활발해지면 ② 태양풍이 강해지고 ③ 지구 자기장이 교란되어 ④ 통신 장애·GPS 오류·정전·오로라 등이 나타난다. 수준: 상=②③④가 순서대로 이어짐(③은 ‘지구에 영향을 준다’ 정도로 표현해도 인정) / 중=태양풍은 썼으나 결과와 연결이 느슨함 / 하=태양풍 없이 결과만 나열. 중1 범위를 넘는 용어(전리층, 자기권 등)는 쓰지 말고 요구하지도 말 것."},
  {t:"clear",vids:[2],pts:["태양풍 = 전기를 띤 입자의 흐름","활발 → 태양풍 강해짐 → 자기장 교란","오로라: 더 자주, 낮은 위도까지","통신 장애·GPS 오류·정전·위성 고장 → 우주 기상 예보로 대비","글의 뼈대 = 인과 사슬 ①→⑤"]}
 ]},
 {id:"c5",cover:"telescope_girl",title:"승무원의 눈",no:"BONUS",sub:"천체 망원경과 천체 관측 · 6분 (평가 범위 밖)",slides:[
@@ -597,7 +598,6 @@ const CH=[
  {t:"clear",pts:["구조: 삼각대·가대·균형추·경통·파인더·접안렌즈","순서: 삼각대→가대·균형추→경통→균형→파인더→접안렌즈","달·행성은 둥근 원반으로, 토성 고리까지","태양은 투영법·필터로만 (직접 보기 금지)","우주 망원경·탐사선 = 더 멀리, 더 가까이"]}
 ]}];
 
-const G2=PL.map(p=>[p.n,p.t,Math.round(70+p.r*16),p.img]);
 
 /* ═══════ 수배 파일 ═══════ */
 const WANTED=[
@@ -621,15 +621,15 @@ const EXAM=[
  {no:1,pts:2,title:"행성의 특징 비교하기",docs:DOC_T1,imgs:["earth","jupiter"],
   q:`【자료 1-가】를 근거로 천체 <b>가</b>와 <b>나</b>를 각각 지구형 행성과 목성형 행성으로 분류하고, 두 천체의 특징을 <b>두 가지 이상 비교</b>하여 분류한 까닭을 서술하시오.`,
   spec:{min:60,groups:[{name:"지구형 분류",words:["지구형"]},{name:"목성형 분류",words:["목성형"]},{name:"비교 근거 ① 지름 또는 밀도",words:["지름","밀도","크기"]},{name:"비교 근거 ② 위성 또는 고리",words:["위성","고리"]}],compare:true},
-  ai:"천체 가(지름 작음·밀도 큼·위성 없음·고리 없음)=지구형, 나(지름 큼·밀도 작음·위성 많음·고리 있음)=목성형으로 분류하고, 특징 2가지 이상을 비교하여 근거로 들었는지 — 중1 논술형 2점 문항 기준으로 평가"},
+  ai:"[문항 1 · 2점] 자료: 가(상대 지름 0.9, 밀도 5.2, 위성 없음, 고리 없음) / 나(상대 지름 11.2, 밀도 1.3, 위성 많음, 고리 있음). 채점 기준: 상(2점)=가를 지구형, 나를 목성형으로 정확히 분류하고, 자료에 제시된 특징 두 가지 이상을 비교하여 분류 근거를 구체적으로 설명 / 중(1점)=두 천체의 유형은 정확히 분류했으나 비교한 특징이 한 가지이거나 자료와 분류 근거의 연결이 부족 / 하(0점)=유형을 정확히 분류하지 못하거나 근거 없음. 근거는 반드시 표의 숫자·내용에서 나와야 함."},
  {no:2,pts:2,title:"태양계 구성원 판단하기",docs:DOC_INTRO+DOC_T2,imgs:["moon","asteroid","comet"],
   q:`【제시문】과 【자료 1-나】를 근거로 천체 <b>다, 라, 마</b>가 각각 어떤 종류의 천체인지 밝히고, "행성이 아닌 다·라·마는 태양계 구성원이 아니다"라는 과학신문 설명이 <b>잘못된 까닭</b>을 <b>공전 관계</b>와 관련지어 서술하시오.`,
   spec:{min:60,groups:[{name:"다=위성",words:["위성"]},{name:"라=소행성",words:["소행성"]},{name:"마=혜성",words:["혜성"]},{name:"공전 관계로 설명",words:["공전","주위를 돌","주위를 도"]},{name:"신문 설명이 잘못됨을 지적",words:["잘못","오류","틀렸","구성원이다","구성원이므로"]}]},
-  ai:"다(행성 주위 공전)=위성, 라(화성·목성 사이 암석)=소행성, 마(얼음·긴 궤도·꼬리)=혜성으로 판단하고, 행성이 아니어도 태양(또는 행성) 주위를 공전하므로 태양계 구성원이라는 근거로 신문의 오류를 설명했는지 — 중1 논술형 2점 문항 기준으로 평가"},
+  ai:"[문항 2 · 2점] 자료: 다=어느 행성 주위를 공전 / 라=태양 주위 공전, 화성·목성 사이, 작고 불규칙한 암석 / 마=얼음·먼지, 긴 궤도로 태양 공전, 가까워지면 꼬리. 신문: ‘행성이 아닌 다·라·마는 태양계 구성원이 아니다’. 채점 기준: 상(2점)=다·라·마를 각각 위성·소행성·혜성으로 정확히 판단하고, 라와 마는 태양 주위를 공전하며 다는 (태양을 도는) 행성 주위를 공전하는 태양계 구성원임을 근거로 신문의 오류를 구체적으로 설명 / 중(1점)=종류는 대체로 판단했으나 일부 누락되었거나 공전 관계 설명이 부족 / 하(0점)=종류 판단 못 함 또는 오류 설명 없음."},
  {no:3,pts:6,title:"태양 활동과 지구의 변화 설명하기",docs:DOC_T3,imgs:["sun2014","aurora"],
   q:`【자료 2】에서 흑점 수와 홍염·플레어의 발생을 비교하여 <b>A와 B 중 태양 활동이 더 활발했던 시기</b>를 판단하고, 태양 활동에 따른 <b>태양풍의 변화</b>와 지구에서 나타난 현상(오로라, GPS 오류)을 관련지어, 우주기상센터가 <b>'중요 설비 보호 조치와 예보 강화'를 하기로 한 결정이 타당한 까닭</b>을 하나의 완결된 글로 서술하시오.`,
   spec:{min:140,groups:[{name:"A 시기가 활발하다는 판단",words:["A"]},{name:"근거 ① 흑점 수",words:["흑점"]},{name:"근거 ② 홍염·플레어",words:["플레어","홍염"]},{name:"태양풍 변화",words:["태양풍"]},{name:"지구에서 나타난 현상(오로라/GPS)",words:["오로라","GPS","지피에스"]},{name:"결정이 타당하다는 결론",words:["타당","필요하","적절"]}]},
-  ai:"① A 시기가 활발함을 흑점 수·플레어 두 근거로 판단 ② 활발→태양풍 강해짐→지구 자기장 교란→오로라가 낮은 위도까지·GPS 오류라는 인과 연결 ③ 따라서 설비 보호와 예보 강화 결정이 타당함 — 세 요소가 하나의 완결된 글로 이어졌는지, 중1 논술형 6점 문항 채점 기준(판단 3점+인과·타당성 3점)으로 평가"}];
+  ai:"[문항 3 · 6점] 자료: A 시기=흑점 많음, 홍염·플레어 자주, 태양풍 강함, 오로라 낮은 위도까지, GPS 오류 급증 / B 시기=그 반대. 센터 결정=중요 설비 보호 조치 + 우주기상 예보 강화. 채점 기준 (요소1, 3점) 활발한 시기 판단: 상(3)=A 시기가 더 활발하다고 판단하고 B와 비교해 흑점 수 증가와 홍염·플레어 잦음을 모두 근거로 설명 / 중(2)=판단 + 둘 중 한 가지 근거 / 하(1)=판단했으나 자료 근거 부족. (요소2, 3점) 인과와 결정의 타당성: 상(3)=태양 활동이 활발해지면 태양풍이 강해지고, 강해진 태양풍이 지구에 영향을 주어 오로라가 낮은 위도까지 나타나고 GPS 오류가 늘어났음을 인과적으로 설명하며, 이를 근거로 설비 보호와 예보 강화가 타당함을 논리적으로 설명 / 중(2)=대체로 설명했으나 태양풍 매개 과정 일부 누락 또는 결정과의 연결 부족 / 하(1)=관련 있다·타당하다고만 서술. 하나의 완결된 글(판단→근거→인과→결론)인지 본다."}];
 
 /* ═══════ 공통 ═══════ */
 const app=document.getElementById("app"), stage=document.getElementById("stage"), gate=document.getElementById("gate");
@@ -649,7 +649,7 @@ function render(){
  document.body.classList.toggle("deckmode",!!deck); stage.hidden=!deck;
  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
  if(deck){renderSlide();return;}
- ({home:renderHome,learn:renderLearn,wanted:renderWanted,exam:renderExam,teacher:renderTeacher})[view]();
+ ({home:renderHome,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,teacher:renderTeacher})[view]();
  showAI();
 }
 
@@ -691,7 +691,7 @@ function renderHome(){
      <button class="btn-g" id="logout" style="margin-top:12px;min-height:40px;font-size:.95rem">다른 승무원으로</button></div></div>
    <h3 style="margin-top:18px">장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
    <div class="badgerow">${ITEMS.map(it=>`<span class="badge ${have(it.k)?'on':''}" title="${esc(it.d)}" style="${have(it.k)?'':'opacity:.45'}">${it.e} ${it.n}${have(it.k)?'':` <span class="small">${it.at}</span>`}</span>`).join("")}</div></div>
-  <div class="card"><h3>오늘의 임무 순서</h3><ol class="steps"><li><b>미션 학습</b> — 장을 열면 전체 화면 슬라이드. 읽고, 퀴즈 풀고, 한 줄 논술까지</li><li><b>수배 파일</b> — 단서로 천체의 정체를 추리</li><li><b>논술 시험</b> — 실제 평가와 같은 3문항, 자동 점검 + AI 코치</li></ol>
+  <div class="card"><h3>오늘의 임무 순서</h3><ol class="steps"><li><b>미션 학습</b> — 장을 열면 전체 화면 슬라이드. 시작할 때 <b>출발 전 교신</b>(질문) 하나, 마칠 때 <b>귀환 후 교신</b> 하나</li><li><b>수배 파일</b> — 단서로 천체의 정체를 추리</li><li><b>논술 시험</b> — 실제 평가와 같은 3문항, 자동 점검 + AI 코치</li><li><b>교신 채널</b> — 다른 승무원의 질문에 응답하면 +2점</li></ol>
    <h3 style="margin-top:14px">훈장</h3>
    <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.no} ${p.d}/${p.total}</span>`;}).join("")}
    <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
@@ -725,20 +725,22 @@ function renderSlide(){
    const scene=sl.scene==="orbit"?sceneOrbit():sl.scene==="sun"?sceneSun():sl.scene==="sim"?sceneSim():(sl.art||"");
    const photo=sl.img?IMG(sl.img,"", "tall"):"";
    body=`<div class="s-hero"><div class="comms">${sl.log}</div><div class="s-kicker">${c.no}</div><div class="s-title">${sl.h}</div><p class="s-sub">${sl.sub}</p>
-   ${(scene&&photo)?`<div class="herogrid"><div>${scene}</div>${photo}</div>`:(scene||photo)}</div>`;}
+   ${(scene&&photo)?`<div class="herogrid"><div>${scene}</div>${photo}</div>`:(scene||photo)}
+   <div style="text-align:left;max-width:860px;margin:14px auto 0">${commsComposeHTML(c.no,"출발 전",{compact:true})}</div></div>`;}
  if(sl.t==="learn"){ seen();
    const media=sl.figs?`<div class="figs ${sl.figs.length>=4?'c2':sl.figs.length===3?'c3':'c2'}">${sl.figs.map(f=>IMG(f[0],f[1],sl.figs.length>=3?'sq':'tall')).join("")}</div>`:sl.img?IMG(sl.img,sl.cap,'tall'):"";
    body=`<div class="s-kicker">${c.no} · ${c.title}</div><div class="s-title">${sl.h}</div>${sl.wide?`<div class="s-body">${sl.b}</div>`:`<div class="s-grid"><div class="s-body">${sl.b}</div>${media}</div>`}`;}
  if(sl.t==="clear"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=2;save();}
    body=`<div class="s-hero"><span class="stamp" style="font-size:1.4rem">MISSION CLEAR</span><div class="s-title" style="margin-top:14px">${c.title} 완료!</div>
    <div class="s-grid" style="text-align:left"><div class="figure"><b style="color:var(--sun);font-family:var(--disp)">오늘의 핵심 다시 보기</b><ul class="cklist">${sl.pts.map(p=>`<li class="y">${p}</li>`).join("")}</ul><p class="small">자꾸 보면 저절로 외워져요. 내일 한 번만 더 넘겨 보기!</p></div>
-   ${sl.vids?videoBlock(sl.vids):IMG(c.cover,"",'tall')}</div></div>`;}
+   ${sl.vids?videoBlock(sl.vids):IMG(c.cover,"",'tall')}</div>
+   <div style="text-align:left;max-width:860px;margin:14px auto 0">${commsComposeHTML(c.no,"귀환 후",{compact:true})}</div></div>`;}
  if(sl.t==="quiz"){
    body=`<div class="s-kicker">⚡ 빠른 확인</div><div class="s-title" style="font-size:clamp(1.5rem,2.8vw,2.3rem)">${sl.q}</div><div class="s-grid"><div>
    <div id="opts">${sl.o.map((o,j)=>`<button class="opt" data-j="${j}"><span class="n">${j+1}</span><span>${o}</span></button>`).join("")}</div>
    <div id="qfb">${S.quiz[k]?`<div class="fb ok"><b>✅ 해결한 퀴즈!</b> ${esc(sl.ex)}</div>`:""}</div></div>${IMG(c.cover,"",'tall')}</div>`;}
  if(sl.t==="game2"){
-   body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div><p class="s-body">아라호 격납고에 행성 사진이 뒤섞였다! 특징을 보고 올바른 격납고로 보내자.</p><div id="g2"></div>`;}
+   body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div><p class="s-body">아라호에서 행성 <b>관측 자료</b>만 도착했다 — 이름도 사진도 없이. 자료만 보고 어느 격납고(지구형/목성형)로 보낼지 판단하고, <em>근거</em>를 함께 보고하라.</p><div id="g2"></div>`;}
  if(sl.t==="write"){const w=S.writes[sl.key]||{};
    body=`<div class="s-kicker">✍️ ${sl.h}</div><div class="s-grid rev">${IMG(sl.img,"",'tall')}<div><div class="s-title" style="font-size:clamp(1.3rem,2.2vw,1.9rem)">${sl.prompt}</div>
    <div class="frame">💬 문장 틀 — ${sl.frame}</div>
@@ -757,6 +759,7 @@ function renderSlide(){
  bodyEl.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
    if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6&&!e.target.closest("textarea,input,.sim,.orbitbox"))go(dx<0?1:-1);tx=null;},{passive:true});
  if(sl.scene==="orbit")bindOrbit(stage); if(sl.scene==="sim")bindSim(stage);
+ if(sl.t==="hero")bindCompose(stage,c.no,"출발 전"); if(sl.t==="clear")bindCompose(stage,c.no,"귀환 후");
  stage.querySelectorAll(".pcard").forEach(b=>b.onclick=()=>b.classList.toggle("on"));
  if(sl.t==="quiz"){stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const j=+b.dataset.j;
    if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();}
@@ -770,15 +773,34 @@ function renderSlide(){
  showAI();
 }
 function mountG2(root,k){
- let q=[...G2].sort(()=>Math.random()-.5), idx=0, miss=0, got={rock:[],gas:[]};
+ /* 정체를 가린 행성의 '관측 자료'를 보고 분류한다. 이름·사진은 분류한 뒤에 공개. */
+ let q=[...PL].sort(()=>Math.random()-.5), idx=0, miss=0, got={rock:[],gas:[]}, reason=null;
+ const comp={rock:"단단한 암석",gas:"수소·헬륨 등 기체"};
  const bins=()=>`<div class="hangars"><div class="hangar rock"><h4>🪨 지구형 격납고</h4><div class="got">${got.rock.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div><div class="hangar gas"><h4>🎈 목성형 격납고</h4><div class="got">${got.gas.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div></div>`;
+ const card=(p,hide)=>`<div class="doc" style="background:#0a0f2c;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)"><h4 style="color:var(--cyan)">관측 자료 — ${hide?`행성 <b>${String.fromCharCode(65+idx)}</b> (정체 미공개)`:`<b style="color:var(--sun)">${p.n}</b>`}</h4>
+   <table class="t" style="font-size:1.08rem"><tr><td>반지름 (지구=1)</td><td style="text-align:left"><b style="color:var(--sun)">${p.r}</b> <span class="small">${p.r>2?"지구보다 훨씬 크다":"지구와 비슷하거나 작다"}</span></td></tr>
+   <tr><td>평균 밀도</td><td style="text-align:left"><b style="color:var(--sun)">${p.d} g/cm³</b> <span class="small">${p.d>3?"암석처럼 꽉 찼다 (물의 3배↑)":"물과 비슷하게 가볍다"}</span></td></tr>
+   <tr><td>위성 수</td><td style="text-align:left"><b style="color:var(--sun)">${p.sat}개</b></td></tr>
+   <tr><td>고리</td><td style="text-align:left"><b style="color:var(--sun)">${p.ring}</b></td></tr></table>
+   <p class="small" style="margin:8px 0 0">힌트: 밀도와 크기를 먼저 보세요. ‘크면 무겁다’가 아니라 ‘얼마나 꽉 찼나’가 밀도!</p></div>`;
  function draw(){
-  if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>지구형 = 작고 꽉 참 · 목성형 = 크고 푹신함. 이제 몸이 기억하죠?</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();return;}
+  if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>밀도·크기·위성·고리</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();return;}
   const p=q[idx];
-  root.innerHTML=`<div class="s-grid"><div class="qPlanet"><span class="ball" style="width:min(${p[2]}px,60vw);height:min(${p[2]}px,60vw);background-image:url(img/${p[3]}.jpg)"></span><span class="nm">${p[0]}</span><span class="small">상대 크기대로 그렸어요</span></div>
-  <div><div class="binbtns"><button class="btn-s" data-b="rock" style="border-color:#d08f5a">🪨 지구형 격납고</button><button class="btn-s" data-b="gas" style="border-color:var(--cyan)">🎈 목성형 격납고</button></div>${bins()}<div id="g2fb"></div></div></div>`;
-  root.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{if(b.dataset.b===p[1]){got[p[1]].push(p[0]);idx++;draw();}
-    else{miss++;b.classList.add("no");root.querySelector("#g2fb").innerHTML=`<div class="fb no">🛰️ 다시! ${p[0]}의 크기를 잘 봐 — ${p[1]==="rock"?"작고 단단한 쪽":"크고 푹신한 쪽"}이야.</div>`;setTimeout(()=>b.classList.remove("no"),400);}});
+  root.innerHTML=`<div class="s-grid"><div><div class="qPlanet" style="margin-bottom:10px"><span class="ball" style="width:min(${Math.round(90+p.r*16)}px,50vw);height:min(${Math.round(90+p.r*16)}px,50vw);background-image:url(img/${p.img}.jpg);filter:blur(10px) brightness(.6)"></span><span class="small" style="display:block;margin-top:6px">상대 크기대로 — 정체는 분류 후 공개</span></div>${card(p,true)}</div>
+  <div><p class="s-body" style="margin-top:0">자료의 <b>어떤 특징</b> 때문에 그 격납고로 보내나요? 근거를 고르고 격납고를 누르세요.</p>
+   <div style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px">${["밀도가 크다/작다","크기가 작다/크다","위성이 적다/많다","고리가 없다/있다"].map((t,i)=>`<button class="btn-g rsn" data-r="${i}" style="min-height:44px;font-size:1rem">${t}</button>`).join("")}</div>
+   <div class="binbtns"><button class="btn-s" data-b="rock" style="border-color:#d08f5a">🪨 지구형 격납고</button><button class="btn-s" data-b="gas" style="border-color:var(--cyan)">🎈 목성형 격납고</button></div>${bins()}<div id="g2fb"></div></div></div>`;
+  root.querySelectorAll(".rsn").forEach(b=>b.onclick=()=>{reason=+b.dataset.r;root.querySelectorAll(".rsn").forEach(x=>x.style.borderColor="");b.style.borderColor="var(--sun)";b.style.color="var(--sun)";});
+  root.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{
+    const fb=root.querySelector("#g2fb");
+    if(reason==null){fb.innerHTML='<div class="fb no">먼저 <b>근거</b>를 하나 고르세요 — 그래야 진짜 분류!</div>';return;}
+    if(b.dataset.b===p.t){got[p.t].push(p.n);
+      fb.innerHTML=`<div class="fb ok"><b>🎯 정답! 행성 ${String.fromCharCode(65+idx)}의 정체는 <span style="color:var(--sun)">${p.n}</span>.</b> ${p.t==="rock"?`밀도 ${p.d} → ${comp.rock}, 지름 ${p.r}배`:`밀도 ${p.d} → ${comp.gas}, 지름 ${p.r}배`}. <span class="small">${p.f.replace(/<[^>]+>/g,"")}</span></div>`;
+      root.querySelector(".ball").style.filter="none"; root.querySelectorAll("[data-b],.rsn").forEach(x=>x.disabled=true);
+      setTimeout(()=>{idx++;reason=null;draw();},1900);}
+    else{miss++;b.classList.add("no");
+      const why=p.t==="rock"?`밀도 ${p.d} g/cm³는 돌덩이 수준(물의 ${Math.round(p.d)}배) → 암석 행성. 위성 ${p.sat}개, 고리 ${p.ring}.`:`밀도 ${p.d} g/cm³는 물과 비슷 → 기체 행성. 반지름은 지구의 ${p.r}배, 위성 ${p.sat}개.`;
+      fb.innerHTML=`<div class="fb no">🛰️ 다시 보자. ${why}</div>`;setTimeout(()=>b.classList.remove("no"),400);}});
  } draw();
 }
 
@@ -904,6 +926,80 @@ async function showDetail(x){
 function localRecordHTML(){const w=Object.entries(S.writes||{}),e=Object.entries(S.exam||{});
  return `<p>${esc(me?me.name:'')} · ⭐${S.pts} · ${rank().r}</p>${w.map(([k,v])=>`<div class="frame" style="color:var(--fg)"><b style="color:var(--sun)">${esc(k)}</b> ${v.ok?'통과':'연습 중'}<br>${esc(v.t)}</div>`).join("")}${e.map(([n,v])=>`<div class="frame" style="color:var(--fg)"><b style="color:var(--sun)">문항 ${n}</b> ${esc(v.g)}<br>${esc(v.t)}</div>`).join("")}`;}
 
+
+/* ═══════ 교신 — 질문 게시판 (질문=교신, 답=응답) ═══════ */
+const LSC="araho_comms_local";
+function localComms(){try{return JSON.parse(localStorage.getItem(LSC)||"[]");}catch(e){return [];}}
+function saveLocalComms(a){try{localStorage.setItem(LSC,JSON.stringify(a.slice(0,300)));}catch(e){}}
+async function commsList(f){
+  if(API){const r=await call({action:'qlist',cls:f.cls||'',num:me?me.num:'',mission:f.mission||''});return r.rows;}
+  let rows=localComms(); if(f.mission)rows=rows.filter(x=>x.mission===f.mission); return rows.map(x=>({...x,mine:me&&x.cls===me.cls&&x.num===me.num}));
+}
+async function commsAdd(o){
+  if(API){return post({action:'qadd',...me,...o});}
+  const rows=localComms(); rows.unshift({id:'l'+Date.now(),t:new Date().toISOString(),cls:me.cls,num:o.anon==='1'?'':me.num,name:o.anon==='1'?'익명 승무원':me.name,mission:o.mission,phase:o.phase,text:o.text,answers:[]}); saveLocalComms(rows); return {ok:true};
+}
+async function commsAnswer(qid,text){
+  const teacher=(me&&me.cls==="T")?'1':'';
+  if(API){return post({action:'qanswer',...me,qid,text,teacher});}
+  const rows=localComms(); const q=rows.find(x=>x.id===qid); if(q){q.answers.push({t:new Date().toISOString(),name:me.name,text,teacher:!!teacher});saveLocalComms(rows);} return {ok:true};
+}
+const PHASES=["출발 전","귀환 후"];
+function commsComposeHTML(mission,phase,opts){
+  opts=opts||{};
+  const pick=opts.pick?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px"><select id="cmM" style="width:auto;padding:8px 12px">${CH.map(c=>`<option value="${c.no}" ${mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select><select id="cmP" style="width:auto;padding:8px 12px">${PHASES.map(x=>`<option ${phase===x?'selected':''}>${x}</option>`).join("")}</select></div>`:"";
+  return `<div class="card" style="margin:${opts.compact?'10px 0 0':'0 0 16px'}"><h3 style="font-size:1.25rem">📡 ${opts.pick?"새 교신 보내기":phase+" 교신 보내기"} ${opts.pick?"":`<span class="small">— ${mission}</span>`}</h3>
+   <p class="small">${phase==="귀환 후"?"임무를 마치고 나서 새로 생긴 질문, 아직도 헷갈리는 것, 더 알고 싶은 것.":"이 주제에서 가장 궁금한 것 하나. 답을 모르는 질문일수록 좋은 교신입니다."}</p>${pick}
+   <textarea id="cmText" style="min-height:90px" placeholder="예) 혜성 꼬리는 왜 항상 태양 반대쪽을 향할까?"></textarea>
+   <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap"><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="cmAnon" style="width:20px;height:20px"> 익명으로 보내기</label>
+   <button class="btn-p" id="cmSend" style="margin-left:auto">교신 발신 (+3점)</button></div><div id="cmMsg"></div></div>`;
+}
+function bindCompose(root,mission,phase,after){
+  const b=root.querySelector("#cmSend"); if(!b)return;
+  b.onclick=async()=>{const t=root.querySelector("#cmText").value.trim(); const m=root.querySelector("#cmMsg");
+    const ms=root.querySelector("#cmM"),ps=root.querySelector("#cmP"); const mi=ms?ms.value:mission, ph=ps?ps.value:phase;
+    if(t.length<5){m.innerHTML='<div class="fb no">질문을 조금 더 자세히 적어 주세요 (5자 이상).</div>';return;}
+    b.disabled=true;b.textContent="발신 중…";
+    try{await commsAdd({mission:mi,phase:ph,text:t,anon:root.querySelector("#cmAnon").checked?'1':'0'});
+      const key="q_"+mi+"_"+ph; S.comms=S.comms||{}; const first=!S.comms[key]; S.comms[key]=(S.comms[key]||0)+1;
+      if(first)addPts(3); else save(); root.querySelector("#cmText").value="";
+      m.innerHTML='<div class="fb ok"><b>📡 교신 수신 완료.</b> 다른 승무원과 센터장이 응답할 거예요. 교신 탭에서 확인!</div>'; if(after)after();}
+    catch(e){m.innerHTML='<div class="fb no">발신 실패: '+esc(e)+'</div>';}
+    b.disabled=false;b.textContent="교신 발신 (+3점)";};
+}
+let CM={mission:"",mine:false,noans:false};
+function renderComms(){
+  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">📡 교신 채널</h2>
+  <p class="small" style="margin:0 4px 10px">승무원들의 질문(교신)과 응답이 모이는 곳. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — 응답 1건에 +2점.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+   <select id="cmMission" style="width:auto;padding:8px 12px"><option value="">모든 미션</option>${CH.map(c=>`<option value="${c.no}" ${CM.mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select>
+   <button class="btn-g" id="cmMine" style="min-height:44px;${CM.mine?'border-color:var(--sun);color:var(--sun)':''}">내 교신만</button>
+   <button class="btn-g" id="cmNoans" style="min-height:44px;${CM.noans?'border-color:var(--sun);color:var(--sun)':''}">응답 없는 교신</button>
+   <button class="btn-s" id="cmReload" style="min-height:44px;margin-left:auto">새로고침</button></div>
+  <div class="row2"><div id="cmList"><p class="small">불러오는 중…</p></div><div id="cmCompose">${commsComposeHTML(CM.mission||CH[0].no,"출발 전",{pick:true})}
+   ${API?"":'<div class="fb no">서버 미연결: 교신이 이 기기에만 저장됩니다. 센터장이 시트를 연결하면 학급 전체가 함께 봅니다.</div>'}</div></div>`;
+  drawHud();
+  bindCompose(app.querySelector("#cmCompose"),CM.mission||CH[0].no,"출발 전",loadComms);
+  app.querySelector("#cmMission").onchange=e=>{CM.mission=e.target.value;render();};
+  app.querySelector("#cmMine").onclick=()=>{CM.mine=!CM.mine;render();}; app.querySelector("#cmNoans").onclick=()=>{CM.noans=!CM.noans;render();};
+  app.querySelector("#cmReload").onclick=loadComms;
+  loadComms();
+}
+async function loadComms(){
+  const L=document.getElementById("cmList"); if(!L)return;
+  try{let rows=await commsList({cls:"",mission:CM.mission});
+    if(CM.mine)rows=rows.filter(r=>r.mine); if(CM.noans)rows=rows.filter(r=>!(r.answers||[]).length);
+    if(!rows.length){L.innerHTML='<div class="card"><p class="small">아직 교신이 없어요. 첫 교신을 보내 보세요!</p></div>';return;}
+    L.innerHTML=rows.map(r=>`<div class="card" style="margin:0 0 12px" data-q="${esc(r.id)}">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tag">${esc(r.mission)}</span><span class="tag">${esc(r.phase)}</span><span class="small">${esc(r.cls)}반 ${esc(r.name)} · ${esc((r.t||'').slice(5,16).replace('T',' '))}</span>${r.mine?'<span class="pill w">내 교신</span>':''}</div>
+      <p class="s-body" style="font-size:1.15rem;margin:8px 0">❓ ${esc(r.text)}</p>
+      ${(r.answers||[]).map(a=>`<div class="frame" style="color:var(--fg);${a.teacher?'border-color:var(--sun);border-style:solid':''}"><b style="color:${a.teacher?'var(--sun)':'var(--cyan)'}">${a.teacher?'🎖️ 센터장':'💬 '+esc(a.name)}</b> <span class="small">${esc((a.t||'').slice(5,16).replace('T',' '))}</span><br>${esc(a.text)}</div>`).join("")}
+      <div style="display:flex;gap:8px;margin-top:8px"><input type="text" class="ansIn" placeholder="응답 쓰기 — 아는 만큼, 근거와 함께" style="flex:1"><button class="btn-s ansBtn" style="min-height:48px">응답</button></div></div>`).join("");
+    L.querySelectorAll(".ansBtn").forEach(b=>b.onclick=async()=>{const card=b.closest("[data-q]"),inp=card.querySelector(".ansIn"),t=inp.value.trim(); if(t.length<2)return toast("응답을 적어 주세요");
+      b.disabled=true; try{await commsAnswer(card.dataset.q,t); S.comms=S.comms||{}; S.comms.ans=(S.comms.ans||0)+1; if(S.comms.ans<=15)addPts(2); else save(); loadComms();}catch(e){toast("응답 실패: "+e);b.disabled=false;}});
+  }catch(e){L.innerHTML=`<div class="fb no">교신 채널 연결 실패: ${esc(e)}</div>`;}
+}
+
 /* ═══════ 내비 ═══════ */
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{view=b.dataset.v;deck=null;render();});
 document.addEventListener("keydown",e=>{if(!deck)return;if(e.target.closest("textarea,input"))return;
@@ -912,7 +1008,7 @@ document.addEventListener("keydown",e=>{if(!deck)return;if(e.target.closest("tex
  if(e.key==="Escape"){deck=null;view="learn";render();}});
 (function(){const h=(location.hash||"").replace("#","");const m=h.match(/^(c[1-5])s(\d+)$/);
  if(m){const ci=CH.findIndex(c=>c.id===m[1]);if(ci>=0){deck={ch:ci,i:Math.min(+m[2]-1,CH[ci].slides.length-1)};view="learn";}}
- else if(["home","learn","wanted","exam","teacher"].includes(h))view=h;})();
+ else if(["home","learn","wanted","exam","comms","teacher"].includes(h))view=h;})();
 if(me){loadLocal(); if(API){call({action:'ping'}).then(r=>{AI_ON=!!r.ai;setSync('on');showAI();}).catch(()=>setSync('err'));}}
 render();
 </script>
