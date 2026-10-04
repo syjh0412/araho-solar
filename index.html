@@ -64,8 +64,9 @@ a{color:var(--cyan)}
 
 /* 하단 탭 */
 nav#tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#070b22ee;border-top:1.5px solid var(--line);backdrop-filter:blur(10px);display:flex;justify-content:center;gap:6px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px))}
-nav#tabs button{background:transparent;min-height:62px;min-width:54px;flex:0 1 150px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.95rem;color:var(--mut);border-radius:14px;padding:6px 4px}
+nav#tabs button{background:transparent;min-height:62px;min-width:44px;flex:0 1 140px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.95rem;color:var(--mut);border-radius:14px;padding:6px 4px}
 nav#tabs button .ic{font-size:1.5rem}
+@media (max-width:560px){nav#tabs{gap:0}nav#tabs button{font-size:.72rem;padding:6px 1px}nav#tabs button .ic{font-size:1.25rem}}
 nav#tabs button.on{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)}
 body.deckmode nav#tabs,body.gate nav#tabs{display:none}
 
@@ -329,6 +330,7 @@ body.deckmode .toast{bottom:110px}
   <button data-v="wanted"><span class="ic">🔭</span>수배 파일</button>
   <button data-v="exam"><span class="ic">✍️</span>논술 시험</button>
   <button data-v="comms"><span class="ic">📡</span>교신</button>
+  <button data-v="docs"><span class="ic">📂</span>자료실</button>
   <button data-v="teacher"><span class="ic">📋</span>센터장</button>
 </nav>
 
@@ -751,7 +753,7 @@ function render(){
  document.body.classList.toggle("deckmode",!!deck); stage.hidden=!deck;
  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
  if(deck){renderSlide();return;}
- ({home:renderHome,crew:renderCrew,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,teacher:renderTeacher})[view]();
+ ({home:renderHome,crew:renderCrew,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,docs:renderDocs,teacher:renderTeacher})[view]();
  showAI();
 }
 
@@ -898,7 +900,7 @@ function renderSlide(){
    body=`<div class="s-kicker">${c.no} · ${c.title}</div><div class="s-title">${sl.h}</div>${sl.wide?`<div class="s-body">${sl.b}</div>`:`<div class="s-grid"><div class="s-body">${sl.b}</div>${media}</div>`}`;}
  if(sl.t==="clear"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=2;save();}
    body=`<div class="s-hero"><span class="stamp" style="font-size:1.4rem">MISSION CLEAR</span><div class="s-title" style="margin-top:14px">${c.title} 완료!</div>
-   <div class="s-grid" style="text-align:left"><div class="figure"><b style="color:var(--sun);font-family:var(--disp)">오늘의 핵심 다시 보기</b><ul class="cklist">${sl.pts.map(p=>`<li class="y">${p}</li>`).join("")}</ul><p class="small">자꾸 보면 저절로 외워져요. 내일 한 번만 더 넘겨 보기!</p></div>
+   <div class="s-grid" style="text-align:left"><div class="figure"><b style="color:var(--sun);font-family:var(--disp)">오늘의 핵심 다시 보기</b><ul class="cklist">${sl.pts.map(p=>`<li class="y">${p}</li>`).join("")}</ul><p class="small">자꾸 보면 저절로 외워져요. 내일 한 번만 더 넘겨 보기!</p>${(()=>{const d=DOCS.find(x=>x.no===c.no);return d?`<a href="docs/${d.f}.pdf" target="_blank" rel="noopener" class="btn-s" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--fg);padding:10px 16px;border-radius:14px;margin-top:6px">📂 복습 자료 열기 — ${d.t.split(":")[0]}</a>`:"";})()}</div>
    ${sl.vids?videoBlock(sl.vids):IMG(c.cover,"",'tall')}</div>
    <div style="text-align:left;max-width:860px;margin:14px auto 0">${commsComposeHTML(c.no,"귀환 후",{compact:true})}</div></div>`;}
  if(sl.t==="quiz"){
@@ -1222,6 +1224,23 @@ async function loadComms(){
   }catch(e){L.innerHTML=`<div class="fb no">교신 채널 연결 실패: ${esc(e)}</div>`;}
 }
 
+
+/* ═══════ 자료실 ═══════ */
+const DOCS=[
+ {f:"m1_solar_system_members",no:"MISSION 01",t:"내 손안의 우주 도감: 태양계의 구성원",d:"태양·행성·위성·소행성·혜성·왜소 행성을 한 권으로 정리",pg:15},
+ {f:"m2_planet_classification",no:"MISSION 02",t:"우주 탐사선 데이터 로그: 8개의 행성을 분류하라",d:"행성별 특징과 지구형·목성형 분류 기준",pg:12},
+ {f:"m3_sun_anatomy",no:"MISSION 03",t:"스스로 빛을 내는 유일한 별, 태양의 해부학",d:"광구·흑점·쌀알 무늬 / 채층·코로나·홍염·플레어",pg:15},
+ {f:"m4_space_weather",no:"MISSION 04",t:"우주 기상 주의보: 태양의 활동이 지구에 미치는 영향",d:"태양풍·오로라·자기 폭풍과 통신·GPS·전력망",pg:14}];
+function renderDocs(){
+  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">📂 자료실</h2>
+  <p class="small" style="margin:0 4px 12px">미션별 정리 자료입니다. 미션 전에 훑어보거나, 끝난 뒤 복습할 때 열어 보세요. 누르면 새 창에서 열립니다.</p>
+  <div class="grid">${DOCS.map(d=>`<a href="docs/${d.f}.pdf" target="_blank" rel="noopener" class="docl" data-f="${d.f}" style="display:flex;flex-direction:column;text-decoration:none;color:var(--fg);background:linear-gradient(180deg,var(--panel),#0c1233);border:1.5px solid var(--line);border-radius:20px;overflow:hidden">
+    <img src="docs/thumb/${d.f.slice(0,2)}.jpg" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-bottom:1.5px solid var(--line)">
+    <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px"><div style="font-family:var(--disp);color:var(--cyan);font-size:.9rem;letter-spacing:.12em">${d.no}</div><h3 style="font-size:1.2rem;line-height:1.4">${d.t}</h3><div class="small">${d.d}</div><div class="small" style="color:var(--sun);margin-top:4px">📄 ${d.pg}쪽 · 열기 ↗ ${S.docs&&S.docs[d.f]?'<span class="pill g" style="margin-left:6px">열어 봄</span>':''}</div></div></a>`).join("")}</div>`;
+  drawHud();
+  app.querySelectorAll(".docl").forEach(a=>a.addEventListener("click",()=>{S.docs=S.docs||{};if(!S.docs[a.dataset.f]){S.docs[a.dataset.f]=1;save();}logSrv('자료실',a.dataset.f,'','','');}));
+}
+
 /* ═══════ 내비 ═══════ */
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{view=b.dataset.v;deck=null;render();});
 document.addEventListener("keydown",e=>{if(!deck)return;if(e.target.closest("textarea,input"))return;
@@ -1230,7 +1249,7 @@ document.addEventListener("keydown",e=>{if(!deck)return;if(e.target.closest("tex
  if(e.key==="Escape"){deck=null;view="learn";render();}});
 (function(){const h=(location.hash||"").replace("#","");const m=h.match(/^(c[1-5])s(\d+)$/);
  if(m){const ci=CH.findIndex(c=>c.id===m[1]);if(ci>=0){deck={ch:ci,i:Math.min(+m[2]-1,CH[ci].slides.length-1)};view="learn";}}
- else if(["home","crew","learn","wanted","exam","comms","teacher"].includes(h))view=h;})();
+ else if(["home","crew","learn","wanted","exam","comms","docs","teacher"].includes(h))view=h;})();
 if(me){loadLocal(); if(API){call({action:'ping'}).then(r=>{AI_ON=!!r.ai;setSync('on');showAI();}).catch(()=>setSync('err'));}}
 render();
 </script>
