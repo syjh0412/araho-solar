@@ -9,8 +9,10 @@
  *       - 액세스 권한이 있는 사용자: 모든 사용자
  *     → 배포 → 권한 허용 → "웹 앱 URL" 복사 (…/exec 로 끝남)
  *  4) index.html 맨 위 API = '여기에 붙여넣기'
- *  5) 시트에 자동으로 생기는 '설정' 탭에서
- *       GEMINI_KEY 칸에 Google AI Studio 키,  PIN 칸에 센터장 코드 입력
+ *  5) AI 키와 센터장 코드 — 둘 중 편한 곳에 넣으면 됩니다 (둘 다 있으면 스크립트 속성이 우선)
+ *     (가) 스크립트 속성: 왼쪽 ⚙ 프로젝트 설정 → 맨 아래 '스크립트 속성' → 속성 추가
+ *          GEMINI_KEY = 발급받은 키 / PIN = 센터장 코드 (예: 0726)
+ *     (나) 시트 '설정' 탭 (웹 앱을 한 번 열면 자동 생성): GEMINI_KEY, PIN 의 B칸
  * 이후 학생 기록은 '학생' / '기록' 탭에 자동으로 쌓이고,
  * 앱의 센터장 탭에서 실시간으로 볼 수 있습니다.
  */
@@ -28,6 +30,8 @@ function sheet(name, header){
 }
 
 function conf(key){
+  // 1순위: 스크립트 속성(⚙ 프로젝트 설정 → 스크립트 속성). 2순위: 시트 '설정' 탭.
+  try{ var sp = PropertiesService.getScriptProperties().getProperty(key); if(sp && String(sp).trim()) return String(sp).trim(); }catch(e){}
   var s = sheet(SHEET_CONF, ['항목','값','설명']);
   var v = s.getDataRange().getValues();
   if(v.length < 2){
