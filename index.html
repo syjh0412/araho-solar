@@ -54,6 +54,7 @@ a{color:var(--cyan)}
 .hud .rk{font-family:var(--disp);font-size:1.2rem;color:var(--sun)}
 .hud .pt{font-variant-numeric:tabular-nums;color:var(--cyan);font-weight:700}
 .hud .sync{margin-left:auto;font-size:.88rem;color:var(--dim)}
+.hud #hudOut{margin-left:4px}
 .hud .sync.on{color:var(--green)}
 .bar{height:10px;background:#080c24;border-radius:99px;overflow:hidden;flex:1;min-width:120px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--cyan));border-radius:99px;transition:width .4s}
@@ -346,7 +347,8 @@ function post(params){ if(!API) return Promise.reject('서버 미설정');
 
 /* ───────── 상태 ───────── */
 const LS="araho_v2", LS_ME="araho_me";
-let me=null; try{me=JSON.parse(localStorage.getItem(LS_ME)||'null');}catch(e){}
+const SESSION_VER=3; // 입장 방식이 바뀌면 올려서 저장된 세션을 무효화
+let me=null; try{me=JSON.parse(localStorage.getItem(LS_ME)||'null'); if(me&&me.ver!==SESSION_VER)me=null;}catch(e){}
 let S=freshState();
 function freshState(){return {pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},slide:{}};}
 function loadLocal(){try{const j=localStorage.getItem(LS+'_'+(me?me.cls+'_'+me.num:'x')); if(j)S={...freshState(),...JSON.parse(j)};}catch(e){}}
@@ -635,7 +637,9 @@ const EXAM=[
 const app=document.getElementById("app"), stage=document.getElementById("stage"), gate=document.getElementById("gate");
 let view="home", deck=null, examPage=0;
 function drawHud(){const h=document.getElementById("hud");if(!h)return;const{r,next}=rank();const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
- h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${astronautSVG(null,null,34)}</span><span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span>`; setSync(syncState);}
+ h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${astronautSVG(null,null,34)}</span><span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`; setSync(syncState);
+ const ho=h.querySelector("#hudOut"); if(ho)ho.onclick=logout;}
+function logout(){me=null;deck=null;TPIN="";try{localStorage.removeItem(LS_ME);}catch(e){}S=freshState();view="home";render();}
 const hudBlock=()=>`<div id="hud" class="hud"></div>`;
 function slideDone(c,sl,idx){const k=c.id+"_"+idx;
  if(sl.t==="learn"||sl.t==="hero"||sl.t==="clear")return !!S.seen[k];
@@ -690,7 +694,7 @@ function renderGate(){
         if(r.state){const sv=r.state; if((sv.pts||0)>=(S.pts||0)) S={...freshState(),...sv};} setSync('on');}
      catch(e){ b.disabled=false;b.textContent="관제센터 입장"; m.innerHTML='<span style="color:var(--red)">'+esc(e)+'</span>'; return; }}
    else{ me=cand; loadLocal(); }
-   try{localStorage.setItem(LS_ME,JSON.stringify(me));}catch(e){}
+   me.ver=SESSION_VER; try{localStorage.setItem(LS_ME,JSON.stringify(me));}catch(e){}
    save(); view="home"; render(); toast("환영합니다, "+me.name+" 훈련생! 🫡");};
  gate.querySelector("#gGo").onclick=go;
  gate.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter")go();});
@@ -723,7 +727,7 @@ function renderHome(){
  </div>`;
  drawHud();
  document.querySelectorAll(".suitbtn").forEach(b=>b.onclick=()=>{S.suit=b.dataset.s;save();render();});
- document.getElementById("logout").onclick=()=>{me=null;try{localStorage.removeItem(LS_ME);}catch(e){}S=freshState();render();};
+ document.getElementById("logout").onclick=logout;
 }
 
 /* ═══════ 학습 목록 ═══════ */
