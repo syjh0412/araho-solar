@@ -825,6 +825,8 @@ function renderSlide(){
    }else if(sl.t==="quiz"){ if(!S.quiz[k])setLock("퀴즈를 맞혀야 다음으로 갈 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="game2"){ if(!S.quiz[k])setLock("분류를 모두 마쳐야 다음으로 갈 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="write"){ if(!(S.writes[sl.key]&&S.writes[sl.key].ok))setLock("한 줄 논술이 점검을 통과해야 넘어갈 수 있어요"); else S.done[k]=1; }
+   else if(sl.t==="hero"){ if(!(S.comms&&S.comms["q_"+c.no+"_출발 전"]))setLock("출발 전 교신(궁금한 것 하나)을 보내야 임무를 시작할 수 있어요"); else S.done[k]=1; }
+   else if(sl.t==="clear"){ if(!(S.comms&&S.comms["q_"+c.no+"_귀환 후"]))setLock("귀환 후 교신(새로 생긴 질문)을 보내야 임무가 종료돼요"); else S.done[k]=1; }
    else S.done[k]=1;
  }
  const go=(d)=>{if(d>0&&locked){toast("🔒 "+lockWhy+" · 막히면 옆 승무원이나 센터장에게!");return;}const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
@@ -835,7 +837,7 @@ function renderSlide(){
  bodyEl.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
    if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6&&!e.target.closest("textarea,input,.sim,.orbitbox"))go(dx<0?1:-1);tx=null;},{passive:true});
  if(sl.scene==="orbit")bindOrbit(stage); if(sl.scene==="sim")bindSim(stage);
- if(sl.t==="hero")bindCompose(stage,c.no,"출발 전"); if(sl.t==="clear")bindCompose(stage,c.no,"귀환 후");
+ if(sl.t==="hero")bindCompose(stage,c.no,"출발 전",unlock); if(sl.t==="clear")bindCompose(stage,c.no,"귀환 후",unlock);
  stage.querySelectorAll(".pcard").forEach(b=>b.onclick=()=>b.classList.toggle("on"));
  if(sl.t==="quiz"){stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const j=+b.dataset.j;
    if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();unlock();}
@@ -1035,7 +1037,7 @@ function commsComposeHTML(mission,phase,opts){
   opts=opts||{};
   const pick=opts.pick?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px"><select id="cmM" style="width:auto;padding:8px 12px">${CH.map(c=>`<option value="${c.no}" ${mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select><select id="cmP" style="width:auto;padding:8px 12px">${PHASES.map(x=>`<option ${phase===x?'selected':''}>${x}</option>`).join("")}</select></div>`:"";
   return `<div class="card" style="margin:${opts.compact?'10px 0 0':'0 0 16px'}"><h3 style="font-size:1.25rem">📡 ${opts.pick?"새 교신 보내기":phase+" 교신 보내기"} ${opts.pick?"":`<span class="small">— ${mission}</span>`}</h3>
-   <p class="small">${phase==="귀환 후"?"임무를 마치고 나서 새로 생긴 질문, 아직도 헷갈리는 것, 더 알고 싶은 것.":"이 주제에서 가장 궁금한 것 하나. 답을 모르는 질문일수록 좋은 교신입니다."}</p>${pick}
+   <p class="small">${phase==="귀환 후"?"임무를 마치고 나서 새로 생긴 질문, 아직도 헷갈리는 것, 더 알고 싶은 것. <b>보내야 임무가 종료됩니다.</b>":"이 주제에서 가장 궁금한 것 하나. 답을 모르는 질문일수록 좋은 교신입니다. <b>보내야 임무가 시작됩니다.</b>"}</p>${pick}
    <textarea id="cmText" style="min-height:90px" placeholder="예) 혜성 꼬리는 왜 항상 태양 반대쪽을 향할까?"></textarea>
    <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap"><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="cmAnon" style="width:20px;height:20px"> 익명으로 보내기</label>
    <button class="btn-p" id="cmSend" style="margin-left:auto">교신 발신 (+3점)</button></div><div id="cmMsg"></div></div>`;

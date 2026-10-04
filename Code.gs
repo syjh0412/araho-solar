@@ -16,7 +16,8 @@
  *  6) (선택) 학생 명단: 아무 탭에나 '반 | 번호 | 이름' 머리글로 명단을 붙여넣으면
  *     학생은 반·번호를 고르고 자기 이름을 확인한 뒤 '콜사인'(비밀번호)으로 입장합니다.
  *     콜사인은 첫 입장 때 학생이 정하고 명단 탭의 '콜사인' 열에 저장됩니다.
- * 이후 학생 기록은 '학생' / '기록' 탭에 자동으로 쌓이고,
+ * 이후 학생 기록은 '학생'(현재 상태) / '기록'(전체) 탭과
+ *   한줄논술①~④ · 시험 문항1~3 · 수배파일 탭(문항별)에 자동으로 쌓이고,
  * 앱의 센터장 탭에서 실시간으로 볼 수 있습니다.
  */
 
@@ -162,9 +163,21 @@ function save(p){
   return {ok:true};
 }
 
+/* 기록은 전체 '기록' 탭 + 문항별 탭에 나눠 쌓입니다 */
+var ITEM_SHEETS = {w_c1:'한줄논술① 태양계 구성원', w_c2:'한줄논술② 행성 분류', w_c3:'한줄논술③ 태양 활동', w_c4:'한줄논술④ 지구 영향'};
+function itemSheetName(p){
+  var it = String(p.item||''), ty = String(p.type||'');
+  for(var k in ITEM_SHEETS){ if(it.indexOf(k)>=0) return ITEM_SHEETS[k]; }
+  var m = it.match(/문항\s*([123])/); if(m) return '시험 문항'+m[1];
+  if(ty==='수배파일') return '수배파일';
+  return '';
+}
 function log(p){
-  var s = sheet(SHEET_LOG, ['시각','반','번호','이름','종류','항목','내용','자동점검','AI수준','AI피드백']);
-  s.appendRow([new Date(), p.cls||'', p.num||'', p.name||'', p.type||'', p.item||'', String(p.text||'').slice(0,5000), p.score||'', p.ai||'', String(p.aifb||'').slice(0,3000)]);
+  var row = [new Date(), p.cls||'', p.num||'', p.name||'', p.type||'', p.item||'', String(p.text||'').slice(0,5000), p.score||'', p.ai||'', String(p.aifb||'').slice(0,3000)];
+  var head = ['시각','반','번호','이름','종류','항목','내용','자동점검','AI수준','AI피드백'];
+  sheet(SHEET_LOG, head).appendRow(row);
+  var name = itemSheetName(p);
+  if(name){ var s2 = sheet(name, head); s2.appendRow(row); }
   return {ok:true};
 }
 
