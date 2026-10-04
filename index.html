@@ -183,7 +183,7 @@ table.t{border-collapse:collapse;width:100%;font-size:clamp(1rem,1.25vw,1.15rem)
 table.t th,table.t td{border:1px solid var(--line);padding:10px 12px;text-align:center}
 table.t th{background:#080c24;color:var(--cyan);font-weight:700}
 table.t td:first-child{color:var(--sun);font-weight:700;white-space:nowrap}
-table.t .grpA{background:#2a1c0a55} table.t .grpB{background:#0a1e3a55}
+table.t .grpA{background:#5a3a0a99;color:#ffe0a8} table.t .grpB{background:#0e2f5a99;color:#cfe6ff}
 .twrap{overflow-x:auto;margin:10px 0}
 
 /* 인과 사슬 */
@@ -516,7 +516,7 @@ const PL=[
  {n:"지구",img:"earth",surf:"earth2",t:"rock",m:1.00,r:1.00,d:5.5,sat:1,ring:"없음",f:"태양에서 알맞은 거리에 있어 <b>물이 액체</b>로 존재하는 생명의 행성. 위성은 <b>달</b> 하나."},
  {n:"화성",img:"mars",surf:"mars_polar",t:"rock",m:0.11,r:0.53,d:3.9,sat:2,ring:"없음",f:"표면이 <b>붉고</b> 물이 흐른 흔적이 있다. 드라이아이스·얼음으로 된 <b>극관</b>이 계절마다 크기가 변한다."},
  {n:"목성",img:"jupiter",surf:"jupiter_spot",t:"gas",m:317.9,r:11.2,d:1.3,sat:92,ring:"있음",f:"태양계에서 <b>가장 큰</b> 행성. 수소·헬륨으로 이루어졌고 줄무늬와 거대한 소용돌이 <b>대적점</b>이 있다."},
- {n:"토성",img:"saturn",surf:"saturn2",t:"gas",m:95.1,r:9.45,d:0.7,sat:83,ring:"있음",f:"얼음과 암석 조각으로 된 <b>뚜렷한 고리</b>. 밀도가 물보다 작아 거대한 욕조가 있다면 <b>뜬다</b>!"},
+ {n:"토성",img:"saturn",surf:"saturn2",t:"gas",m:95.1,r:9.45,d:0.7,sat:83,ring:"있음",f:"얼음과 암석 조각으로 된 <b>뚜렷한 고리</b>. 평균 밀도 0.7 g/cm³로 <b>물보다 밀도가 작은</b> 유일한 행성."},
  {n:"천왕성",img:"uranus",surf:"uranus_ring",t:"gas",m:14.5,r:4.0,d:1.3,sat:27,ring:"있음",f:"메테인 때문에 <b>청록색</b>. <b>자전축이 거의 누워</b> 있어 굴러가듯 공전한다."},
  {n:"해왕성",img:"neptune",surf:"neptune_surf",t:"gas",m:17.1,r:3.9,d:1.6,sat:14,ring:"있음",f:"태양에서 가장 먼 <b>푸른 행성</b>. 천왕성과 성분이 비슷하고 거대한 소용돌이 <b>대흑점</b>이 있다."}];
 const planetGallery=(type)=>`<div class="pgal">${PL.filter(p=>p.t===type).map(p=>`<button class="pcard" data-p="${p.n}"><div class="ph" style="background-image:url(img/${p.img}.jpg)"></div><div class="nm">${p.n}</div><div class="ft">${p.f}</div></button>`).join("")}</div>`;
@@ -528,7 +528,7 @@ const DATA_TABLE=`<div class="twrap"><table class="t"><tr><th>행성</th>${PL.ma
 <tr><td>위성 수</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.sat}</td>`).join("")}</tr>
 <tr><td>고리</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.ring}</td>`).join("")}</tr></table></div><p class="figcap">위성 수는 교과서(2022 기준) 값 · 노란 칸 = 지구형, 파란 칸 = 목성형</p>`;
 
-const VIDEOS=[["J5przHKeTpI","선생님 영상 ① 태양계를 이루는 행성"],["y1q1-eUv8iI","선생님 영상 ② 행성의 분류"],["i0A5PIkozWo","선생님 영상 ③"]];
+const VIDEOS=[["i0A5PIkozWo","센터장 영상 · 태양계를 이루는 천체"],["J5przHKeTpI","센터장 영상 · 행성의 분류"],["y1q1-eUv8iI","센터장 영상 · 태양과 태양 활동"]];
 const videoBlock=(ids)=>`<div class="figs c${ids.length}">${ids.map(i=>`<div><div class="vid"><iframe src="https://www.youtube.com/embed/${VIDEOS[i][0]}?rel=0" title="${VIDEOS[i][1]}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div><p class="figcap">${VIDEOS[i][1]}</p></div>`).join("")}</div>`;
 
 /* ═══════ 학습 콘텐츠 ═══════ */
@@ -553,7 +553,7 @@ const CH=[
  {t:"learn",h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>크다</em> · 주로 <b>기체</b> → 밀도 <em>작다</em> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
  {t:"learn",h:"목성형 행성의 표면",wide:true,b:planetSurf("gas")+`<p style="margin-top:12px">착륙할 땅이 없어요! 보이는 건 전부 <b>기체 대기의 소용돌이</b>. 목성의 대적점, 토성의 줄무늬, 천왕성의 가느다란 고리, 해왕성의 대흑점.</p>`},
  {t:"learn",h:"자료표로 두 팀 가르기",wide:true,b:DATA_TABLE+`<div class="key"><span class="kt">논술형 핵심</span>표에서 <b>반지름·질량·밀도·위성 수·고리</b> 중 두 가지 이상을 골라 "A는 B<em>보다</em> ~하다"로 비교하면 근거 완성!</div>`},
- {t:"learn",h:"반전: 클수록 가볍다?",img:"saturn",cap:"<b>토성</b> — 평균 밀도 0.7 g/cm³, 물보다 가볍다",b:`<p>가장 많이 틀리는 오개념 — "크면 밀도도 크겠지?" <b>반대예요!</b></p>${METAPHOR}<div class="key"><span class="kt">오개념 교정</span>밀도는 '얼마나 꽉 찼는가'. 목성형은 덩치는 커도 기체라 <b>밀도가 작아요.</b></div>`},
+ {t:"learn",h:"반전: 클수록 밀도는 작다?",img:"saturn",cap:"<b>토성</b> — 평균 밀도 0.7 g/cm³, 물(1.0)보다 밀도가 작다",b:`<p>가장 많이 틀리는 오개념 — "크면 밀도도 크겠지?" <b>반대예요!</b></p>${METAPHOR}<div class="key"><span class="kt">오개념 교정</span>밀도는 '얼마나 꽉 찼는가'. 목성형은 덩치는 커도 기체라 <b>밀도가 작아요.</b></div>`},
  {t:"game2",h:"격납고 분류 작전"},
  {t:"learn",h:"서술 공식",img:"planets4",cap:"수성 · 금성 · 지구 · 화성 — 실제 비율",b:`<div class="key"><span class="kt">서술 공식</span>"A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>."</div><p>⚠️ 근거는 반드시 <b>두 가지 이상</b> — 한 가지만 쓰면 감점!</p><div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>크기·질량</td><td>작다</td><td>크다</td></tr><tr><td>평균 밀도</td><td>크다</td><td>작다</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div>`},
  {t:"quiz",q:"평균 밀도가 크고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"밀도가 크다 = 암석 행성 = 지구형! 지구형은 위성이 없거나 적어요."},
@@ -572,7 +572,7 @@ const CH=[
  {t:"quiz",q:"흑점이 어둡게 보이는 까닭은?",o:["빛을 전혀 내지 않아서","주위(광구)보다 온도가 낮아서","구멍이 뚫려 있어서"],a:1,ex:"흑점도 빛을 내지만, 약 4000℃로 주위(6000℃)보다 온도가 낮아 상대적으로 어둡게 보여요."},
  {t:"quiz",q:"개기 일식 때만 볼 수 있는, 100만 ℃가 넘는 태양의 바깥 대기는?",o:["광구","채층","코로나"],a:2,ex:"코로나! 평소엔 광구가 너무 밝아 보이지 않아요."},
  {t:"write",key:"w_c3",h:"관제 일지 · 한 줄 논술",img:"flare2",prompt:`관측 기록 — <b>(가) 시기</b>: 흑점 수 적음, 플레어 드묾 / <b>(나) 시기</b>: 흑점 수 많음, 플레어 자주 발생.<br>태양 활동이 더 활발한 시기를 <b>판단</b>하고, 자료에서 <b>근거 두 가지</b>를 들어 쓰세요.`,frame:"태양 활동은 <b>___ 시기</b>에 더 활발하다. 왜냐하면 (가) 시기보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:35,groups:[{name:"'(나) 시기' 판단",words:["나"]},{name:"흑점 근거",words:["흑점"]},{name:"플레어(홍염) 근거",words:["플레어","홍염"]}]},ai:"자료: (가) 흑점 적음·플레어 드묾 / (나) 흑점 많음·플레어 자주. 평가 요소: ① (나) 시기가 더 활발하다고 판단 ② 근거로 흑점 수 증가 ③ 근거로 홍염·플레어 잦음 ④ (가)와 비교하는 표현. 수준: 상=①②③④ / 중=판단 맞고 근거 하나 / 하=판단만 또는 틀림. 중1 범위: 흑점 수↑, 홍염·플레어↑ = 태양 활동 활발."},
- {t:"clear",pts:["표면: 광구(6000℃)·흑점(온도 낮아 어둡게)·쌀알 무늬(대류)","흑점 이동 = 태양의 자전 · 흑점 수 주기 약 11년","대기: 채층·코로나(100만℃↑) — 개기 일식 때","홍염(불기둥)·플레어(폭발)","활발 신호: 흑점↑·홍염/플레어↑·코로나↑·태양풍↑"]}
+ {t:"clear",vids:[2],pts:["표면: 광구(6000℃)·흑점(온도 낮아 어둡게)·쌀알 무늬(대류)","흑점 이동 = 태양의 자전 · 흑점 수 주기 약 11년","대기: 채층·코로나(100만℃↑) — 개기 일식 때","홍염(불기둥)·플레어(폭발)","활발 신호: 흑점↑·홍염/플레어↑·코로나↑·태양풍↑"]}
 ]},
 {id:"c4",cover:"aurora",title:"태양이 보낸 신호",no:"MISSION 04",sub:"태양 활동이 지구에 미치는 영향 · 8분",slides:[
  {t:"hero",log:"통신 로그 · D+58 · 우주기상 경보 발령",h:"태양이 보낸 신호",sub:"플레어 폭발 확인. 1억 5천만 km 떨어진 지구가 어떻게 흔들리는지 밝혀라 — 아라호의 통신이 끊기기 전에. — 센터장",scene:"sim"},
@@ -584,7 +584,7 @@ const CH=[
  {t:"quiz",q:"태양 활동이 활발할 때 지구에서 나타날 수 있는 현상이 <b>아닌</b> 것은?",o:["오로라가 더 자주 나타난다","GPS 수신에 오류가 생긴다","태양풍이 완전히 사라진다"],a:2,ex:"활발할수록 태양풍은 오히려 강해져요!"},
  {t:"quiz",q:"오로라에 대한 설명으로 옳은 것은?",o:["태양풍 입자가 공기와 부딪혀 빛을 낸다","지구 내부의 용암이 비친 것이다","달빛이 구름에 반사된 것이다"],a:0,ex:"태양풍의 전기를 띤 입자가 극지방 대기와 충돌하며 빛을 내는 현상이에요."},
  {t:"write",key:"w_c4",h:"관제 일지 · 한 줄 논술",img:"earth_effects",prompt:`"태양 활동이 활발해지면 지구의 통신이 왜 위험해질까?"<br><b>태양풍</b>이라는 말을 꼭 넣어, 원인→결과가 이어지는 한 문단으로 쓰세요.`,frame:"태양 활동이 활발해지면 <b>___이/가 강해지고</b>, 이것이 지구의 ___을/를 교란하여 <b>___ 현상</b>이 나타날 수 있다.",spec:{min:45,groups:[{name:"태양풍 언급",words:["태양풍"]},{name:"지구에서 나타나는 현상(통신 장애·GPS·오로라·정전·위성 등)",words:["통신","GPS","지피에스","오로라","정전","위성","델린저"]}]},ai:"평가 요소(인과 사슬): ① 태양 활동이 활발해지면 ② 태양풍이 강해지고 ③ 지구 자기장이 교란되어 ④ 통신 장애·GPS 오류·정전·오로라 등이 나타난다. 수준: 상=②③④가 순서대로 이어짐(③은 ‘지구에 영향을 준다’ 정도로 표현해도 인정) / 중=태양풍은 썼으나 결과와 연결이 느슨함 / 하=태양풍 없이 결과만 나열. 중1 범위를 넘는 용어(전리층, 자기권 등)는 쓰지 말고 요구하지도 말 것."},
- {t:"clear",vids:[2],pts:["태양풍 = 전기를 띤 입자의 흐름","활발 → 태양풍 강해짐 → 자기장 교란","오로라: 더 자주, 낮은 위도까지","통신 장애·GPS 오류·정전·위성 고장 → 우주 기상 예보로 대비","글의 뼈대 = 인과 사슬 ①→⑤"]}
+ {t:"clear",pts:["태양풍 = 전기를 띤 입자의 흐름","활발 → 태양풍 강해짐 → 자기장 교란","오로라: 더 자주, 낮은 위도까지","통신 장애·GPS 오류·정전·위성 고장 → 우주 기상 예보로 대비","글의 뼈대 = 인과 사슬 ①→⑤"]}
 ]},
 {id:"c5",cover:"telescope_girl",title:"승무원의 눈",no:"BONUS",sub:"천체 망원경과 천체 관측 · 6분 (평가 범위 밖)",slides:[
  {t:"hero",log:"통신 로그 · 지상 관제 · 보조 임무",h:"승무원의 눈",sub:"아라호만 우주를 보는 게 아니다. 승무원도 직접 하늘을 봐야 한다 — 천체 망원경을 조립하고 달과 행성, 태양을 관측하라. — 센터장",img:"telescope_girl"},
@@ -779,10 +779,10 @@ function mountG2(root,k){
  const bins=()=>`<div class="hangars"><div class="hangar rock"><h4>🪨 지구형 격납고</h4><div class="got">${got.rock.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div><div class="hangar gas"><h4>🎈 목성형 격납고</h4><div class="got">${got.gas.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div></div>`;
  const card=(p,hide)=>`<div class="doc" style="background:#0a0f2c;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)"><h4 style="color:var(--cyan)">관측 자료 — ${hide?`행성 <b>${String.fromCharCode(65+idx)}</b> (정체 미공개)`:`<b style="color:var(--sun)">${p.n}</b>`}</h4>
    <table class="t" style="font-size:1.08rem"><tr><td>반지름 (지구=1)</td><td style="text-align:left"><b style="color:var(--sun)">${p.r}</b> <span class="small">${p.r>2?"지구보다 훨씬 크다":"지구와 비슷하거나 작다"}</span></td></tr>
-   <tr><td>평균 밀도</td><td style="text-align:left"><b style="color:var(--sun)">${p.d} g/cm³</b> <span class="small">${p.d>3?"암석처럼 꽉 찼다 (물의 3배↑)":"물과 비슷하게 가볍다"}</span></td></tr>
+   <tr><td>평균 밀도</td><td style="text-align:left"><b style="color:var(--sun)">${p.d} g/cm³</b> <span class="small">${p.d>3?"암석처럼 꽉 찼다 (물의 3배↑)":"물(1.0)과 비슷한 밀도 → 기체"}</span></td></tr>
    <tr><td>위성 수</td><td style="text-align:left"><b style="color:var(--sun)">${p.sat}개</b></td></tr>
    <tr><td>고리</td><td style="text-align:left"><b style="color:var(--sun)">${p.ring}</b></td></tr></table>
-   <p class="small" style="margin:8px 0 0">힌트: 밀도와 크기를 먼저 보세요. ‘크면 무겁다’가 아니라 ‘얼마나 꽉 찼나’가 밀도!</p></div>`;
+   <p class="small" style="margin:8px 0 0">힌트: 밀도와 크기를 먼저 보세요. ‘크기가 크다’와 ‘밀도가 크다’는 다른 말! 밀도는 ‘얼마나 꽉 찼나’.</p></div>`;
  function draw(){
   if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>밀도·크기·위성·고리</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();return;}
   const p=q[idx];
