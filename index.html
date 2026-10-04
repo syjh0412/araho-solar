@@ -47,6 +47,9 @@ a{color:var(--cyan)}
 .tag{display:inline-flex;align-items:center;gap:6px;background:#080c24;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:3px 14px;font-size:.9rem}
 .small{font-size:.95rem;color:var(--mut)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.crew3{display:grid;grid-template-columns:.8fr 1.1fr 1.1fr;gap:16px;align-items:start;margin-bottom:16px}
+@media (max-width:1100px){.crew3{grid-template-columns:1fr 1fr}.crew3>:first-child{grid-column:1/-1}}
+@media (max-width:700px){.crew3{grid-template-columns:1fr}}
 @media (max-width:860px){.row2{grid-template-columns:1fr}}
 
 /* HUD */
@@ -399,7 +402,7 @@ let COUP={};
 function cpnState(c){const st=COUP[c.id]; if(st==="Y")return "y"; if(st==="W")return "w"; return c.t()?"ready":"lock";}
 function cpnHTML(){
   const got=CPNS.filter(c=>COUP[c.id]==="Y").length;
-  return `<h3 style="margin-top:18px">🍬 센터장 보급 <span class="small">받음 ${got}/${CPNS.length}</span></h3>
+  return `<h3>🍬 센터장 보급 <span class="small">받음 ${got}/${CPNS.length}</span></h3>
   <p class="small">조건을 채우면 <b>보급 신청</b> → 센터장 콘솔에 올라가고, 간식은 수업 시간에 받습니다. 쿠폰은 하나씩 한 번만!</p>
   ${API?CPNS.map(c=>{const st=cpnState(c);return `<div class="frame" style="display:flex;gap:10px;align-items:center;color:var(--fg);${st==='lock'?'opacity:.5':''}${st==='ready'?'border-color:var(--sun);border-style:solid':''}"><span style="font-size:1.4rem">🍬</span><div style="flex:1"><b>${c.n}</b><div class="small">${c.c}${st==='w'?' · 수업 시간에 센터장께 받으세요':''}</div></div>
    ${st==='y'?'<span class="pill g">지급 완료 ✓</span>':st==='w'?'<span class="pill w">센터장 결재 대기</span>':st==='ready'?`<button class="btn-p cpn" data-cid="${c.id}" style="min-height:42px;padding:6px 14px;font-size:.98rem">보급 신청</button>`:'<span class="pill">🔒</span>'}</div>`;}).join(""):'<p class="small">서버가 연결되면 열립니다.</p>'}`;
@@ -830,8 +833,8 @@ function renderCrew(){
  const sw=(t,obj,cur,shape,lockFn)=>`<div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">${Object.entries(obj).map(([k,v])=>{const lock=lockFn&&lockFn(k);return `<button class="stybtn" data-t="${t}" data-v="${k}" title="${v[v.length-1]}" ${lock?'disabled':''} style="min-height:0;width:44px;height:44px;padding:0;border-radius:${shape};background:${t==='visor'?`radial-gradient(circle at 35% 30%,${v[1]},${v[0]})`:v[0]};border:3px solid ${cur===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`;
  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실</h2>
  <p class="small" style="margin:0 4px 12px">점수를 모으면 장비가 지급되고, 지급된 장비는 색과 모양을 고를 수 있어요.</p>
- <div class="row2">
-  <div class="card" style="text-align:center"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${astronautSVG(null,null,260)}</div>
+ <div class="crew3">
+  <div class="card" style="text-align:center;margin:0"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${astronautSVG(null,null,220)}</div>
    <div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">${esc(me.name)}</div><div style="font-family:var(--disp);color:var(--sun);font-size:1.2rem">${r}</div>
    <div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
    <div style="text-align:left;margin-top:16px">
@@ -839,9 +842,9 @@ function renderCrew(){
     <div class="small" style="margin-top:12px">장갑·부츠 ${have("gloves")?"":"<span class='pill'>15점에 지급</span>"}</div>${have("gloves")?sw("glove",GLOVES,sty().glove,"10px"):""}
     <div class="small" style="margin-top:12px">헬멧 바이저 ${have("helmet")?"":"<span class='pill'>50점에 지급</span>"}</div>${have("helmet")?sw("visor",VISORS,sty().visor,"50%",k=>k==="gold"&&!have("visor")):""}
    </div></div>
-  <div class="card"><h3>장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
-   <div style="display:grid;gap:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);${have(it.k)?'border-color:var(--sun);border-style:solid':'opacity:.5'}"><span style="font-size:1.6rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill ${have(it.k)?'g':''}">${have(it.k)?'보유':it.at+'점'}</span></div>`).join("")}</div>
-   <div id="cpnBox">${cpnHTML()}</div></div>
+  <div class="card" style="margin:0"><h3>장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
+   <div style="display:grid;gap:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);margin:0;${have(it.k)?'border-color:var(--sun);border-style:solid':'opacity:.5'}"><span style="font-size:1.5rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill ${have(it.k)?'g':''}">${have(it.k)?'보유':it.at+'점'}</span></div>`).join("")}</div></div>
+  <div class="card" style="margin:0"><div id="cpnBox">${cpnHTML()}</div></div>
  </div>
  <div class="row2"><div class="card"><h3>🎖️ 승급 경로</h3><p class="small">점수가 쌓이면 자동으로 승급합니다. 지금 ${S.pts}점 — ${next?`<b style="color:var(--sun)">${next[1]}</b>까지 ${next[0]-S.pts}점`:"최고 등급!"}</p>
    <div style="display:grid;gap:8px">${RANKS.map((x,i)=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);${i===ri?'border-color:var(--sun);border-style:solid;background:#ffb13b14':i<ri?'opacity:.75':'opacity:.5'}"><span class="pill ${i<=ri?'g':''}" style="min-width:64px;text-align:center">${x[0]}점</span><b style="font-family:var(--disp);font-size:1.1rem">${x[1]}</b>${i===ri?'<span class="pill w" style="margin-left:auto">현재</span>':i===ri+1?'<span class="pill" style="margin-left:auto">다음</span>':''}</div>`).join("")}</div></div>
