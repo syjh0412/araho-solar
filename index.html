@@ -3,92 +3,236 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060a1f">
 <title>아라호 관제센터</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
-/* Layout: 하단 큰 탭 내비 + 한 화면 한 카드. 우주 관제센터 모니터 컨셉의 단일 다크 테마. */
+/* ──────────────────────────────────────────────
+   아라호 관제센터 · 디자인 토큰
+   레이아웃: 학습은 100dvh 풀스크린 슬라이드(전자칠판·태블릿),
+   나머지는 스크롤 카드. 볼드함은 각 장의 '살아있는 우주 장면' 한 곳에 집중.
+   ────────────────────────────────────────────── */
 :root{
-  --bg:#0b1026; --bg2:#121a3d; --card:#1a2350; --card2:#222d63; --line:#35407e;
-  --fg:#eef1ff; --muted:#aab3e0; --sun:#ffb340; --ice:#6ee7ff; --good:#4ade80; --bad:#ff8585; --warn:#ffd166;
+  --space0:#060a1f; --space1:#0b1130; --panel:#121a40; --panel2:#1a2454; --line:#2c3775; --line2:#44519e;
+  --fg:#f2f4ff; --mut:#9aa6db; --dim:#6b77b4;
+  --sun:#ffae34; --sun2:#ff7b1c; --cyan:#53e0ff; --green:#3de8a0; --red:#ff6b6b; --violet:#9b8cff;
   --disp:'Jua',sans-serif; --body:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
   color-scheme:dark;
 }
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.7;margin:0;
-  background-image:radial-gradient(1.5px 1.5px at 20% 30%,#ffffff55 50%,transparent 51%),radial-gradient(1px 1px at 70% 15%,#ffffff44 50%,transparent 51%),radial-gradient(1.5px 1.5px at 85% 60%,#ffffff33 50%,transparent 51%),radial-gradient(1px 1px at 40% 80%,#ffffff44 50%,transparent 51%),radial-gradient(1px 1px at 10% 70%,#ffffff33 50%,transparent 51%);}
-#app{max-width:860px;margin:0 auto;padding:16px 16px 110px}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:var(--space0);color:var(--fg);font-family:var(--body);font-size:17.5px;line-height:1.75;
+  background-image:
+   radial-gradient(1200px 700px at 85% -10%,#1b2a6b55,transparent 60%),
+   radial-gradient(900px 600px at -10% 110%,#3a155f44,transparent 60%),
+   radial-gradient(1.6px 1.6px at 12% 22%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 68% 12%,#fff6 50%,transparent 51%),
+   radial-gradient(1.4px 1.4px at 86% 48%,#fff5 50%,transparent 51%),radial-gradient(1px 1px at 38% 78%,#fff6 50%,transparent 51%),
+   radial-gradient(1.2px 1.2px at 8% 64%,#fff4 50%,transparent 51%),radial-gradient(1px 1px at 52% 38%,#fff5 50%,transparent 51%);
+  background-attachment:fixed}
 h1,h2,h3,.disp{font-family:var(--disp);font-weight:400;letter-spacing:.01em;text-wrap:balance;margin:0}
-h2{font-size:1.7rem} h3{font-size:1.3rem}
-p{margin:.5em 0}
-button{font-family:var(--body);font-size:1.05rem;border:0;border-radius:14px;cursor:pointer;min-height:52px;padding:10px 18px;color:var(--fg)}
-button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-offset:2px}
-.btn-p{background:var(--sun);color:#2a1a00;font-weight:700;font-size:1.15rem}
-.btn-s{background:var(--card2);border:1.5px solid var(--line)}
-.btn-g{background:transparent;border:1.5px solid var(--line);color:var(--muted)}
-textarea,input[type=text]{width:100%;background:var(--bg2);color:var(--fg);border:1.5px solid var(--line);border-radius:14px;padding:14px;font-size:1.1rem;font-family:var(--body);line-height:1.7}
-textarea{min-height:130px;resize:vertical}
-.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:20px 20px;margin:14px 0}
-.tag{display:inline-block;background:var(--bg2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:2px 12px;font-size:.85rem;letter-spacing:.06em}
-.hud{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:12px 16px}
-.hud .rk{font-family:var(--disp);font-size:1.15rem;color:var(--sun)}
-.hud .pt{font-variant-numeric:tabular-nums;color:var(--ice)}
-.bar{height:10px;background:var(--bg2);border-radius:99px;overflow:hidden;flex:1;min-width:120px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--ice));border-radius:99px}
-nav#tabs{position:fixed;left:0;right:0;bottom:0;background:#0d1330ee;border-top:1.5px solid var(--line);backdrop-filter:blur(6px);display:flex;justify-content:center;gap:4px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px))}
-nav#tabs button{background:transparent;min-height:60px;min-width:64px;flex:0 1 150px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.92rem;color:var(--muted);border-radius:14px;padding:6px 4px}
+p{margin:.55em 0}
+button{font-family:var(--body);font-size:1.05rem;border:0;border-radius:14px;cursor:pointer;min-height:52px;padding:10px 18px;color:var(--fg);-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.btn-p{background:linear-gradient(135deg,var(--sun),var(--sun2));color:#2a1500;font-weight:900;font-size:1.12rem;box-shadow:0 4px 18px #ff9c2a44}
+.btn-s{background:var(--panel2);border:1.5px solid var(--line2)}
+.btn-g{background:transparent;border:1.5px solid var(--line);color:var(--mut)}
+textarea,input[type=text]{width:100%;background:#0a0f2c;color:var(--fg);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-size:1.12rem;font-family:var(--body);line-height:1.8}
+textarea{min-height:140px;resize:vertical}
+textarea::placeholder,input::placeholder{color:var(--dim)}
+.wrap{max-width:900px;margin:0 auto;padding:18px 18px 112px}
+.card{background:linear-gradient(180deg,var(--panel),#0e1538);border:1.5px solid var(--line);border-radius:22px;padding:22px;margin:16px 0}
+.tag{display:inline-flex;align-items:center;gap:6px;background:#0a0f2c;border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:3px 14px;font-size:.88rem}
+.small{font-size:.95rem;color:var(--mut)}
+
+/* ── 상단 HUD ── */
+.hud{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#0d1335cc;border:1.5px solid var(--line);border-radius:18px;padding:12px 18px;backdrop-filter:blur(8px)}
+.hud .rk{font-family:var(--disp);font-size:1.2rem;color:var(--sun)}
+.hud .pt{font-variant-numeric:tabular-nums;color:var(--cyan);font-weight:700}
+.bar{height:10px;background:#0a0f2c;border-radius:99px;overflow:hidden;flex:1;min-width:110px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--cyan));border-radius:99px;transition:width .4s}
+
+/* ── 하단 탭 ── */
+nav#tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#090e26ee;border-top:1.5px solid var(--line);backdrop-filter:blur(10px);display:flex;justify-content:center;gap:4px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px))}
+nav#tabs button{background:transparent;min-height:62px;min-width:62px;flex:0 1 150px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.92rem;color:var(--mut);border-radius:14px;padding:6px 4px}
 nav#tabs button .ic{font-size:1.5rem}
-nav#tabs button.on{background:var(--card2);color:var(--fg)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.chap{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:18px;cursor:pointer;text-align:left;min-height:120px;display:flex;flex-direction:column;gap:8px}
-.chap .em{font-size:2rem}
-.chap.doneAll{border-color:var(--good)}
+nav#tabs button.on{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)}
+body.deckmode nav#tabs{display:none}
+
+/* ── 홈 히어로 ── */
+.hero{position:relative;text-align:center;padding:46px 18px 34px;overflow:hidden;border-radius:26px;border:1.5px solid var(--line);
+ background:radial-gradient(600px 330px at 50% 115%,#2a1a5e66,transparent),linear-gradient(180deg,#0d1335,#0a0f2c)}
+.hero .rocket{font-size:3.4rem;display:inline-block}
+@media (prefers-reduced-motion:no-preference){.hero .rocket{animation:bob 3.4s ease-in-out infinite}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}}
+.hero h1{font-size:clamp(2.1rem,7vw,3rem);margin:6px 0 2px;text-shadow:0 0 28px #ffae3430}
+.hero .sub{color:var(--mut);font-size:1.08rem;max-width:34em;margin:8px auto 0}
+.flow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.flow span{background:#0a0f2c;border:1.5px solid var(--line);border-radius:12px;padding:8px 14px;font-size:.98rem}
+.flow b{color:var(--sun)}
+
+/* ── 장 카드(미션 학습 목록) ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.chap{position:relative;overflow:hidden;background:linear-gradient(160deg,var(--panel),#0d1335);border:1.5px solid var(--line);border-radius:22px;padding:20px;cursor:pointer;text-align:left;min-height:150px;display:flex;flex-direction:column;gap:8px;transition:transform .15s,border-color .15s}
+.chap:active{transform:scale(.98)}
+.chap.doneAll{border-color:var(--green)}
+.chap .em{font-size:2.2rem}
+.chap h3{font-size:1.32rem}
+.chap .glow{position:absolute;right:-34px;top:-34px;width:120px;height:120px;border-radius:50%;filter:blur(32px);opacity:.5}
 .dots{display:flex;gap:6px;flex-wrap:wrap}
-.dots i{width:12px;height:12px;border-radius:99px;background:var(--bg2);border:1px solid var(--line)}
+.dots i{width:13px;height:13px;border-radius:99px;background:#0a0f2c;border:1px solid var(--line)}
 .dots i.on{background:var(--sun);border-color:var(--sun)}
-.deck-nav{display:flex;gap:10px;justify-content:space-between;margin-top:14px}
-.deck-nav button{flex:1;font-size:1.15rem}
-.learnbody{font-size:1.18rem}
-.learnbody b{color:var(--sun)} .learnbody em{color:var(--ice);font-style:normal;font-weight:700}
-.key{background:var(--bg2);border-left:5px solid var(--sun);border-radius:12px;padding:12px 14px;margin:12px 0;font-size:1.1rem}
-.opt{display:block;width:100%;text-align:left;background:var(--card2);border:1.5px solid var(--line);margin:8px 0;font-size:1.1rem;padding:14px 16px}
-.opt.ok{background:#15381f;border-color:var(--good)}
-.opt.no{background:#3a1b1b;border-color:var(--bad)}
-.fb{border-radius:14px;padding:12px 14px;margin-top:10px;font-size:1.05rem}
-.fb.ok{background:#15381f;border:1.5px solid var(--good)}
-.fb.no{background:#3a2314;border:1.5px solid var(--warn)}
+.stamp{font-family:var(--disp);color:var(--green);border:2.5px solid var(--green);border-radius:10px;display:inline-block;padding:2px 14px;transform:rotate(-6deg);background:#06301d55}
+
+/* ══════════ 슬라이드 무대 ══════════ */
+#stage{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--space0);
+ background-image:radial-gradient(1000px 560px at 80% -10%,#1b2a6b55,transparent 60%),radial-gradient(1.4px 1.4px at 16% 26%,#fff7 50%,transparent 51%),radial-gradient(1px 1px at 72% 16%,#fff5 50%,transparent 51%),radial-gradient(1.3px 1.3px at 88% 56%,#fff5 50%,transparent 51%),radial-gradient(1px 1px at 34% 82%,#fff5 50%,transparent 51%)}
+.stg-top{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px}
+.stg-top .ttl{font-family:var(--disp);font-size:1.12rem;color:var(--mut);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stg-top .num{font-variant-numeric:tabular-nums;color:var(--cyan);font-weight:700;font-size:1.05rem}
+.stg-top button{min-height:44px;padding:6px 14px}
+.pbar{height:5px;background:#0a0f2c}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--cyan));transition:width .35s}
+.stg-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:18px 18px 10px;display:flex}
+.slide{margin:auto;width:100%;max-width:860px}
+.stg-nav{position:relative;display:flex;gap:12px;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.stg-nav button{flex:1;font-size:1.2rem;min-height:60px}
+.stg-nav .hintkey{display:none}
+@media (min-width:900px){.stg-nav .hintkey{display:block;position:absolute;left:50%;transform:translateX(-50%);top:-20px;color:var(--dim);font-size:.85rem}}
+
+/* 슬라이드 공통 타이포 */
+.s-kicker{font-family:var(--disp);color:var(--cyan);font-size:1.05rem;letter-spacing:.04em;margin-bottom:4px}
+.s-title{font-family:var(--disp);font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.3;margin:2px 0 14px;text-shadow:0 0 24px #53e0ff1f}
+.s-body{font-size:clamp(1.12rem,2.6vw,1.3rem);line-height:1.85;max-width:38em}
+.s-body b{color:var(--sun)} .s-body em{color:var(--cyan);font-style:normal;font-weight:700}
+.s-body ul{padding-left:1.2em;margin:.5em 0}
+.key{background:#0a0f2c;border:1.5px solid var(--line);border-left:6px solid var(--sun);border-radius:14px;padding:14px 18px;margin:16px 0;font-size:clamp(1.08rem,2.4vw,1.22rem)}
+.key .kt{font-family:var(--disp);color:var(--sun);display:block;margin-bottom:2px}
+.figure{background:#0a0f2ccc;border:1.5px solid var(--line);border-radius:20px;padding:16px;margin:14px 0}
+.figcap{color:var(--mut);font-size:.95rem;text-align:center;margin-top:8px}
+svg text{font-family:var(--body)}
+
+/* 히어로 슬라이드 */
+.s-hero{text-align:center}
+.s-hero .s-title{font-size:clamp(2rem,6vw,3.1rem)}
+.s-hero .s-sub{color:var(--mut);font-size:1.12rem;max-width:30em;margin:0 auto}
+
+/* 퀴즈 */
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel2);border:1.5px solid var(--line2);margin:10px 0;font-size:clamp(1.08rem,2.5vw,1.25rem);padding:16px 18px;border-radius:16px}
+.opt .n{font-family:var(--disp);color:var(--cyan);flex:0 0 auto}
+.opt.ok{background:#0d3a2455;border-color:var(--green)}
+.opt.no{background:#43182055;border-color:var(--red)}
+@media (prefers-reduced-motion:no-preference){.opt.no{animation:shake .3s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}}
+.fb{border-radius:16px;padding:14px 18px;margin-top:14px;font-size:1.08rem}
+.fb.ok{background:#0d3a2455;border:1.5px solid var(--green)}
+.fb.no{background:#3a2a1055;border:1.5px solid var(--sun)}
 .cklist{list-style:none;padding:0;margin:8px 0}
 .cklist li{padding:4px 0}
-.cklist .y::before{content:"✔ ";color:var(--good)} .cklist .n::before{content:"✦ ";color:var(--warn)}
-.frame{background:var(--bg2);border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;color:var(--muted);font-size:1rem;margin:8px 0}
-table.t{border-collapse:collapse;width:100%;font-size:1.05rem}
-table.t th,table.t td{border:1px solid var(--line);padding:9px 10px;text-align:center}
-table.t th{background:var(--bg2);color:var(--ice);font-weight:700}
+.cklist .y::before{content:"✔ ";color:var(--green)} .cklist .n::before{content:"✦ ";color:var(--sun)}
+.frame{background:#0a0f2c;border:1.5px dashed var(--line2);border-radius:14px;padding:12px 16px;color:var(--mut);font-size:1.02rem;margin:10px 0}
+.frame b{color:var(--cyan)}
+
+/* 표 */
+table.t{border-collapse:collapse;width:100%;font-size:clamp(1rem,2.3vw,1.12rem);font-variant-numeric:tabular-nums}
+table.t th,table.t td{border:1px solid var(--line);padding:10px 12px;text-align:center}
+table.t th{background:#0a0f2c;color:var(--cyan);font-weight:700}
 table.t td:first-child{color:var(--sun);font-weight:700}
 .twrap{overflow-x:auto;margin:10px 0}
-.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}
-.chain .nd{background:var(--card2);border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:1rem}
-.chain .ar{color:var(--sun);font-size:1.3rem}
-.aurora{height:90px;border-radius:14px;margin:10px 0;background:linear-gradient(100deg,#0b1026 0%,#0e4d3a 25%,#2bd4a0 45%,#6ee7ff 60%,#7a5cff 80%,#0b1026 100%);opacity:.85;filter:blur(1px)}
-.wanted{border:2px solid var(--line);border-radius:18px;padding:16px;background:linear-gradient(180deg,var(--card),var(--bg2));margin:12px 0}
-.wanted.solved{border-color:var(--good)}
-.stamp{font-family:var(--disp);color:var(--good);border:2.5px solid var(--good);border-radius:10px;display:inline-block;padding:2px 12px;transform:rotate(-6deg)}
-.sec{border:1.5px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
-.sec>button{width:100%;text-align:left;background:var(--card2);border:0;border-radius:0;font-size:1.08rem;font-weight:700}
-.sec>div{padding:12px 16px;background:var(--bg2)}
-.small{font-size:.95rem;color:var(--muted)}
-.codebox{background:#050816;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:.85rem;word-break:break-all;max-height:140px;overflow:auto;user-select:all}
+
+/* 인과 사슬 */
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:14px 0}
+.chain .nd{flex:1 1 140px;background:var(--panel2);border:1.5px solid var(--line2);border-radius:14px;padding:12px 14px;font-size:1.02rem;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.chain .nd b{color:var(--sun);font-family:var(--disp);font-weight:400}
+.chain .ar{align-self:center;color:var(--sun);font-size:1.5rem}
+
+/* ── 장면: 공전 태양계 ── */
+.orbitbox{position:relative;width:min(88vw,460px);aspect-ratio:1;max-width:100%;margin:6px auto}
+.orbit{position:absolute;border:1.5px dashed #3a4a9a66;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
+.spin{position:absolute;left:50%;top:50%;width:0;height:0}
+@media (prefers-reduced-motion:no-preference){.spin{animation:rot linear infinite}@keyframes rot{to{transform:rotate(360deg)}}}
+.planet{position:absolute;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;box-shadow:0 0 10px #0008}
+.planet u{text-decoration:none}
+.planet span{position:absolute;left:50%;top:-2em;transform:translateX(-50%);font-size:.85rem;color:var(--fg);background:#0a0f2cdd;border:1px solid var(--line);border-radius:8px;padding:1px 8px;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.planet.show span{opacity:1}
+.sunCore{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15%;aspect-ratio:1;border-radius:50%;
+ background:radial-gradient(circle at 38% 34%,#fff3c4,#ffae34 55%,#ff7b1c);box-shadow:0 0 36px 10px #ffae3466,0 0 90px 30px #ff7b1c22}
+.beltdot{position:absolute;width:3px;height:3px;border-radius:50%;background:#c9b08a;transform:translate(-50%,-50%)}
+
+/* ── 장면: 태양 클로즈업 ── */
+.sunstage{position:relative;width:min(92vw,460px);margin:4px auto}
+@media (prefers-reduced-motion:no-preference){
+ .corona{animation:pulse 4.5s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+ .flareA{animation:flick 2.6s ease-in-out infinite}@keyframes flick{0%,100%{opacity:.35}45%{opacity:1}}
+}
+.pin{font-size:15px;fill:#f2f4ff}
+
+/* ── 장면: 분류 격납고 게임 ── */
+.hangars{display:flex;gap:12px;margin-top:14px}
+.hangar{flex:1;border:2px solid var(--line2);border-radius:18px;padding:12px;min-height:110px;text-align:center}
+.hangar h4{font-family:var(--disp);font-weight:400;font-size:1.15rem;margin:0 0 6px}
+.hangar.rock{border-color:#d08f5a} .hangar.gas{border-color:var(--cyan)}
+.hangar .got{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.hangar .got span{background:#0a0f2c;border:1px solid var(--line);border-radius:10px;padding:3px 10px;font-size:.95rem}
+.qPlanet{text-align:center;margin:8px 0}
+.qPlanet .ball{display:inline-block;border-radius:50%;box-shadow:0 0 24px #0009, inset -14px -14px 30px #0006}
+.qPlanet .nm{font-family:var(--disp);font-size:1.5rem;display:block;margin-top:8px}
+.binbtns{display:flex;gap:12px;margin-top:10px}
+.binbtns button{flex:1;font-size:1.15rem;min-height:62px}
+
+/* ── 장면: 태양 활동 시뮬레이터 ── */
+.sim{border:1.5px solid var(--line);border-radius:20px;background:#0a0f2cd9;padding:16px;text-align:left}
+.simrow{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center}
+.simsun{position:relative;width:120px;height:120px;border-radius:50%;flex:0 0 auto;overflow:hidden;
+ background:radial-gradient(circle at 38% 34%,#fff3c4,#ffae34 55%,#ff7b1c);box-shadow:0 0 12px 4px #ffae3466;transition:box-shadow .3s}
+.simsun i{position:absolute;border-radius:50%;background:#5a2d00}
+.windlane{position:relative;flex:1;min-width:150px;height:60px;overflow:hidden}
+.wp{position:absolute;top:0;width:7px;height:7px;border-radius:50%;background:var(--cyan);opacity:.9}
+@media (prefers-reduced-motion:no-preference){.wp{animation:fly linear infinite}@keyframes fly{from{transform:translateX(-10px)}to{transform:translateX(440px)}}}
+.earthdot{width:74px;height:74px;border-radius:50%;flex:0 0 auto;position:relative;
+ background:radial-gradient(circle at 35% 35%,#9fd8ff,#2a6fd6 60%,#143a78);box-shadow:0 0 18px #2a6fd666}
+.aur{position:absolute;left:50%;top:-16px;transform:translateX(-50%);width:88px;height:30px;border-radius:50%;
+ background:linear-gradient(90deg,transparent,var(--green),var(--cyan),var(--violet),transparent);filter:blur(5px);opacity:.15;transition:opacity .3s,height .3s}
+.lamps{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+.lamp{background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:10px;text-align:center;font-size:.98rem;transition:border-color .3s}
+.lamp .st{display:block;font-weight:900;margin-top:2px}
+.lamp.good{border-color:var(--green)} .lamp.good .st{color:var(--green)}
+.lamp.warnL{border-color:var(--sun)} .lamp.warnL .st{color:var(--sun)}
+.lamp.badL{border-color:var(--red)} .lamp.badL .st{color:var(--red)}
+input[type=range]{width:100%;accent-color:var(--sun);height:40px}
+.simread{font-family:var(--disp);text-align:center;font-size:1.25rem;margin-top:8px}
+.simread b{color:var(--sun)}
+
+/* 비유 그림 */
+.metaphor{display:flex;gap:14px;justify-content:center;align-items:flex-end;flex-wrap:wrap;margin:12px 0}
+.metaphor .m{text-align:center;flex:1 1 150px;max-width:230px}
+.metaphor .shape{margin:0 auto;border-radius:50%}
+.metaphor .lb{margin-top:8px;font-size:1.02rem}
+.metaphor .lb b{color:var(--sun)}
+
+/* 수배 파일 */
+.wanted{position:relative;border:2px solid var(--line2);border-radius:20px;padding:18px;background:linear-gradient(170deg,var(--panel),#0a0f2c);margin:14px 0}
+.wanted::before{content:"CASE FILE";position:absolute;right:16px;top:-12px;font-family:var(--disp);font-size:.8rem;letter-spacing:.2em;color:var(--dim);background:var(--space0);padding:0 8px}
+.wanted.solved{border-color:var(--green)}
+.clue{background:#0a0f2c;border:1.5px dashed var(--line2);border-radius:14px;padding:12px 16px;font-size:1.1rem;margin:10px 0}
+
+/* 선생님/코드 */
+.codebox{background:#04071a;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:.85rem;word-break:break-all;max-height:150px;overflow:auto;user-select:all}
 .badgerow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-.badge{background:var(--bg2);border:1.5px solid var(--line);border-radius:12px;padding:6px 12px;font-size:.95rem}
-.badge.on{border-color:var(--sun);color:var(--sun)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--sun);color:#2a1a00;font-weight:700;padding:12px 22px;border-radius:99px;box-shadow:0 6px 24px #0008;z-index:50;transition:opacity .3s}
-svg text{font-family:var(--body)}
-@media (prefers-reduced-motion:no-preference){ .flare{animation:fl 3s ease-in-out infinite} @keyframes fl{0%,100%{opacity:.5}50%{opacity:1}} }
-@media (max-width:460px){ body{font-size:16px} .card{padding:16px 14px} }
+.badge{background:#0a0f2c;border:1.5px solid var(--line);border-radius:12px;padding:7px 13px;font-size:.98rem}
+.badge.on{border-color:var(--sun);color:var(--sun);box-shadow:0 0 14px #ffae3422}
+.sec{border:1.5px solid var(--line);border-radius:16px;margin:12px 0;overflow:hidden}
+.sec>button{width:100%;text-align:left;background:var(--panel2);border:0;border-radius:0;font-size:1.08rem;font-weight:700}
+.sec>div{padding:14px 18px;background:#0a0f2c}
+.news{border-left:6px solid var(--violet);background:#151040;border-radius:12px;padding:12px 16px;margin:10px 0;font-size:1.08rem}
+.news .src{color:var(--mut);font-size:.9rem}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(98px + env(safe-area-inset-bottom,0px));background:linear-gradient(135deg,var(--sun),var(--sun2));color:#2a1500;font-weight:900;padding:13px 24px;border-radius:99px;box-shadow:0 8px 28px #000a;z-index:60;transition:opacity .3s;font-size:1.05rem}
+body.deckmode .toast{bottom:110px}
+@media (max-width:460px){body{font-size:16.5px}.card{padding:18px 16px}}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app" class="wrap"></div>
+<div id="stage" hidden></div>
 <nav id="tabs">
   <button data-v="home"><span class="ic">🛰️</span>관제센터</button>
   <button data-v="learn"><span class="ic">📚</span>미션 학습</button>
@@ -99,22 +243,22 @@ svg text{font-family:var(--body)}
 
 <script>
 "use strict";
-/* ───────── 상태 ───────── */
+/* ═══════ 상태 ═══════ */
 const LS="araho_v1", TEACHER_CODE="0726";
-let S={name:"",cls:"",pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},tdone:false};
+let S={name:"",cls:"",pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},tdone:false,slide:{}};
 try{const j=localStorage.getItem(LS); if(j)S={...S,...JSON.parse(j)};}catch(e){}
+if(!S.slide)S.slide={};
 function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){} drawHud();}
 function addPts(n){S.pts+=n;save();toast("+"+n+"점!");}
-function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),400);},1300);}
-const RANKS=[[0,"훈련생 🌱"],[30,"3등 관제사 🥉"],[70,"2등 관제사 🥈"],[120,"1등 관제사 🥇"],[170,"수석 관제사 ⭐"]];
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),400);},1400);}
+const RANKS=[[0,"훈련생 🌱"],[30,"3등 관제사 🥉"],[80,"2등 관제사 🥈"],[140,"1등 관제사 🥇"],[200,"수석 관제사 ⭐"]];
 function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length;i++){if(S.pts>=RANKS[i][0]){r=RANKS[i][1];next=RANKS[i+1]||null;}}return{r,next};}
 function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
-/* ───────── AI 코치 (Gemini API) ───────── */
+/* ═══════ AI 코치 (Gemini) ═══════ */
 const GKEY_LS="araho_gkey";
 function getKey(){try{return localStorage.getItem(GKEY_LS)||"";}catch(e){return "";}}
 function setKey(k){try{if(k)localStorage.setItem(GKEY_LS,k);else localStorage.removeItem(GKEY_LS);}catch(e){}}
-/* 배포 링크(?k=... 또는 #k=...)로 열면 키를 기기에 저장하고 주소에서 지움 */
 (function(){try{
   const q=new URLSearchParams(location.search); let k=q.get("k")||"";
   if(!k&&location.hash.startsWith("#k="))k=decodeURIComponent(location.hash.slice(3));
@@ -129,7 +273,7 @@ async function geminiJSON(prompt){
       const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`,{
         method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:"application/json",temperature:0.4}})});
-      if(res.status===404)continue;               // 이 모델이 없으면 다음 모델 시도
+      if(res.status===404)continue;
       if(!res.ok){lastErr=res.status;if(res.status===429){await new Promise(r=>setTimeout(r,1500));continue;}break;}
       const j=await res.json();
       const txt=j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts&&j.candidates[0].content.parts.map(p=>p.text||"").join("");
@@ -139,8 +283,9 @@ async function geminiJSON(prompt){
   }
   throw lastErr||new Error("fail");
 }
+function showAI(){document.querySelectorAll(".aibtn").forEach(b=>b.hidden=!coach());}
 
-/* ───────── 서술 점검 엔진 ───────── */
+/* ═══════ 서술 점검 엔진 ═══════ */
 const LINKS=/(때문|따라서|그러므로|왜냐하면|그래서|이므로|으므로)/;
 const COMPARE=/(반면|비해|보다|많고|적고|크고|작고|높고|낮고|달리)/;
 function checkWrite(text,spec){
@@ -152,8 +297,7 @@ function checkWrite(text,spec){
   if(spec.link!==false){need++;if(LINKS.test(t)){got++;msgs.push({y:1,m:"이유·결론 연결어 사용 (때문에, 따라서 등)"});}else msgs.push({y:0,m:"'왜냐하면 ~ 때문이다', '따라서 ~'로 근거와 주장을 이어 보세요"});}
   return {pass:got>=need, got, need, msgs};
 }
-function fbHTML(r){return `<div class="fb ${r.pass?'ok':'no'}"><b>${r.pass?'✅ 통과! 논리가 잘 이어졌어요.':'🛰️ 관제센터 점검 결과 '+r.got+'/'+r.need}</b><ul class="cklist">${r.msgs.map(m=>`<li class="${m.y?'y':'n'}">${esc(m.m)}</li>`).join("")}</ul>${r.pass?'':'<div class="small">✦ 표시만 고쳐서 다시 점검해 보세요. 고칠수록 점수가 올라가는 게 진짜 공부!</div>'}</div>`;}
-
+function fbHTML(r){return `<div class="fb ${r.pass?'ok':'no'}"><b>${r.pass?'✅ 통과! 논리가 잘 이어졌어요.':'🛰️ 관제센터 점검 '+r.got+'/'+r.need}</b><ul class="cklist">${r.msgs.map(m=>`<li class="${m.y?'y':'n'}">${esc(m.m)}</li>`).join("")}</ul>${r.pass?'':'<div class="small">✦ 표시만 고쳐서 다시 점검해 보세요. 고칠수록 좋아지는 게 진짜 글쓰기!</div>'}</div>`;}
 async function aiFeedback(key,prompt,textGetter,outEl){
   const t=textGetter(); if(!t.trim()){outEl.innerHTML='<div class="fb no">먼저 글을 써 주세요!</div>';return;}
   outEl.innerHTML='<div class="fb no">🤖 AI 코치가 읽는 중…</div>';
@@ -167,75 +311,178 @@ async function aiFeedback(key,prompt,textGetter,outEl){
       ${res.next?`<div class="frame">✍️ 이렇게 이어 보면? “${esc(res.next)}”</div>`:""}</div>`;
   }catch(e){outEl.innerHTML='<div class="fb no">AI 코치 연결에 실패했어요(키 확인 또는 잠시 후 다시). 자동 점검으로도 충분히 연습할 수 있어요!</div>';}
 }
-function showAI(){document.querySelectorAll(".aibtn").forEach(b=>b.hidden=!coach());}
 
-/* ───────── 학습 콘텐츠 ───────── */
-const SUN_SVG=`<svg viewBox="0 0 360 230" style="max-width:100%;display:block;margin:8px auto">
-<defs><radialGradient id="sg" cx="50%" cy="50%"><stop offset="0%" stop-color="#fff3c4"/><stop offset="55%" stop-color="#ffb340"/><stop offset="100%" stop-color="#ff7b1c"/></radialGradient></defs>
-<circle cx="150" cy="120" r="92" fill="none" stroke="#ffd16655" stroke-width="16"/>
-<circle cx="150" cy="120" r="78" fill="url(#sg)"/>
-<ellipse cx="128" cy="100" rx="9" ry="6" fill="#5a2d00"/><ellipse cx="170" cy="140" rx="6" ry="4" fill="#5a2d00"/><ellipse cx="146" cy="150" rx="4" ry="3" fill="#5a2d00"/>
-<path class="flare" d="M216 70 q30 -26 14 -52 q-4 26 -30 36 z" fill="#ffd166"/>
-<path d="M60 160 q-20 18 2 34 q20 12 30 -6" fill="none" stroke="#ff8f4d" stroke-width="7" stroke-linecap="round"/>
-<line x1="128" y1="100" x2="288" y2="40" stroke="#aab3e0" stroke-width="1"/><text x="238" y="34" fill="#eef1ff" font-size="15">흑점</text>
-<line x1="222" y1="52" x2="288" y2="78" stroke="#aab3e0" stroke-width="1"/><text x="292" y="83" fill="#eef1ff" font-size="15">플레어</text>
-<line x1="75" y1="185" x2="60" y2="212" stroke="#aab3e0" stroke-width="1"/><text x="40" y="227" fill="#eef1ff" font-size="15">홍염</text>
-<line x1="150" y1="34" x2="200" y2="14" stroke="#aab3e0" stroke-width="1"/><text x="204" y="14" fill="#eef1ff" font-size="15">코로나(대기)</text>
-<line x1="108" y1="62" x2="52" y2="40" stroke="#aab3e0" stroke-width="1"/><text x="12" y="34" fill="#eef1ff" font-size="15">광구(표면)</text>
-</svg>`;
-const ORBIT_SVG=`<svg viewBox="0 0 360 210" style="max-width:100%;display:block;margin:8px auto">
-<circle cx="180" cy="105" r="16" fill="#ffb340"/><text x="180" y="86" fill="#ffd166" font-size="14" text-anchor="middle">태양</text>
-<ellipse cx="180" cy="105" rx="46" ry="26" fill="none" stroke="#35407e"/><circle cx="226" cy="105" r="5" fill="#8ab4ff"/>
-<ellipse cx="180" cy="105" rx="86" ry="48" fill="none" stroke="#35407e"/><circle cx="94" cy="105" r="6" fill="#6ee7ff"/><circle cx="104" cy="96" r="2.5" fill="#dfe6ff"/><text x="60" y="94" fill="#aab3e0" font-size="13">행성＋위성</text>
-<g fill="#b7a27a">${Array.from({length:22},(_,i)=>{const a=i/22*6.283;return `<circle cx="${(180+118*Math.cos(a)).toFixed(0)}" cy="${(105+62*Math.sin(a)).toFixed(0)}" r="1.6"/>`;}).join("")}</g>
-<text x="300" y="150" fill="#aab3e0" font-size="13">소행성대</text>
-<path d="M330 40 q-60 10 -120 52" fill="none" stroke="#35407e" stroke-dasharray="4 4"/>
-<circle cx="330" cy="40" r="5" fill="#bfe9ff"/><path d="M335 36 l26 -14 M335 42 l28 -4" stroke="#bfe9ff" stroke-width="2"/>
-<text x="268" y="26" fill="#aab3e0" font-size="13">혜성(긴 궤도)</text>
-</svg>`;
-const CHAIN=`<div class="chain"><span class="nd">태양 활동 활발 ☀️</span><span class="ar">→</span><span class="nd">흑점 수 ↑ · 홍염/플레어 잦음</span><span class="ar">→</span><span class="nd">태양풍 강해짐 🌬️</span><span class="ar">→</span><span class="nd">지구 자기장 교란</span><span class="ar">→</span><span class="nd">오로라·통신 장애·GPS 오류·정전·위성 고장</span></div>`;
+/* ═══════ 장면(Scene) 빌더 ═══════ */
+function sceneOrbit(){
+  const planets=[
+   ["수성",14,7,"#b9a08a",6,10],["금성",20,10,"#e8c27a",10,120],["지구",27,11,"#4f9df0",14,230],["화성",33,8,"#e06b4c",18,40],
+   ["목성",48,22,"#e0a876",30,300],["토성",60,19,"#e6cf9b",40,80],["천왕성",72,14,"#9fdce6",52,190],["해왕성",84,13,"#5f84e8",64,330]];
+  let belt="";for(let i=0;i<34;i++){const a=i/34*360+(i*7)%13;const r=40.5+((i*13)%7)/3;
+    belt+=`<i class="beltdot" style="left:${(50+r*Math.cos(a*Math.PI/180)).toFixed(1)}%;top:${(50+r*Math.sin(a*Math.PI/180)).toFixed(1)}%"></i>`;}
+  return `<div class="orbitbox">
+    ${planets.map(p=>`<div class="orbit" style="width:${p[1]*2}%;height:${p[1]*2}%"></div>`).join("")}
+    ${belt}
+    <div class="sunCore"></div>
+    ${planets.map(p=>`<div class="spin" style="animation-duration:${p[4]}s;transform:rotate(${p[5]}deg)">
+       <div class="planet" data-nm="${p[0]}" style="left:${p[1]*2.3}px;top:0;width:${p[2]}px;height:${p[2]}px;background:radial-gradient(circle at 35% 35%,#fff6,${p[3]})">
+       ${p[0]==="토성"?'<u style="position:absolute;left:50%;top:50%;width:170%;height:40%;border:1.5px solid #e6cf9baa;border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg)"></u>':""}
+       <span>${p[0]}</span></div></div>`).join("")}
+  </div>
+  <p class="figcap">행성을 눌러 이름 확인 · 화성과 목성 사이 작은 점들 = 소행성대</p>`;
+}
+function bindOrbit(root){
+  /* spin 원점이 컨테이너 중앙(0,0)이므로 행성 left를 '궤도 반지름 % × 컨테이너 폭' px로 배치 */
+  const box=root.querySelector(".orbitbox"); if(!box)return;
+  const RAD={"수성":14,"금성":20,"지구":27,"화성":33,"목성":48,"토성":60,"천왕성":72,"해왕성":84};
+  const place=()=>{const w=box.clientWidth;
+    box.querySelectorAll(".planet").forEach(pl=>{pl.style.left=(w*(RAD[pl.dataset.nm]||20)/100)+"px";});};
+  box.querySelectorAll(".planet").forEach(pl=>{pl.onclick=()=>pl.classList.toggle("show");});
+  place(); window.addEventListener("resize",place,{passive:true});
+}
 
+function sceneSun(){
+ return `<div class="sunstage"><svg viewBox="0 0 460 330" style="width:100%;display:block">
+  <defs>
+   <radialGradient id="sg2" cx="42%" cy="38%"><stop offset="0%" stop-color="#fff6cf"/><stop offset="55%" stop-color="#ffae34"/><stop offset="100%" stop-color="#ff7b1c"/></radialGradient>
+   <radialGradient id="cor" cx="50%" cy="50%"><stop offset="55%" stop-color="#ffd16600"/><stop offset="80%" stop-color="#ffd16633"/><stop offset="100%" stop-color="#ffd16600"/></radialGradient>
+  </defs>
+  <circle class="corona" cx="210" cy="170" r="150" fill="url(#cor)"/>
+  <circle cx="210" cy="170" r="104" fill="none" stroke="#ff9c5a66" stroke-width="10"/>
+  <circle cx="210" cy="170" r="96" fill="url(#sg2)"/>
+  <g fill="#ffca6b22">${[0,1,2,3,4,5].map(i=>`<circle cx="${175+i*14}" cy="${130+((i*37)%70)}" r="9"/>`).join("")}</g>
+  <ellipse cx="182" cy="142" rx="12" ry="8" fill="#5a2d00"/><ellipse cx="238" cy="196" rx="8" ry="5" fill="#5a2d00"/><ellipse cx="206" cy="210" rx="5" ry="4" fill="#5a2d00"/>
+  <path class="flareA" d="M292 92 q40 -34 20 -70 q-6 34 -40 48 z" fill="#ffd166"/>
+  <path d="M118 236 q-26 24 2 44 q26 16 40 -8" fill="none" stroke="#ff8f4d" stroke-width="9" stroke-linecap="round"/>
+  <line x1="182" y1="142" x2="356" y2="76" stroke="#9aa6db" stroke-width="1"/><text x="300" y="68" class="pin">흑점</text>
+  <line x1="300" y1="56" x2="356" y2="112" stroke="#9aa6db" stroke-width="1"/><text x="360" y="118" class="pin">플레어</text>
+  <line x1="138" y1="258" x2="110" y2="296" stroke="#9aa6db" stroke-width="1"/><text x="76" y="314" class="pin">홍염</text>
+  <line x1="210" y1="66" x2="258" y2="30" stroke="#9aa6db" stroke-width="1"/><text x="262" y="26" class="pin">코로나(대기)</text>
+  <line x1="150" y1="104" x2="84" y2="66" stroke="#9aa6db" stroke-width="1"/><text x="18" y="58" class="pin">광구(표면)</text>
+  <line x1="178" y1="232" x2="300" y2="260" stroke="#9aa6db" stroke-width="1"/><text x="304" y="266" class="pin">쌀알 무늬</text>
+ </svg></div>`;
+}
+
+const SIZE_FIG=`<div class="figure"><svg viewBox="0 0 440 150" style="width:100%;display:block">
+  <circle cx="60" cy="96" r="4" fill="#b9a08a"/><circle cx="96" cy="92" r="8.5" fill="#e8c27a"/><circle cx="138" cy="91" r="9" fill="#4f9df0"/><circle cx="176" cy="95" r="5" fill="#e06b4c"/>
+  <circle cx="262" cy="74" r="48" fill="#e0a876"/><circle cx="352" cy="80" r="40" fill="#e6cf9b"/><ellipse cx="352" cy="80" rx="62" ry="12" fill="none" stroke="#e6cf9b" stroke-width="3"/>
+  <circle cx="412" cy="96" r="17" fill="#9fdce6"/>
+  <line x1="20" y1="126" x2="430" y2="126" stroke="#2c3775"/>
+  <text x="112" y="146" fill="#9aa6db" font-size="14" text-anchor="middle">지구형 — 작다</text>
+  <text x="330" y="146" fill="#9aa6db" font-size="14" text-anchor="middle">목성형 — 크다</text>
+</svg><p class="figcap">실제 비율로 그린 행성 크기 비교 — 지구는 목성 옆에선 구슬 크기!</p></div>`;
+
+const METAPHOR=`<div class="metaphor">
+ <div class="m"><div class="shape" style="width:84px;height:84px;background:radial-gradient(circle at 35% 35%,#fff,#c9ccd8 60%,#7d8294);box-shadow:inset -14px -14px 24px #0005"></div>
+  <div class="lb"><b>쇠구슬</b> = 지구형<br>작지만 <b>꽉 찬 암석</b> → 밀도 크다</div></div>
+ <div class="m"><div class="shape" style="width:150px;height:150px;background:radial-gradient(circle at 35% 35%,#ffe9f6,#f7b8e0 55%,#c98ad4);box-shadow:inset -20px -20px 40px #0003"></div>
+  <div class="lb"><b>솜사탕</b> = 목성형<br>크지만 <b>푹신한 기체</b> → 밀도 작다</div></div>
+</div>`;
+
+const FAMILY_FIG=`<div class="figure"><svg viewBox="0 0 440 190" style="width:100%;display:block">
+ <circle cx="70" cy="95" r="26" fill="#ffae34"/><text x="70" y="101" text-anchor="middle" font-size="16" fill="#2a1500" font-weight="700">태양</text>
+ <g stroke="#53e0ff" stroke-width="2" fill="none"><path d="M100 80 Q160 48 212 56"/><path d="M100 95 Q165 95 212 100"/><path d="M100 112 Q160 148 212 144"/></g>
+ <text x="146" y="46" fill="#53e0ff" font-size="13">공전</text><text x="152" y="88" fill="#53e0ff" font-size="13">공전</text><text x="146" y="166" fill="#53e0ff" font-size="13">공전</text>
+ <rect x="214" y="40" rx="10" width="92" height="32" fill="#1a2454" stroke="#44519e"/><text x="260" y="61" text-anchor="middle" fill="#f2f4ff" font-size="15">행성 8개</text>
+ <rect x="214" y="86" rx="10" width="92" height="30" fill="#1a2454" stroke="#44519e"/><text x="260" y="106" text-anchor="middle" fill="#f2f4ff" font-size="15">소행성</text>
+ <rect x="214" y="130" rx="10" width="92" height="30" fill="#1a2454" stroke="#44519e"/><text x="260" y="150" text-anchor="middle" fill="#f2f4ff" font-size="15">혜성</text>
+ <path d="M308 56 Q346 56 366 70" stroke="#3de8a0" stroke-width="2" fill="none"/><text x="322" y="46" fill="#3de8a0" font-size="13">공전</text>
+ <rect x="358" y="64" rx="10" width="72" height="30" fill="#1a2454" stroke="#3de8a0"/><text x="394" y="84" text-anchor="middle" fill="#f2f4ff" font-size="15">위성</text>
+</svg><p class="figcap">태양계 가족 지도 — 화살표(공전)를 따라가면 누구든 결국 태양과 이어진다</p></div>`;
+
+function sceneSim(){
+ return `<div class="sim">
+  <div class="simrow">
+    <div class="simsun" id="simsun"></div>
+    <div class="windlane" id="windlane"></div>
+    <div class="earthdot"><div class="aur" id="aur"></div></div>
+  </div>
+  <div class="simread" id="simread"></div>
+  <input type="range" id="simrange" min="0" max="100" value="15" aria-label="태양 활동 세기">
+  <div style="display:flex;justify-content:space-between" class="small"><span>조용한 태양</span><span>활발한 태양</span></div>
+  <div class="lamps">
+   <div class="lamp" id="lp1">🌌 오로라<span class="st">—</span></div>
+   <div class="lamp" id="lp2">📡 무선 통신<span class="st">—</span></div>
+   <div class="lamp" id="lp3">🧭 GPS<span class="st">—</span></div>
+   <div class="lamp" id="lp4">💡 전력망<span class="st">—</span></div>
+  </div>
+ </div>
+ <p class="figcap">슬라이더를 밀어 보세요 — 흑점·태양풍·지구의 변화가 한 줄로 이어집니다</p>`;
+}
+function bindSim(root){
+  const r=root.querySelector("#simrange"); if(!r)return;
+  const sun=root.querySelector("#simsun"),lane=root.querySelector("#windlane"),aur=root.querySelector("#aur"),read=root.querySelector("#simread");
+  const lamps=[root.querySelector("#lp1"),root.querySelector("#lp2"),root.querySelector("#lp3"),root.querySelector("#lp4")];
+  function setLamp(el,cls,txt){el.classList.remove("good","warnL","badL");el.classList.add(cls);el.querySelector(".st").textContent=txt;}
+  function upd(){
+    const v=+r.value;
+    const n=Math.round(1+v/11);
+    sun.innerHTML=Array.from({length:n},(_,i)=>{const a=(i*137)%360,d=16+(i*29)%34;
+      return `<i style="left:${(54+d*Math.cos(a*Math.PI/180)*0.9).toFixed(0)}px;top:${(54+d*Math.sin(a*Math.PI/180)*0.9).toFixed(0)}px;width:${6+(i%3)*3}px;height:${5+(i%3)*2}px"></i>`;}).join("");
+    sun.style.boxShadow=`0 0 ${12+v*0.5}px ${4+v*0.22}px #ffae34${v>60?"aa":"66"}`;
+    const np=Math.round(3+v/7);
+    lane.innerHTML=Array.from({length:np},(_,i)=>`<span class="wp" style="top:${(i*53)%92}%;animation-duration:${(3.6-v*0.028).toFixed(2)}s;animation-delay:-${(i*0.47).toFixed(2)}s;opacity:${(0.4+v/160).toFixed(2)}"></span>`).join("");
+    aur.style.opacity=(0.12+v/110).toFixed(2); aur.style.height=(24+v*0.5)+"px";
+    read.innerHTML=`흑점 수 <b>${n}개</b> · 태양풍 세기 <b>${v<34?"약함":v<67?"보통":"강함"}</b>`;
+    if(v<34){setLamp(lamps[0],"good","극지방에서 가끔");setLamp(lamps[1],"good","정상");setLamp(lamps[2],"good","정상");setLamp(lamps[3],"good","정상");}
+    else if(v<67){setLamp(lamps[0],"warnL","더 자주 관측");setLamp(lamps[1],"warnL","약한 잡음");setLamp(lamps[2],"good","정상");setLamp(lamps[3],"good","정상");}
+    else{setLamp(lamps[0],"badL","낮은 위도까지!");setLamp(lamps[1],"badL","통신 장애");setLamp(lamps[2],"badL","오류 증가");setLamp(lamps[3],"warnL","정전 주의");}
+  }
+  r.oninput=upd; upd();
+}
+
+/* ═══════ 학습 콘텐츠 (슬라이드) ═══════ */
 const CH=[
-{id:"c1",em:"🪐",title:"1장. 태양계 가족을 찾아라",sub:"태양계 구성원",cards:[
- {t:"l",h:"미션 브리핑",b:`탐사선 <b>아라호</b>가 곧 발사됩니다. 관제사의 첫 임무는 <em>태양계에 누가 사는지</em> 정확히 아는 것!<div class="key">💡 <b>태양계</b> = 태양 + 태양의 영향 안에서 <b>태양을 중심으로 도는(공전하는) 모든 천체</b></div>${ORBIT_SVG}`},
- {t:"l",h:"태양 — 유일한 별",b:`태양은 태양계에서 <b>스스로 빛을 내는 유일한 천체</b>, 즉 <em>별(항성)</em>이에요. 행성과 달이 밝게 보이는 건 태양 빛을 <b>반사</b>하기 때문이죠.<div class="key">🌟 스스로 빛을 낸다 → 별 / 빛을 반사한다 → 행성·위성 등</div>`},
- {t:"l",h:"행성 8형제",b:`태양 주위를 공전하는 8개의 행성: <em>수성·금성·지구·화성·목성·토성·천왕성·해왕성</em><div class="key">🎵 외우기: "수·금·지·화·목·토·천·해" — 태양에서 가까운 순서!</div>`},
- {t:"l",h:"위성 — 행성의 단짝",b:`<b>위성</b>은 <em>행성 주위를 공전</em>하는 천체예요. 지구의 위성은 <b>달</b>! 목성형 행성들은 위성을 수십 개씩 거느려요.<div class="key">⚠️ 위성은 태양이 아니라 <b>행성</b> 주위를 돌지만, 그 행성이 태양을 돌기 때문에 <b>위성도 태양계 구성원</b>이에요.</div>`},
- {t:"l",h:"소행성 — 돌덩이 무리",b:`<b>소행성</b>은 크기가 작고 모양이 불규칙한 <em>암석 천체</em>로, 태양 주위를 공전해요. 주로 <b>화성과 목성 사이</b>의 '소행성대'에 모여 있어요.`},
- {t:"l",h:"혜성 — 꼬리 달린 방문자",b:`<b>혜성</b>은 <em>얼음과 먼지</em>로 이루어져 있고, <b>길쭉한 궤도</b>로 태양 주위를 공전해요. 태양에 가까워지면 얼음이 녹아 <b>꼬리</b>가 생기는데, 꼬리는 항상 <em>태양 반대쪽</em>을 향해요.`},
- {t:"q",q:"혜성의 꼬리가 생기는 때와 방향으로 옳은 것은?",o:["태양에서 멀어질 때, 태양 쪽","태양에 가까워질 때, 태양 반대쪽","언제나 꼬리가 있고 방향은 제멋대로"],a:1,ex:"태양에 가까워지면 얼음이 승화해 꼬리가 생기고, 태양풍에 밀려 꼬리는 태양 반대쪽을 향해요."},
- {t:"q",q:"다음 중 태양계 구성원이 <b>아닌</b> 것은?",o:["달(위성)","소행성","태양계 밖의 다른 별"],a:2,ex:"위성·소행성·혜성도 모두 태양계 구성원! 태양계 밖의 별은 구성원이 아니에요."},
- {t:"w",key:"w_c1",h:"🛰️ 관제 일지 한 줄 논술",prompt:`우주 신문에 "행성이 아닌 혜성은 태양계 구성원이 아니다"라는 기사가 실렸어요. 이 기사가 <b>잘못된 까닭</b>을 한두 문장으로 써 보세요.`,frame:"혜성은 행성은 아니지만 ______을/를 공전하기 때문에 ______이다.",spec:{min:25,groups:[{name:"'공전'이라는 말",words:["공전","주위를 돌","주위를 도는","태양 주위"]},{name:"'태양계 구성원'이라는 판단",words:["구성원","태양계에 포함","태양계이다","태양계에 속"]}]},ai:"혜성이 행성이 아니어도 태양 주위를 공전하므로 태양계 구성원이라는 점을 근거-주장 구조로 썼는지 평가"}
+{id:"c1",em:"🪐",glow:"#53e0ff",title:"1장. 태양계 가족을 찾아라",sub:"태양계 구성원 · 6분",slides:[
+ {t:"hero",k:"MISSION 01",h:"태양계 가족을 찾아라",sub:"탐사선 아라호 발사 D-1. 관제사의 첫 임무 — 태양계에 누가 사는지 전부 파악하라!",scene:"orbit"},
+ {t:"learn",h:"태양계란 무엇일까",b:`<p>태양계는 <b>태양</b>과, 태양의 영향 안에서 <em>태양을 중심으로 도는(공전하는)</em> 모든 천체를 말해요.</p>${FAMILY_FIG}<div class="key"><span class="kt">판단 기준은 단 하나</span>행성인지 아닌지가 아니라, <b>공전으로 태양과 이어져 있는가</b>!</div>`},
+ {t:"learn",h:"태양 — 태양계의 유일한 별",b:`<p>태양은 태양계에서 <b>스스로 빛을 내는 유일한 천체</b>, 즉 <em>별(항성)</em>이에요.</p><p>행성과 달이 밝게 보이는 건? 태양 빛을 <b>반사</b>하기 때문!</p><div class="key"><span class="kt">한 줄 정리</span>스스로 빛을 낸다 → 별 · 빛을 반사한다 → 행성, 위성, 소행성, 혜성</div>`},
+ {t:"learn",h:"행성 8형제",b:`<p>태양 주위를 공전하는 8개의 행성.</p><p style="font-family:var(--disp);font-size:1.5rem;text-align:center;letter-spacing:.06em">수성 · 금성 · 지구 · 화성<br>목성 · 토성 · 천왕성 · 해왕성</p><div class="key"><span class="kt">외우기</span>"수·금·지·화·목·토·천·해" — 태양에서 가까운 순서!</div>`},
+ {t:"learn",h:"위성 — 행성의 단짝",b:`<p><b>위성</b>은 <em>행성 주위를 공전</em>하는 천체. 지구의 위성은 <b>달</b>이에요.</p><p>목성형 행성들은 위성을 수십 개씩 거느려요.</p><div class="key"><span class="kt">함정 주의</span>위성은 태양이 아니라 <b>행성</b> 주위를 돌아요. 하지만 그 행성이 태양을 돌기 때문에 — <b>위성도 당당한 태양계 구성원!</b></div>`},
+ {t:"learn",h:"소행성과 혜성",b:`<ul><li><b>소행성</b> — 작고 불규칙한 <em>암석</em> 천체. 주로 <b>화성과 목성 사이</b> '소행성대'에서 태양 주위를 공전</li><li><b>혜성</b> — <em>얼음과 먼지</em> 덩어리. <b>길쭉한 궤도</b>로 태양 주위를 공전</li></ul><div class="key"><span class="kt">혜성의 꼬리</span>태양에 <b>가까워지면</b> 얼음이 녹아 꼬리가 생기고, 꼬리는 항상 <em>태양 반대쪽</em>을 향해요.</div>`},
+ {t:"quiz",q:"혜성의 꼬리가 생기는 때와 방향으로 옳은 것은?",o:["태양에서 멀어질 때, 태양 쪽","태양에 가까워질 때, 태양 반대쪽","언제나 꼬리가 있고 방향은 제멋대로"],a:1,ex:"태양에 가까워지면 얼음이 승화해 꼬리가 생기고, 태양풍에 밀려 꼬리는 태양 반대쪽을 향해요."},
+ {t:"quiz",q:"다음 중 태양계 구성원이 <b>아닌</b> 것은?",o:["달(위성)","소행성","태양계 밖의 다른 별"],a:2,ex:"위성·소행성·혜성도 모두 태양계 구성원! 태양계 밖의 별은 구성원이 아니에요."},
+ {t:"write",key:"w_c1",h:"관제 일지 · 한 줄 논술",prompt:`우주 신문에 <b>"행성이 아닌 혜성은 태양계 구성원이 아니다"</b>라는 기사가 실렸어요. 이 기사가 잘못된 까닭을 한두 문장으로 반박해 보세요.`,frame:"혜성은 행성은 아니지만 <b>______을/를 공전</b>하기 때문에 <b>______</b>이다.",spec:{min:25,groups:[{name:"'공전'이라는 말",words:["공전","주위를 돌","주위를 도는","태양 주위"]},{name:"'태양계 구성원'이라는 판단",words:["구성원","태양계에 포함","태양계이다","태양계에 속"]}]},ai:"혜성이 행성이 아니어도 태양 주위를 공전하므로 태양계 구성원이라는 점을 근거-주장 구조로 썼는지 평가"},
+ {t:"clear",pts:["태양계 = 태양 + 공전하는 모든 천체","태양은 유일한 별(스스로 빛)","행성 8개: 수금지화목토천해","위성·소행성·혜성도 구성원 (공전!)","혜성 꼬리: 태양 가까이, 태양 반대쪽"]}
 ]},
-{id:"c2",em:"⚖️",title:"2장. 쌍둥이가 아니야",sub:"지구형 행성 vs 목성형 행성",cards:[
- {t:"l",h:"행성을 두 팀으로",b:`아라호가 보낸 행성 자료가 도착! 8개의 행성은 특징에 따라 <em>지구형 행성</em>과 <em>목성형 행성</em> 두 팀으로 나뉘어요.<div class="key">🔑 분류 기준: <b>반지름(크기)·질량·평균 밀도·위성 수·고리</b></div>`},
- {t:"l",h:"지구형 행성 (수·금·지·화)",b:`<b>수성, 금성, 지구, 화성</b><ul><li>크기와 질량이 <em>작다</em></li><li>평균 밀도가 <em>크다</em> (단단한 <b>암석</b>으로 되어 있어서!)</li><li>위성이 <em>없거나 적다</em></li><li>고리가 <em>없다</em></li></ul>`},
- {t:"l",h:"목성형 행성 (목·토·천·해)",b:`<b>목성, 토성, 천왕성, 해왕성</b><ul><li>크기와 질량이 <em>크다</em></li><li>평균 밀도가 <em>작다</em> (주로 <b>기체</b>로 되어 있어서!)</li><li>위성이 <em>많다</em></li><li>고리가 <em>있다</em></li></ul><div class="key">🤯 반전 포인트: <b>덩치가 클수록 밀도는 오히려 작다!</b> 커다란 솜사탕(목성형) vs 작은 쇠구슬(지구형)을 떠올려 보세요.</div>`},
- {t:"l",h:"자료로 판단하는 법",b:`논술형 평가의 핵심은 <em>표를 읽고 근거를 대는 것</em>!<div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>크기·질량</td><td>작다</td><td>크다</td></tr><tr><td>평균 밀도</td><td>크다</td><td>작다</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div><div class="key">✍️ 서술 공식: "A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>." — 근거는 <b>두 가지 이상</b>!</div>`},
- {t:"q",q:"평균 밀도가 크고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"밀도가 크다 = 암석 행성 = 지구형! 지구형은 위성이 없거나 적어요."},
- {t:"q",q:"목성형 행성에 대한 설명으로 옳은 것은?",o:["크기가 크고 밀도도 크다","크기가 크고 밀도는 작다","크기가 작고 밀도는 크다"],a:1,ex:"목성형은 기체로 되어 있어 덩치는 크지만 밀도는 작아요."},
- {t:"w",key:"w_c2",h:"🛰️ 관제 일지 한 줄 논술",prompt:`아라호가 관측한 <b>천체 P</b>: 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음.<br>P를 지구형/목성형으로 <b>분류</b>하고, 자료에서 <b>근거 두 가지 이상</b>을 들어 까닭을 쓰세요.`,frame:"P는 ___형 행성이다. 왜냐하면 지구형 행성보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:40,groups:[{name:"'목성형'이라는 분류",words:["목성형"]},{name:"밀도 근거",words:["밀도"]},{name:"위성 또는 고리 근거",words:["위성","고리"]}],compare:true},ai:"천체 P(밀도 작음, 위성 많음, 고리 있음)를 목성형으로 분류하고 자료의 특징 2가지 이상을 비교해 근거로 들었는지 평가"}
+{id:"c2",em:"⚖️",glow:"#e8c27a",title:"2장. 쌍둥이가 아니야",sub:"지구형 vs 목성형 행성 · 7분",slides:[
+ {t:"hero",k:"MISSION 02",h:"쌍둥이가 아니야",sub:"아라호가 보낸 행성 자료 도착. 8개의 행성은 두 팀으로 나뉜다 — 분류 기준을 마스터하라!",art:SIZE_FIG},
+ {t:"learn",h:"분류 기준 다섯 가지",b:`<p>행성은 특징에 따라 <em>지구형</em>과 <em>목성형</em> 두 팀으로 나뉘어요.</p><div class="key"><span class="kt">기준</span><b>반지름(크기) · 질량 · 평균 밀도 · 위성 수 · 고리</b></div><p>논술형 평가는 늘 이 기준으로 "표를 읽고 근거를 대라"고 물어요.</p>`},
+ {t:"learn",h:"지구형 행성 — 수·금·지·화",b:`<ul><li>크기와 질량이 <em>작다</em></li><li>평균 밀도가 <em>크다</em> — 단단한 <b>암석</b>으로 되어 있어서!</li><li>위성이 <em>없거나 적다</em></li><li>고리가 <em>없다</em></li></ul>`},
+ {t:"learn",h:"목성형 행성 — 목·토·천·해",b:`<ul><li>크기와 질량이 <em>크다</em></li><li>평균 밀도가 <em>작다</em> — 주로 <b>기체</b>로 되어 있어서!</li><li>위성이 <em>많다</em></li><li>고리가 <em>있다</em></li></ul>`},
+ {t:"learn",h:"반전: 클수록 가볍다?",b:`<p>가장 많이 틀리는 오개념 — "크면 밀도도 크겠지?" <b>반대예요!</b></p>${METAPHOR}<div class="key"><span class="kt">오개념 교정</span>밀도는 '얼마나 꽉 찼는가'. 목성형은 덩치는 커도 기체라 <b>밀도가 작아요.</b></div>`},
+ {t:"game2",h:"격납고 분류 작전"},
+ {t:"learn",h:"서술 공식",b:`<p>표가 나오면 이 틀로 쓰면 됩니다.</p><div class="key"><span class="kt">서술 공식</span>"A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>."</div><p>⚠️ 근거는 반드시 <b>두 가지 이상</b> — 한 가지만 쓰면 감점!</p><div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>크기·질량</td><td>작다</td><td>크다</td></tr><tr><td>평균 밀도</td><td>크다</td><td>작다</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div>`},
+ {t:"quiz",q:"평균 밀도가 크고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"밀도가 크다 = 암석 행성 = 지구형! 지구형은 위성이 없거나 적어요."},
+ {t:"write",key:"w_c2",h:"관제 일지 · 한 줄 논술",prompt:`아라호가 관측한 <b>천체 P</b> — 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음.<br>P를 지구형/목성형으로 <b>분류</b>하고, 자료에서 <b>근거 두 가지 이상</b>을 들어 까닭을 쓰세요.`,frame:"P는 <b>___형 행성</b>이다. 왜냐하면 지구형 행성보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:40,groups:[{name:"'목성형'이라는 분류",words:["목성형"]},{name:"밀도 근거",words:["밀도"]},{name:"위성 또는 고리 근거",words:["위성","고리"]}],compare:true},ai:"천체 P(밀도 작음, 위성 많음, 고리 있음)를 목성형으로 분류하고 자료의 특징 2가지 이상을 비교해 근거로 들었는지 평가"},
+ {t:"clear",pts:["지구형(수금지화): 작다·밀도 크다·위성 적다·고리 없다","목성형(목토천해): 크다·밀도 작다·위성 많다·고리 있다","클수록 밀도는 작다 (솜사탕!)","서술은 '…보다 ~하기 때문이다' + 근거 2가지"]}
 ]},
-{id:"c3",em:"☀️",title:"3장. 태양의 얼굴",sub:"태양의 특징과 태양 활동",cards:[
- {t:"l",h:"태양 관측 임무 개시",b:`아라호의 태양 카메라가 켜졌습니다. 태양의 <b>표면</b>과 <b>대기</b>에서 무슨 일이 벌어지는지 확인!${SUN_SVG}`},
- {t:"l",h:"표면: 광구·흑점·쌀알 무늬",b:`<ul><li><b>광구</b>: 우리가 보는 태양의 둥근 표면, 온도 약 <em>6000℃</em></li><li><b>흑점</b>: 주위보다 온도가 <em>낮아서(약 4000℃)</em> 어둡게 보이는 점</li><li><b>쌀알 무늬</b>: 광구 아래에서 물질이 끓어오르며(대류) 생기는 쌀알 모양 무늬</li></ul><div class="key">🔄 흑점이 동→서로 이동하는 것처럼 보이는 까닭? 태양이 <b>자전</b>하기 때문!</div>`},
- {t:"l",h:"대기: 채층과 코로나",b:`태양의 대기는 평소엔 광구가 너무 밝아 안 보이고, <em>개기 일식</em> 때 볼 수 있어요.<ul><li><b>채층</b>: 광구 바로 위의 붉은 대기층</li><li><b>코로나</b>: 바깥쪽으로 멀리 뻗은 진주색 대기, 온도가 <em>100만 ℃ 이상!</em></li></ul>`},
- {t:"l",h:"대기의 폭발 쇼: 홍염과 플레어",b:`<ul><li><b>홍염</b>: 광구에서 솟아오르는 거대한 <em>불기둥</em></li><li><b>플레어</b>: 흑점 근처에서 일어나는 강력한 <em>폭발</em> — 엄청난 에너지와 물질을 내뿜어요</li></ul>`},
- {t:"l",h:"태양 활동이 '활발하다'는 신호",b:`<div class="key">📡 활발할 때 함께 나타나는 것들 (세트로 외우기!)<br>① <b>흑점 수 증가</b> ② <b>홍염·플레어 잦아짐</b> ③ <b>코로나 커짐</b> ④ <b>태양풍 강해짐</b></div>논술형 문제는 "어느 시기가 활발한가? <em>근거는?</em>"을 꼭 물어봐요. 근거는 <b>흑점 수</b>와 <b>홍염·플레어</b> 자료에서 찾으세요!`},
- {t:"q",q:"흑점이 어둡게 보이는 까닭은?",o:["빛을 전혀 내지 않아서","주위(광구)보다 온도가 낮아서","구멍이 뚫려 있어서"],a:1,ex:"흑점도 빛을 내지만, 약 4000℃로 주위(6000℃)보다 온도가 낮아 상대적으로 어둡게 보여요."},
- {t:"w",key:"w_c3",h:"🛰️ 관제 일지 한 줄 논술",prompt:`관측 기록 — <b>(가) 시기</b>: 흑점 수 적음, 플레어 드묾 / <b>(나) 시기</b>: 흑점 수 많음, 플레어 자주 발생.<br>태양 활동이 더 활발한 시기를 <b>판단</b>하고, 자료에서 <b>근거 두 가지</b>를 들어 쓰세요.`,frame:"태양 활동은 ___ 시기에 더 활발하다. 왜냐하면 (가) 시기보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:35,groups:[{name:"'(나) 시기' 판단",words:["나"]},{name:"흑점 근거",words:["흑점"]},{name:"플레어(홍염) 근거",words:["플레어","홍염"]}]},ai:"흑점 수와 플레어 발생 자료를 근거로 (나) 시기에 태양 활동이 활발하다고 판단했는지, 근거 2가지를 들었는지 평가"}
+{id:"c3",em:"☀️",glow:"#ffae34",title:"3장. 태양의 얼굴",sub:"태양의 특징과 태양 활동 · 7분",slides:[
+ {t:"hero",k:"MISSION 03",h:"태양의 얼굴",sub:"아라호의 태양 카메라 가동. 표면과 대기에서 벌어지는 거대한 쇼를 기록하라!",scene:"sun"},
+ {t:"learn",h:"표면: 광구와 흑점",b:`<ul><li><b>광구</b> — 우리가 보는 태양의 둥근 표면. 온도 약 <em>6000℃</em></li><li><b>흑점</b> — 주위보다 온도가 <em>낮아서(약 4000℃)</em> 어둡게 보이는 점</li></ul><div class="key"><span class="kt">오개념 교정</span>흑점도 빛을 내요! 다만 주위가 더 밝아서 <b>상대적으로</b> 어두워 보일 뿐.</div>`},
+ {t:"learn",h:"쌀알 무늬, 그리고 자전",b:`<ul><li><b>쌀알 무늬</b> — 광구 아래에서 물질이 끓어오르며(대류) 생기는 쌀알 모양 무늬</li><li>흑점이 동→서로 <b>이동하는 것처럼</b> 보이는 까닭? 태양이 <em>자전</em>하기 때문!</li></ul>`},
+ {t:"learn",h:"대기: 채층과 코로나",b:`<p>태양의 대기는 평소엔 광구가 너무 밝아 안 보이고, <em>개기 일식</em> 때 볼 수 있어요.</p><ul><li><b>채층</b> — 광구 바로 위의 붉은 대기층</li><li><b>코로나</b> — 바깥으로 멀리 뻗은 진주색 대기. 온도가 <em>100만 ℃ 이상!</em></li></ul>`},
+ {t:"learn",h:"대기의 폭발 쇼: 홍염과 플레어",b:`<ul><li><b>홍염</b> — 광구에서 솟아오르는 거대한 <em>불기둥</em></li><li><b>플레어</b> — 흑점 근처에서 일어나는 강력한 <em>폭발</em>. 엄청난 에너지와 물질을 내뿜어요</li></ul>`},
+ {t:"learn",h:"'활발하다'의 신호 세트",b:`<div class="key"><span class="kt">태양 활동이 활발할 때 (세트로 외우기!)</span>① <b>흑점 수 증가</b> ② <b>홍염·플레어 잦아짐</b> ③ <b>코로나 커짐</b> ④ <b>태양풍 강해짐</b></div><p>논술형은 "어느 시기가 활발한가? <em>근거는?</em>"을 꼭 물어요. 근거는 <b>흑점 수</b>와 <b>홍염·플레어</b> 자료에서 찾으세요!</p>`},
+ {t:"quiz",q:"흑점이 어둡게 보이는 까닭은?",o:["빛을 전혀 내지 않아서","주위(광구)보다 온도가 낮아서","구멍이 뚫려 있어서"],a:1,ex:"흑점도 빛을 내지만, 약 4000℃로 주위(6000℃)보다 온도가 낮아 상대적으로 어둡게 보여요."},
+ {t:"write",key:"w_c3",h:"관제 일지 · 한 줄 논술",prompt:`관측 기록 — <b>(가) 시기</b>: 흑점 수 적음, 플레어 드묾 / <b>(나) 시기</b>: 흑점 수 많음, 플레어 자주 발생.<br>태양 활동이 더 활발한 시기를 <b>판단</b>하고, 자료에서 <b>근거 두 가지</b>를 들어 쓰세요.`,frame:"태양 활동은 <b>___ 시기</b>에 더 활발하다. 왜냐하면 (가) 시기보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:35,groups:[{name:"'(나) 시기' 판단",words:["나"]},{name:"흑점 근거",words:["흑점"]},{name:"플레어(홍염) 근거",words:["플레어","홍염"]}]},ai:"흑점 수와 플레어 발생 자료를 근거로 (나) 시기에 태양 활동이 활발하다고 판단했는지, 근거 2가지를 들었는지 평가"},
+ {t:"clear",pts:["표면: 광구(6000℃)·흑점(온도 낮아 어둡게)·쌀알 무늬(대류)","흑점 이동 = 태양의 자전","대기: 채층·코로나(100만℃↑) — 개기 일식 때","홍염(불기둥)·플레어(폭발)","활발 신호: 흑점↑·홍염/플레어↑·코로나↑·태양풍↑"]}
 ]},
-{id:"c4",em:"🌏",title:"4장. 태양이 보낸 신호",sub:"태양 활동이 지구에 미치는 영향",cards:[
- {t:"l",h:"태양풍 — 태양이 부는 바람",b:`태양은 빛만 보내는 게 아니에요. 전기를 띤 입자들을 사방으로 내뿜는데, 이것이 <b>태양풍</b>! 태양 활동이 활발해지면 태양풍도 <em>강해져요</em>.`},
- {t:"l",h:"지구의 방패, 그리고 오로라",b:`지구의 <b>자기장</b>이 태양풍을 막아 주는 방패 역할을 해요. 일부 입자가 극지방 하늘로 들어와 공기와 부딪히면 — <b>오로라</b>가 빛나요!<div class="aurora"></div><div class="key">🌌 태양 활동이 활발하면: 오로라가 <b>더 자주</b>, 평소보다 <b>낮은 위도</b>에서도 나타나요.</div>`},
- {t:"l",h:"활발해지면 생기는 문제들",b:`강해진 태양풍이 지구 자기장을 뒤흔들면(자기 폭풍) 이런 일이 생겨요.<ul><li>📻 장거리 <b>무선 통신 장애</b>(델린저 현상)</li><li>🛰️ <b>인공위성 고장</b>, <b>GPS 수신 오류</b></li><li>💡 송전 시설 고장으로 <b>대규모 정전</b></li><li>👨‍🚀 우주 비행사 피폭 위험</li></ul>`},
- {t:"l",h:"인과 사슬로 꿰기 — 논술의 뼈대",b:`논술형 최고 배점 문항은 이 <em>인과 사슬</em>을 글로 잇는 거예요!${CHAIN}<div class="key">✍️ 서술 공식: "태양 활동이 활발해지면 <b>태양풍이 강해지고</b>, 강해진 태양풍이 지구 자기장을 교란하여 ○○ 현상이 나타날 수 있다. <b>따라서</b> ~한 대비가 필요하다."</div>`},
- {t:"q",q:"태양 활동이 활발할 때 지구에서 나타날 수 있는 현상이 <b>아닌</b> 것은?",o:["오로라가 더 자주 나타난다","GPS 수신에 오류가 생긴다","태양풍이 완전히 사라진다"],a:2,ex:"활발할수록 태양풍은 오히려 강해져요!"},
- {t:"q",q:"오로라 설명으로 옳은 것은?",o:["태양풍 입자가 공기와 부딪혀 빛을 낸다","지구 내부의 용암이 비친 것이다","달빛이 구름에 반사된 것이다"],a:0,ex:"태양풍의 전기를 띤 입자가 극지방 대기와 충돌하며 빛을 내는 현상이에요."},
- {t:"w",key:"w_c4",h:"🛰️ 관제 일지 한 줄 논술",prompt:`"태양 활동이 활발해지면 지구의 통신이 왜 위험해질까?" <b>태양풍</b>이라는 말을 꼭 넣어, 원인→결과가 이어지는 한 문단으로 쓰세요.`,frame:"태양 활동이 활발해지면 ___이/가 강해지고, 이것이 지구의 ___을/를 교란하여 ___ 현상이 나타날 수 있다.",spec:{min:45,groups:[{name:"태양풍 언급",words:["태양풍"]},{name:"지구에서 나타나는 현상(통신 장애·GPS·오로라·정전·위성 등)",words:["통신","GPS","지피에스","오로라","정전","위성","델린저"]}]},ai:"태양 활동↑→태양풍 강해짐→자기장 교란→통신 장애 등 지구 영향으로 이어지는 인과 사슬을 빠짐없이 썼는지 평가"}
+{id:"c4",em:"🌏",glow:"#3de8a0",title:"4장. 태양이 보낸 신호",sub:"태양 활동이 지구에 미치는 영향 · 7분",slides:[
+ {t:"hero",k:"MISSION 04",h:"태양이 보낸 신호",sub:"우주기상 경보 발령. 태양의 변화가 1억 5천만 km 떨어진 지구를 어떻게 흔드는지 밝혀라!",scene:"sim"},
+ {t:"learn",h:"태양풍 — 태양이 부는 바람",b:`<p>태양은 빛만 보내는 게 아니에요. <b>전기를 띤 입자</b>들을 사방으로 내뿜는데, 이것이 <em>태양풍</em>!</p><div class="key"><span class="kt">핵심 연결</span>태양 활동이 활발해지면 → 태양풍도 <b>강해진다</b></div>`},
+ {t:"learn",h:"지구의 방패, 그리고 오로라",b:`<p>지구의 <b>자기장</b>이 태양풍을 막아 주는 방패 역할을 해요.</p><p>일부 입자가 극지방 하늘로 들어와 공기와 부딪히면 — <b>오로라</b>가 빛나요!</p><div class="key"><span class="kt">활발할 때의 오로라</span><b>더 자주</b>, 그리고 평소보다 <b>낮은 위도</b>에서도 나타나요.</div>`},
+ {t:"learn",h:"활발해지면 생기는 문제들",b:`<p>강해진 태양풍이 지구 자기장을 뒤흔들면(자기 폭풍) —</p><ul><li>📡 장거리 <b>무선 통신 장애</b> (델린저 현상)</li><li>🛰️ <b>인공위성 고장</b>, <b>GPS 수신 오류</b></li><li>💡 송전 시설 고장으로 <b>대규모 정전</b></li><li>👨‍🚀 우주 비행사 피폭 위험</li></ul>`},
+ {t:"learn",h:"인과 사슬 — 6점짜리 글의 뼈대",b:`<p>최고 배점 문항은 이 사슬을 <em>글로 잇는</em> 거예요.</p><div class="chain"><span class="nd"><b>①</b>태양 활동 활발</span><span class="ar">→</span><span class="nd"><b>②</b>흑점↑ 홍염·플레어↑</span><span class="ar">→</span><span class="nd"><b>③</b>태양풍 강해짐</span><span class="ar">→</span><span class="nd"><b>④</b>지구 자기장 교란</span><span class="ar">→</span><span class="nd"><b>⑤</b>오로라·통신 장애·GPS 오류·정전</span></div><div class="key"><span class="kt">서술 공식</span>"태양 활동이 활발해지면 <b>태양풍이 강해지고</b>, 강해진 태양풍이 지구 자기장을 교란하여 ○○ 현상이 나타날 수 있다. <b>따라서</b> ~한 대비가 필요하다."</div>`},
+ {t:"quiz",q:"태양 활동이 활발할 때 지구에서 나타날 수 있는 현상이 <b>아닌</b> 것은?",o:["오로라가 더 자주 나타난다","GPS 수신에 오류가 생긴다","태양풍이 완전히 사라진다"],a:2,ex:"활발할수록 태양풍은 오히려 강해져요!"},
+ {t:"quiz",q:"오로라에 대한 설명으로 옳은 것은?",o:["태양풍 입자가 공기와 부딪혀 빛을 낸다","지구 내부의 용암이 비친 것이다","달빛이 구름에 반사된 것이다"],a:0,ex:"태양풍의 전기를 띤 입자가 극지방 대기와 충돌하며 빛을 내는 현상이에요."},
+ {t:"write",key:"w_c4",h:"관제 일지 · 한 줄 논술",prompt:`"태양 활동이 활발해지면 지구의 통신이 왜 위험해질까?"<br><b>태양풍</b>이라는 말을 꼭 넣어, 원인→결과가 이어지는 한 문단으로 쓰세요.`,frame:"태양 활동이 활발해지면 <b>___이/가 강해지고</b>, 이것이 지구의 ___을/를 교란하여 <b>___ 현상</b>이 나타날 수 있다.",spec:{min:45,groups:[{name:"태양풍 언급",words:["태양풍"]},{name:"지구에서 나타나는 현상(통신 장애·GPS·오로라·정전·위성 등)",words:["통신","GPS","지피에스","오로라","정전","위성","델린저"]}]},ai:"태양 활동↑→태양풍 강해짐→자기장 교란→통신 장애 등 지구 영향으로 이어지는 인과 사슬을 빠짐없이 썼는지 평가"},
+ {t:"clear",pts:["태양풍 = 전기를 띤 입자의 흐름","활발 → 태양풍 강해짐 → 자기장 교란","오로라: 더 자주, 낮은 위도까지","통신 장애·GPS 오류·정전·위성 고장","글의 뼈대 = 인과 사슬 ①→⑤"]}
 ]}];
 
-/* ───────── 수배 파일 ───────── */
+/* 분류 게임 데이터: [이름, 팀, 크기px, 색] */
+const G2=[["수성","rock",34,"#b9a08a"],["목성","gas",130,"#e0a876"],["화성","rock",40,"#e06b4c"],["토성","gas",112,"#e6cf9b"],["지구","rock",52,"#4f9df0"],["천왕성","gas",76,"#9fdce6"],["금성","rock",50,"#e8c27a"],["해왕성","gas",74,"#5f84e8"]];
+
+/* ═══════ 수배 파일 ═══════ */
 const WANTED=[
  {id:"wd1",clue:"태양 주위를 공전한다. 주로 화성과 목성 사이에서 관측된다. 크기가 작고 모양이 불규칙한 암석 천체다.",a:"소행성"},
  {id:"wd2",clue:"얼음과 먼지로 이루어져 있다. 길쭉한 궤도로 태양 주위를 돈다. 태양에 가까워지자 꼬리가 나타났다!",a:"혜성"},
@@ -245,11 +492,11 @@ const WANTED=[
  {id:"wd6",clue:"지름이 작고 평균 밀도가 크다. 단단한 암석 표면을 가졌고 위성이 없거나 적다.",a:"지구형 행성"}];
 const WOPTS=["태양","지구형 행성","목성형 행성","위성","소행성","혜성"];
 
-/* ───────── 논술형 평가 연습 (평행 문항) ───────── */
+/* ═══════ 논술형 평가 연습 ═══════ */
 const EXAM=[
  {no:1,pts:2,title:"행성의 특징 비교하기",
   q:`【자료 1】을 근거로 천체 <b>가</b>와 <b>나</b>를 각각 지구형 행성과 목성형 행성으로 분류하고, 두 천체의 특징을 <b>두 가지 이상 비교</b>하여 분류한 까닭을 서술하시오.`,
-  spec:{min:60,groups:[{name:"가=지구형 / 나=목성형 분류",words:["지구형"]},{name:"목성형 언급",words:["목성형"]},{name:"비교 근거 ① 지름 또는 밀도",words:["지름","밀도","크기"]},{name:"비교 근거 ② 위성 또는 고리",words:["위성","고리"]}],compare:true},
+  spec:{min:60,groups:[{name:"지구형 분류",words:["지구형"]},{name:"목성형 분류",words:["목성형"]},{name:"비교 근거 ① 지름 또는 밀도",words:["지름","밀도","크기"]},{name:"비교 근거 ② 위성 또는 고리",words:["위성","고리"]}],compare:true},
   ai:"천체 가(지름 작음·밀도 큼·위성 없음·고리 없음)=지구형, 나(지름 큼·밀도 작음·위성 많음·고리 있음)=목성형으로 분류하고, 특징 2가지 이상을 비교하여 근거로 들었는지 — 중1 논술형 2점 문항 기준으로 평가"},
  {no:2,pts:2,title:"태양계 구성원 판단하기",
   q:`【자료 1】을 근거로 천체 <b>다, 라, 마</b>가 각각 어떤 종류의 천체인지 밝히고, "행성이 아닌 다·라·마는 태양계 구성원이 아니다"라는 과학신문 설명이 <b>잘못된 까닭</b>을 <b>공전 관계</b>와 관련지어 서술하시오.`,
@@ -260,48 +507,56 @@ const EXAM=[
   spec:{min:140,groups:[{name:"A 시기가 활발하다는 판단",words:["A"]},{name:"근거 ① 흑점 수",words:["흑점"]},{name:"근거 ② 홍염·플레어",words:["플레어","홍염"]},{name:"태양풍 변화",words:["태양풍"]},{name:"지구에서 나타난 현상(오로라/GPS)",words:["오로라","GPS","지피에스"]},{name:"결정이 타당하다는 결론",words:["타당","필요하","적절"]}]},
   ai:"① A 시기가 활발함을 흑점 수·플레어 두 근거로 판단 ② 활발→태양풍 강해짐→지구 자기장 교란→오로라가 낮은 위도까지·GPS 오류라는 인과 연결 ③ 따라서 설비 보호와 예보 강화 결정이 타당함 — 세 요소가 하나의 완결된 글로 이어졌는지, 중1 논술형 6점 문항 채점 기준(판단 3점+인과·타당성 3점)으로 평가"}];
 
-/* ───────── 그리기 ───────── */
-const app=document.getElementById("app");
+/* ═══════ 공통 그리기 ═══════ */
+const app=document.getElementById("app"), stage=document.getElementById("stage");
 let view="home", deck=null;
 
 function drawHud(){const h=document.getElementById("hud");if(!h)return;const{r,next}=rank();
  const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
- h.innerHTML=`<span class="rk">${esc(S.name||"이름 미입력")} · ${r}</span><span class="pt">⭐ ${S.pts}점</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급!"}</span>`;}
-
-function chapProg(c){const total=c.cards.length;let d=0;c.cards.forEach((cd,i)=>{const k=c.id+"_"+i;
- if(cd.t==="l"&&S.seen[k])d++; if(cd.t==="q"&&S.quiz[k])d++; if(cd.t==="w"&&S.writes[cd.key]&&S.writes[cd.key].ok)d++;});return{d,total};}
-
-function render(){
- document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
- const r=(()=>{ if(view==="home")return renderHome();
- if(view==="learn")return deck?renderDeck():renderLearn();
- if(view==="wanted")return renderWanted();
- if(view==="exam")return renderExam();
- if(view==="teacher")return renderTeacher(); })();
- showAI(); return r;
-}
+ h.innerHTML=`<span class="rk">${esc(S.name||"이름 미입력")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span>`;}
 function hudBlock(){return `<div id="hud" class="hud"></div>`;}
 
+function slideDone(c,sl,idx){const k=c.id+"_"+idx;
+ if(sl.t==="learn"||sl.t==="hero"||sl.t==="clear")return !!S.seen[k];
+ if(sl.t==="quiz"||sl.t==="game2")return !!S.quiz[k];
+ if(sl.t==="write")return !!(S.writes[sl.key]&&S.writes[sl.key].ok);
+ return false;}
+function chapProg(c){let d=0;c.slides.forEach((sl,i)=>{if(slideDone(c,sl,i))d++;});return{d,total:c.slides.length};}
+
+function render(){
+ document.body.classList.toggle("deckmode",!!deck);
+ stage.hidden=!deck;
+ document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+ if(deck){renderSlide();return;}
+ if(view==="home")renderHome();
+ else if(view==="learn")renderLearn();
+ else if(view==="wanted")renderWanted();
+ else if(view==="exam")renderExam();
+ else if(view==="teacher")renderTeacher();
+ showAI();
+}
+
+/* ═══════ 홈 ═══════ */
 function renderHome(){
  app.innerHTML=`${hudBlock()}
- <div class="card" style="text-align:center">
-  <div style="font-size:3rem">🚀</div>
-  <h2>아라호 관제센터</h2>
-  <p class="learnbody">2049년, 대한민국 우주 관제센터.<br>탐사선 <b>아라호</b>가 태양계 탐사를 떠난다.<br>너의 임무: 미션을 완수하며 <em>수석 관제사</em>가 되는 것!</p>
-  <div class="frame">📚 미션 학습으로 지식 쌓기 → 🔭 수배 파일로 추리하기 → ✍️ 관제사 자격 논술 시험 통과!</div>
+ <div class="hero" style="margin-top:14px">
+  <span class="rocket">🚀</span>
+  <h1>아라호 관제센터</h1>
+  <p class="sub">2049년, 대한민국 우주 관제센터. 탐사선 <b style="color:var(--sun)">아라호</b>가 태양계로 떠난다.<br>미션을 완수하고 <b style="color:var(--cyan)">수석 관제사</b>가 되어라!</p>
+  <div class="flow"><span>📚 <b>학습</b> 지식 쌓기</span><span>🔭 <b>수배</b> 추리하기</span><span>✍️ <b>논술</b> 자격 시험</span></div>
  </div>
  <div class="card">
   <h3>관제사 등록</h3>
   <p class="small">반·번호·이름을 쓰면 기록이 이 기기에 저장돼요.</p>
   <div style="display:flex;gap:10px;flex-wrap:wrap">
-   <input type="text" id="inCls" placeholder="반·번호 (예: 3반 12번)" value="${esc(S.cls)}" style="flex:1;min-width:140px">
+   <input type="text" id="inCls" placeholder="반·번호 (예: 3반 12번)" value="${esc(S.cls)}" style="flex:1;min-width:150px">
    <input type="text" id="inName" placeholder="이름" value="${esc(S.name)}" style="flex:1;min-width:120px">
   </div>
   <button class="btn-p" id="btnReg" style="margin-top:12px;width:100%">등록 / 수정</button>
  </div>
  <div class="card">
   <h3>나의 훈장</h3>
-  <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.em} ${c.title.split(".")[0]}장 ${p.d}/${p.total}</span>`;}).join("")}
+  <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.em} ${p.d}/${p.total}</span>`;}).join("")}
   <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
   <span class="badge ${[1,2,3].every(n=>S.exam[n])?'on':''}">✍️ 시험 ${[1,2,3].filter(n=>S.exam[n]).length}/3</span></div>
  </div>
@@ -324,77 +579,125 @@ function renderHome(){
  };
 }
 
+/* ═══════ 학습 목록 ═══════ */
 function renderLearn(){
- app.innerHTML=`${hudBlock()}<h2 style="margin:16px 4px 6px">📚 미션 학습</h2>
- <p class="small" style="margin:0 4px 10px">한 장은 5~10분! 카드를 넘기며 읽고, 퀴즈를 풀고, 마지막에 '한 줄 논술'로 마무리해요.</p>
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.8rem">📚 미션 학습</h2>
+ <p class="small" style="margin:0 4px 12px">한 장은 6~7분. 전체 화면 슬라이드로 넘기며 배우고, 마지막 '한 줄 논술'로 마무리!</p>
  <div class="grid">${CH.map((c,i)=>{const p=chapProg(c);return `<button class="chap ${p.d>=p.total?'doneAll':''}" data-ch="${i}">
+   <span class="glow" style="background:${c.glow}"></span>
    <span class="em">${c.em}</span><h3>${c.title}</h3><span class="small">${c.sub}</span>
-   <span class="dots">${c.cards.map((_,j)=>{const cd=c.cards[j],k=c.id+"_"+j;const on=(cd.t==="l"&&S.seen[k])||(cd.t==="q"&&S.quiz[k])||(cd.t==="w"&&S.writes[cd.key]&&S.writes[cd.key].ok);return `<i class="${on?'on':''}"></i>`;}).join("")}</span>
-   ${p.d>=p.total?'<span class="stamp">MISSION CLEAR</span>':''}</button>`;}).join("")}</div>`;
+   <span class="dots">${c.slides.map((sl,j)=>`<i class="${slideDone(c,sl,j)?'on':''}"></i>`).join("")}</span>
+   ${p.d>=p.total?'<span class="stamp">MISSION CLEAR</span>':`<span class="small" style="color:var(--cyan)">진행 ${p.d}/${p.total} ${p.d>0?"· 이어서 하기 ▶":"· 시작 ▶"}</span>`}</button>`;}).join("")}</div>`;
  drawHud();
- document.querySelectorAll(".chap").forEach(b=>b.onclick=()=>{deck={ch:+b.dataset.ch,i:0};render();});
+ document.querySelectorAll(".chap").forEach(b=>b.onclick=()=>{const ci=+b.dataset.ch;const c=CH[ci];
+   deck={ch:ci,i:Math.min(S.slide[c.id]||0,c.slides.length-1)};render();});
 }
 
-function renderDeck(){
- const c=CH[deck.ch], i=deck.i, cd=c.cards[i], k=c.id+"_"+i;
+/* ═══════ 슬라이드 ═══════ */
+function renderSlide(){
+ const c=CH[deck.ch], i=deck.i, sl=c.slides[i], k=c.id+"_"+i;
+ S.slide[c.id]=i; try{history.replaceState(null,"",location.pathname+"#"+c.id+"s"+(i+1));}catch(e){}
  let body="";
- if(cd.t==="l"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=1;save();}
-   body=`<span class="tag">카드 ${i+1}/${c.cards.length} · 읽기</span><h3 style="margin:10px 0">${cd.h}</h3><div class="learnbody">${cd.b}</div>`;}
- if(cd.t==="q"){
-   body=`<span class="tag">카드 ${i+1}/${c.cards.length} · 퀴즈</span><h3 style="margin:10px 0">❓ ${cd.q}</h3>
-   <div id="opts">${cd.o.map((o,j)=>`<button class="opt" data-j="${j}">${j+1}. ${o}</button>`).join("")}</div><div id="qfb">${S.quiz[k]?`<div class="fb ok"><b>✅ 해결한 퀴즈!</b> ${esc(cd.ex)}</div>`:""}</div>`;}
- if(cd.t==="w"){const w=S.writes[cd.key]||{};
-   body=`<span class="tag">카드 ${i+1}/${c.cards.length} · 한 줄 논술</span><h3 style="margin:10px 0">${cd.h}</h3>
-   <p class="learnbody">${cd.prompt}</p><div class="frame">💬 문장 틀: ${esc(cd.frame)}</div>
-   <textarea id="wt">${esc(w.t||"")}</textarea>
+ if(sl.t==="hero"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=1;save();}
+   body=`<div class="s-hero"><div class="s-kicker">${sl.k}</div><div class="s-title">${sl.h}</div><p class="s-sub">${sl.sub}</p>
+   ${sl.scene==="orbit"?sceneOrbit():sl.scene==="sun"?sceneSun():sl.scene==="sim"?sceneSim():(sl.art||"")}</div>`;}
+ if(sl.t==="learn"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=1;save();}
+   body=`<div class="s-kicker">${c.em} ${c.title}</div><div class="s-title">${sl.h}</div><div class="s-body">${sl.b}</div>`;}
+ if(sl.t==="clear"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=2;save();}
+   body=`<div class="s-hero"><span class="stamp" style="font-size:1.4rem">MISSION CLEAR</span><div class="s-title" style="margin-top:14px">${c.title.split(". ")[1]} 완료!</div>
+   <div class="figure" style="text-align:left"><b style="color:var(--sun);font-family:var(--disp)">오늘의 핵심 다시 보기</b><ul class="cklist">${sl.pts.map(p=>`<li class="y">${p}</li>`).join("")}</ul></div>
+   <p class="s-sub">자꾸 보면 저절로 외워져요. 내일 한 번만 더 넘겨 보기!</p></div>`;}
+ if(sl.t==="quiz"){
+   body=`<div class="s-kicker">⚡ 빠른 확인</div><div class="s-title" style="font-size:clamp(1.4rem,3.6vw,2rem)">${sl.q}</div>
+   <div id="opts">${sl.o.map((o,j)=>`<button class="opt" data-j="${j}"><span class="n">${j+1}</span><span>${o}</span></button>`).join("")}</div>
+   <div id="qfb">${S.quiz[k]?`<div class="fb ok"><b>✅ 해결한 퀴즈!</b> ${esc(sl.ex)}</div>`:""}</div>`;}
+ if(sl.t==="game2"){
+   body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div>
+   <p class="s-body">아라호 격납고에 행성 모형이 뒤섞였다! 특징을 보고 올바른 격납고로 보내자.</p><div id="g2"></div>`;}
+ if(sl.t==="write"){const w=S.writes[sl.key]||{};
+   body=`<div class="s-kicker">✍️ ${sl.h}</div><div class="s-title" style="font-size:clamp(1.3rem,3.2vw,1.8rem)">${sl.prompt}</div>
+   <div class="frame">💬 문장 틀 — ${sl.frame}</div>
+   <textarea id="wt" placeholder="자료 속 말을 근거로, 완전한 문장으로 써 보세요.">${esc(w.t||"")}</textarea>
    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
      <button class="btn-p" id="wchk" style="flex:1">관제센터 점검받기</button>
      <button class="btn-s aibtn" id="wai" style="flex:1" hidden>🤖 AI 코치 피드백</button>
    </div><div id="wout">${w.ok?'<div class="fb ok"><b>✅ 통과한 논술이에요. 더 다듬어 다시 점검해도 좋아요!</b></div>':""}</div>`;}
- app.innerHTML=`${hudBlock()}
- <div style="display:flex;align-items:center;gap:10px;margin:14px 2px 0"><button class="btn-g" id="back" style="min-height:44px">← 목록</button><h2 style="font-size:1.3rem">${c.em} ${c.title}</h2></div>
- <div class="card">${body}</div>
- <div class="deck-nav">
-   <button class="btn-s" id="prev" ${i===0?"disabled":""}>◀ 이전</button>
-   <button class="btn-p" id="next">${i===c.cards.length-1?"장 마치기 🏁":"다음 ▶"}</button>
- </div>`;
- drawHud();
- document.getElementById("back").onclick=()=>{deck=null;render();};
- document.getElementById("prev").onclick=()=>{deck.i--;render();};
- document.getElementById("next").onclick=()=>{if(i===c.cards.length-1){deck=null;toast(c.em+" 미션 진행 저장!");render();}else{deck.i++;render();}};
- if(cd.t==="q"){document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+ stage.innerHTML=`
+  <div class="stg-top"><button class="btn-g" id="exit">✕ 나가기</button><span class="ttl">${c.em} ${c.title}</span><span class="num">${i+1} / ${c.slides.length}</span></div>
+  <div class="pbar"><i style="width:${((i+1)/c.slides.length*100).toFixed(1)}%"></i></div>
+  <div class="stg-body" id="stgbody"><div class="slide">${body}</div></div>
+  <div class="stg-nav">
+    <span class="hintkey">← → 키 · 밀어서 넘기기</span>
+    <button class="btn-s" id="prev" ${i===0?"disabled":""}>◀ 이전</button>
+    <button class="btn-p" id="next">${i===c.slides.length-1?"목록으로 🏁":"다음 ▶"}</button>
+  </div>`;
+ const go=(d)=>{const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
+ stage.querySelector("#exit").onclick=()=>{deck=null;view="learn";render();};
+ stage.querySelector("#prev").onclick=()=>go(-1);
+ stage.querySelector("#next").onclick=()=>go(1);
+ const bodyEl=stage.querySelector("#stgbody"); let tx=null,ty=null;
+ bodyEl.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+ bodyEl.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+   if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6&&!e.target.closest("textarea,input"))go(dx<0?1:-1);tx=null;},{passive:true});
+ if(sl.t==="hero"&&sl.scene==="orbit")bindOrbit(stage);
+ if(sl.t==="hero"&&sl.scene==="sim")bindSim(stage);
+ if(sl.t==="quiz"){stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
    const j=+b.dataset.j;
-   if(j===cd.a){b.classList.add("ok");document.getElementById("qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(cd.ex)}</div>`;
+   if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;
      if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();}
-   else{b.classList.add("no");document.getElementById("qfb").innerHTML=`<div class="fb no"><b>🛰️ 다시 생각!</b> 힌트: ${esc(cd.ex)}</div>`;}});}
- if(cd.t==="w"){
-   const out=document.getElementById("wout");
-   document.getElementById("wchk").onclick=()=>{
-     const t=document.getElementById("wt").value; const r=checkWrite(t,cd.spec);
+   else{b.classList.add("no");stage.querySelector("#qfb").innerHTML=`<div class="fb no"><b>🛰️ 다시 생각!</b> 힌트: ${esc(sl.ex)}</div>`;}});}
+ if(sl.t==="game2")mountG2(stage.querySelector("#g2"),k);
+ if(sl.t==="write"){
+   const out=stage.querySelector("#wout");
+   stage.querySelector("#wchk").onclick=()=>{
+     const t=stage.querySelector("#wt").value; const r=checkWrite(t,sl.spec);
      out.innerHTML=fbHTML(r);
-     const first=!(S.writes[cd.key]&&S.writes[cd.key].ok);
-     S.writes[cd.key]={t,ok:r.pass||((S.writes[cd.key]||{}).ok),ts:Date.now()};
+     const first=!(S.writes[sl.key]&&S.writes[sl.key].ok);
+     S.writes[sl.key]={t,ok:r.pass||((S.writes[sl.key]||{}).ok),ts:Date.now()};
      if(r.pass&&first)addPts(5); else save();};
-   document.getElementById("wai").onclick=()=>aiFeedback(cd.key,cd.ai,()=>document.getElementById("wt").value,out);
+   stage.querySelector("#wai").onclick=()=>aiFeedback(sl.key,sl.ai,()=>stage.querySelector("#wt").value,out);
  }
+ showAI();
 }
 
+/* 분류 게임 */
+function mountG2(root,k){
+ let q=[...G2].sort(()=>Math.random()-.5), idx=0, score=0, got={rock:[],gas:[]};
+ function bins(){return `<div class="hangars"><div class="hangar rock"><h4>🪨 지구형</h4><div class="got">${got.rock.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div>
+  <div class="hangar gas"><h4>🎈 목성형</h4><div class="got">${got.gas.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div></div>`;}
+ function draw(){
+  if(idx>=q.length){
+    root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! ${score}번 만에 성공 🎉</b><p>지구형 = 작고 꽉 참 · 목성형 = 크고 푹신함. 이제 몸이 기억하죠?</p></div>${bins()}`;
+    if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();
+    return;}
+  const p=q[idx];
+  root.innerHTML=`<div class="qPlanet"><span class="ball" style="width:${p[2]}px;height:${p[2]}px;background:radial-gradient(circle at 35% 35%,#fff7,${p[3]})"></span><span class="nm">${p[0]}</span></div>
+  <div class="binbtns"><button class="btn-s" data-b="rock" style="border-color:#d08f5a">🪨 지구형 격납고</button><button class="btn-s" data-b="gas" style="border-color:var(--cyan)">🎈 목성형 격납고</button></div>
+  ${bins()}<div id="g2fb"></div>`;
+  root.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.b===p[1]){got[p[1]].push(p[0]);score++;idx++;draw();}
+    else{b.classList.add("no");root.querySelector("#g2fb").innerHTML=`<div class="fb no">🛰️ 다시! ${p[0]}의 크기를 잘 봐 — ${p[1]==="rock"?"작고 단단한 쪽":"크고 푹신한 쪽"}이야.</div>`;setTimeout(()=>b.classList.remove("no"),400);}});
+ }
+ draw();
+}
+
+/* ═══════ 수배 파일 ═══════ */
 function renderWanted(){
- app.innerHTML=`${hudBlock()}<h2 style="margin:16px 4px 6px">🔭 미스터리 천체 수배 파일</h2>
- <p class="small" style="margin:0 4px">관제센터에 정체불명 관측 기록이 수신됐다! 단서를 읽고 천체의 정체를 추리하라. (명탐정처럼 🕵️)</p>
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.8rem">🔭 미스터리 천체 수배 파일</h2>
+ <p class="small" style="margin:0 4px">관제센터에 정체불명 관측 기록 수신! 단서를 읽고 천체의 정체를 추리하라. 🕵️</p>
  ${WANTED.map((w,idx)=>{const sv=S.wanted[w.id];
   return `<div class="wanted ${sv?'solved':''}">
    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3>사건 파일 #${idx+1}</h3>${sv?'<span class="stamp">해결!</span>':'<span class="tag">미해결</span>'}</div>
-   <p class="learnbody" style="margin:8px 0">🗂️ 단서: “${w.clue}”</p>
+   <div class="clue">🗂️ “${w.clue}”</div>
    ${sv?`<div class="fb ok"><b>정체: ${w.a}</b>${sv.memo?`<div class="small">🕵️ 나의 추리: ${esc(sv.memo)}</div>`:""}</div>`:
-   `<div data-wid="${w.id}">${WOPTS.map(o=>`<button class="opt wopt" data-wid="${w.id}" data-o="${o}">${o}</button>`).join("")}</div>
+   `<div>${WOPTS.map(o=>`<button class="opt wopt" data-wid="${w.id}" data-o="${o}"><span>${o}</span></button>`).join("")}</div>
     <div id="wf_${w.id}"></div>`}
   </div>`;}).join("")}`;
  drawHud();
  document.querySelectorAll(".wopt").forEach(b=>b.onclick=()=>{
    const w=WANTED.find(x=>x.id===b.dataset.wid); const fb=document.getElementById("wf_"+w.id);
    if(b.dataset.o===w.a){b.classList.add("ok");
-     fb.innerHTML=`<div class="fb ok"><b>🎯 정답! 정체는 ${w.a}.</b><p class="small" style="margin:6px 0">결정적 단서가 뭐였는지 한 줄로 남기면 추리 점수 UP! (예: "태양 주위를 공전하므로…")</p>
+     fb.innerHTML=`<div class="fb ok"><b>🎯 정답! 정체는 ${w.a}.</b><p class="small" style="margin:6px 0">결정적 단서를 한 줄로 남기면 추리 점수 UP!</p>
      <textarea id="memo_${w.id}" style="min-height:70px" placeholder="나는 ~라는 단서 때문에 ${w.a}(이)라고 판단했다."></textarea>
      <button class="btn-p" id="ms_${w.id}" style="width:100%;margin-top:8px">사건 종결하기</button></div>`;
      document.getElementById("ms_"+w.id).onclick=()=>{S.wanted[w.id]={memo:document.getElementById("memo_"+w.id).value.trim()};addPts(4);render();};}
@@ -402,26 +705,27 @@ function renderWanted(){
  });
 }
 
+/* ═══════ 논술 시험 ═══════ */
 function renderExam(){
  const sec=(t,b,open)=>`<div class="sec"><button data-sec>${open?"▼":"▶"} ${t}</button><div ${open?"":"hidden"}>${b}</div></div>`;
- app.innerHTML=`${hudBlock()}<h2 style="margin:16px 4px 6px">✍️ 관제사 자격 논술 시험 (연습)</h2>
- <p class="small" style="margin:0 4px 10px">실제 평가와 같은 방식, 다른 자료! 총 10점 · 자료를 근거로 완전한 문장으로 서술하세요.</p>
- ${sec("【제시문】 탐사선 아라호의 새 임무",`<p class="learnbody">국제 공동 탐사선 <b>아라호</b>는 지구를 출발해 천체 <b>다</b>의 근처를 지난 뒤 천체 <b>가</b>와 <b>나</b>를 관측할 예정이다. 이후 화성과 목성 사이에서 태양 주위를 도는 천체 <b>라</b>를 근접 촬영하고, 긴 궤도를 따라 돌다가 태양에 가까워지면 꼬리가 나타나는 천체 <b>마</b>를 관측한다.</p><p class="learnbody">탐사 소식을 전한 과학신문에는 이렇게 실렸다. <em>“태양계는 태양과 8개의 행성으로 이루어져 있다. 따라서 행성이 아닌 다, 라, 마는 태양계 구성원이 아니다.”</em></p>`,true)}
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.8rem">✍️ 관제사 자격 논술 시험</h2>
+ <p class="small" style="margin:0 4px 12px">실제 평가와 같은 방식, 다른 자료! 총 10점 · 자료를 근거로 완전한 문장으로 서술하세요.</p>
+ ${sec("【제시문】 탐사선 아라호의 새 임무",`<p class="s-body">국제 공동 탐사선 <b>아라호</b>는 지구를 출발해 천체 <b>다</b>의 근처를 지난 뒤 천체 <b>가</b>와 <b>나</b>를 관측할 예정이다. 이후 화성과 목성 사이에서 태양 주위를 도는 천체 <b>라</b>를 근접 촬영하고, 긴 궤도를 따라 돌다가 태양에 가까워지면 꼬리가 나타나는 천체 <b>마</b>를 관측한다.</p>
+ <div class="news">“태양계는 태양과 8개의 행성으로 이루어져 있다. 따라서 행성이 아닌 다, 라, 마는 태양계 구성원이 아니다.”<div class="src">— 과학신문 기사 중</div></div>`,true)}
  ${sec("【자료 1】 천체 관측 결과",`<div class="twrap"><table class="t"><tr><th>구분</th><th>천체 가</th><th>천체 나</th></tr><tr><td>상대 지름</td><td>0.9</td><td>11.2</td></tr><tr><td>평균 밀도(g/cm³)</td><td>5.2</td><td>1.3</td></tr><tr><td>위성</td><td>없다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div><p class="small">※ 상대 지름은 지구의 지름을 1.0으로 한 값</p>
  <div class="twrap"><table class="t"><tr><th>천체</th><th>관측 결과</th></tr><tr><td>다</td><td style="text-align:left">어느 행성 주위를 공전한다.</td></tr><tr><td>라</td><td style="text-align:left">태양 주위를 공전하며 화성과 목성 사이에서 주로 관측된다. 작고 불규칙한 암석 천체이다.</td></tr><tr><td>마</td><td style="text-align:left">얼음과 먼지로 이루어져 있고 긴 궤도로 태양 주위를 공전한다. 태양에 가까워지면 꼬리가 나타난다.</td></tr></table></div>`,true)}
- ${sec("【자료 2】 우주기상센터의 관측 기록",`<div class="twrap"><table class="t"><tr><th>항목</th><th>A 시기</th><th>B 시기</th></tr><tr><td>태양의 흑점 수</td><td>많음</td><td>적음</td></tr><tr><td>홍염과 플레어</td><td>자주 발생</td><td>드물게 발생</td></tr><tr><td>태양풍</td><td>강함</td><td>비교적 약함</td></tr><tr><td>오로라</td><td>평소보다 낮은 위도에서도 관측</td><td>극지방에서 드물게 관측</td></tr><tr><td>GPS 수신 오류 신고</td><td>크게 증가</td><td>거의 없음</td></tr></table></div><p class="learnbody">우주기상센터는 기록을 검토한 뒤, 태양 활동을 지속적으로 관측하면서 <b>인공위성·송전 설비 등 중요 설비 보호 조치</b>를 하고 <b>우주기상 예보를 강화</b>하기로 하였다.</p>`,true)}
- ${EXAM.map(e=>{const sv=S.exam[e.no]||{};return `<div class="card"><span class="tag">문항 ${e.no} · ${e.pts}점</span><h3 style="margin:8px 0">${e.no}. ${e.title}</h3>
-  <p class="learnbody">${e.q}</p>
-  <textarea id="et${e.no}" style="min-height:${e.no===3?220:150}px" placeholder="자료의 숫자·내용을 근거로, '왜냐하면/따라서'로 이어지는 완전한 문장으로 써 보세요.">${esc(sv.t||"")}</textarea>
+ ${sec("【자료 2】 우주기상센터의 관측 기록",`<div class="twrap"><table class="t"><tr><th>항목</th><th>A 시기</th><th>B 시기</th></tr><tr><td>태양의 흑점 수</td><td>많음</td><td>적음</td></tr><tr><td>홍염과 플레어</td><td>자주 발생</td><td>드물게 발생</td></tr><tr><td>태양풍</td><td>강함</td><td>비교적 약함</td></tr><tr><td>오로라</td><td>평소보다 낮은 위도에서도 관측</td><td>극지방에서 드물게 관측</td></tr><tr><td>GPS 수신 오류 신고</td><td>크게 증가</td><td>거의 없음</td></tr></table></div><p class="s-body">우주기상센터는 기록을 검토한 뒤, 태양 활동을 지속적으로 관측하면서 <b>인공위성·송전 설비 등 중요 설비 보호 조치</b>를 하고 <b>우주기상 예보를 강화</b>하기로 하였다.</p>`,true)}
+ ${EXAM.map(e=>{const sv=S.exam[e.no]||{};return `<div class="card"><span class="tag">문항 ${e.no} · ${e.pts}점</span><h3 style="margin:8px 0;font-size:1.35rem">${e.no}. ${e.title}</h3>
+  <p class="s-body">${e.q}</p>
+  <textarea id="et${e.no}" style="min-height:${e.no===3?230:160}px" placeholder="자료의 숫자·내용을 근거로, '왜냐하면/따라서'로 이어지는 완전한 문장으로.">${esc(sv.t||"")}</textarea>
   <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
    <button class="btn-p echk" data-no="${e.no}" style="flex:1">자동 점검</button>
    <button class="btn-s aibtn eai" data-no="${e.no}" style="flex:1" hidden>🤖 AI 코치 피드백</button>
    <button class="btn-s esub" data-no="${e.no}" style="flex:1">제출 저장 ${sv.t?"(재제출)":""}</button>
   </div><div id="eout${e.no}">${sv.t?'<div class="fb ok"><b>📨 제출 저장됨</b> — 홈에서 제출 코드를 만들어 선생님께 보내세요.</div>':""}</div></div>`;}).join("")}
- <div class="card"><h3>🧭 좋은 논술의 3단 공식</h3><div class="chain"><span class="nd">① 판단/분류 (주장)</span><span class="ar">→</span><span class="nd">② 자료 속 근거 (왜냐하면~)</span><span class="ar">→</span><span class="nd">③ 연결·결론 (따라서~)</span></div></div>`;
+ <div class="card"><h3>🧭 좋은 논술의 3단 공식</h3><div class="chain"><span class="nd"><b>①</b>판단·분류<br><span class="small">(주장)</span></span><span class="ar">→</span><span class="nd"><b>②</b>자료 속 근거<br><span class="small">(왜냐하면~)</span></span><span class="ar">→</span><span class="nd"><b>③</b>연결·결론<br><span class="small">(따라서~)</span></span></div></div>`;
  drawHud();
  document.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{const d=b.nextElementSibling;d.hidden=!d.hidden;b.textContent=(d.hidden?"▶":"▼")+b.textContent.slice(1);});
- showAI();
  document.querySelectorAll(".echk").forEach(b=>b.onclick=()=>{const e=EXAM.find(x=>x.no==b.dataset.no);
    const r=checkWrite(document.getElementById("et"+e.no).value,e.spec);
    document.getElementById("eout"+e.no).innerHTML=fbHTML(r);});
@@ -434,7 +738,7 @@ function renderExam(){
    document.getElementById("eout"+no).innerHTML='<div class="fb ok"><b>📨 제출 저장 완료!</b> 홈 화면 → "제출 코드 만들기"로 선생님께 보내면 끝.</div>';});
 }
 
-/* ───────── 선생님 ───────── */
+/* ═══════ 선생님 ═══════ */
 function renderTeacher(){
  if(!S.tdone){
   app.innerHTML=`${hudBlock()}<div class="card" style="max-width:480px;margin:40px auto"><h3>📋 선생님 전용</h3>
@@ -444,7 +748,7 @@ function renderTeacher(){
   document.getElementById("tgo").onclick=()=>{if(document.getElementById("tc").value.trim()===TEACHER_CODE){S.tdone=true;save();render();}else document.getElementById("terr").innerHTML='<div class="fb no">코드가 달라요.</div>';};
   return;
  }
- app.innerHTML=`${hudBlock()}<h2 style="margin:16px 4px 6px">📋 학급 학습 기록</h2>
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 6px;font-size:1.8rem">📋 학급 학습 기록</h2>
  <div class="card"><h3>🤖 AI 코치 설정 (Gemini API)</h3>
  <p class="small">Google AI Studio(aistudio.google.com)에서 발급한 API 키를 넣으면 이 기기에서 AI 피드백 버튼이 켜져요. 키는 <b>이 기기에만</b> 저장됩니다.</p>
  <div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="gk" placeholder="AIza... 로 시작하는 키" value="${esc(getKey())}" style="flex:1;min-width:200px"><button class="btn-p" id="gksave" style="min-width:110px">저장</button></div>
@@ -466,9 +770,9 @@ function renderTeacher(){
    document.getElementById("gkout").innerHTML=`<div class="codebox">${esc(url)}</div>`;
    navigator.clipboard.writeText(url).then(()=>toast("링크 복사됨 — QR로 만들어 배포!")).catch(()=>toast("길게 눌러 복사하세요"));};
  const studentHTML=(d)=>`<div class="card"><h3>👩‍🚀 ${esc(d.n||"이름없음")} <span class="small">(${esc(d.c||"-")})</span></h3>
-   <p>⭐ ${d.p}점 · ${esc(d.r||"")} · 제출 시각 ${esc(d.ts||"-")}</p>
+   <p>⭐ ${d.p}점 · ${esc(d.r||"")} · 제출 ${esc(d.ts||"-")}</p>
    <p class="small">학습 진도: ${ (d.ch||[]).map((x,i)=>`${i+1}장 ${x}`).join(" · ") } · 수배 해결 ${d.wd??0}/${WANTED.length}</p>
-   ${(d.w||[]).length?`<div class="sec"><button data-sec>▶ 한 줄 논술 ${(d.w||[]).length}건</button><div hidden>${d.w.map(w=>`<p><b>${esc(w.k)}</b> ${w.ok?'<span style="color:var(--good)">통과</span>':'<span style="color:var(--warn)">연습 중</span>'}<br>${esc(w.t)}</p>`).join("<hr style='border-color:var(--line)'>")}</div></div>`:'<p class="small">한 줄 논술 기록 없음</p>'}
+   ${(d.w||[]).length?`<div class="sec"><button data-sec>▶ 한 줄 논술 ${(d.w||[]).length}건</button><div hidden>${d.w.map(w=>`<p><b>${esc(w.k)}</b> ${w.ok?'<span style="color:var(--green)">통과</span>':'<span style="color:var(--sun)">연습 중</span>'}<br>${esc(w.t)}</p>`).join("<hr style='border-color:var(--line)'>")}</div></div>`:'<p class="small">한 줄 논술 기록 없음</p>'}
    ${d.e&&Object.keys(d.e).length?`<div class="sec"><button data-sec>▶ 논술 시험 답안 ${Object.keys(d.e).length}문항</button><div hidden>${Object.entries(d.e).map(([n,v])=>`<p><b>문항 ${n}</b> <span class="small">(자동점검 ${esc(v.g||"-")})</span><br>${esc(v.t)}</p>`).join("<hr style='border-color:var(--line)'>")}</div></div>`:'<p class="small">시험 답안 없음</p>'}</div>`;
  const bindSec=(root)=>root.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{const dd=b.nextElementSibling;dd.hidden=!dd.hidden;b.textContent=(dd.hidden?"▶":"▼")+b.textContent.slice(1);});
  document.getElementById("parse").onclick=()=>{
@@ -486,10 +790,18 @@ function renderTeacher(){
  document.getElementById("tlock").onclick=()=>{S.tdone=false;save();render();};
 }
 
-/* ───────── 내비 ───────── */
+/* ═══════ 내비 ═══════ */
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{view=b.dataset.v;deck=null;render();});
-const h0=(location.hash||"").replace("#","");
-if(["home","learn","wanted","exam","teacher"].includes(h0))view=h0;
+document.addEventListener("keydown",e=>{
+ if(!deck)return; if(e.target.closest("textarea,input"))return;
+ if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();const n=stage.querySelector("#next");if(n)n.click();}
+ if(e.key==="ArrowLeft"){e.preventDefault();const p=stage.querySelector("#prev");if(p&&!p.disabled)p.click();}
+ if(e.key==="Escape"){deck=null;view="learn";render();}
+});
+(function(){const h=(location.hash||"").replace("#","");
+ const m=h.match(/^(c[1-4])s(\d+)$/);
+ if(m){const ci=CH.findIndex(c=>c.id===m[1]);if(ci>=0){deck={ch:ci,i:Math.min(+m[2]-1,CH[ci].slides.length-1)};view="learn";}}
+ else if(["home","learn","wanted","exam","teacher"].includes(h))view=h;})();
 render();
 </script>
 </body>
