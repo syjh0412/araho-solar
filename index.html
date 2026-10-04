@@ -370,7 +370,7 @@ function save(){
 }
 function setSync(s){syncState=s;const el=document.querySelector('.hud .sync');if(el){el.className='sync '+(s==='on'?'on':'');el.textContent=s==='on'?'● 센터장 시트에 저장됨':s==='pending'?'○ 저장 중…':s==='err'?'! 저장 실패(다시 시도 중)':API?'○ 연결 대기':'기기에만 저장';}}
 function logSrv(type,item,text,score,ai){ if(API&&me) post({action:'log',...me,type,item,text,score,ai}).catch(()=>{}); }
-function addPts(n){const b=S.pts;S.pts+=n;save();toast("+"+n+"점!");checkUnlock(b,S.pts);}
+function addPts(n){if(isT()){save();return;}const b=S.pts;S.pts+=n;save();toast("+"+n+"점!");checkUnlock(b,S.pts);}
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),400);},1500);}
 /* 등급: 우주 비행사 경력 순서 */
 const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[100,"우주 비행사"],[170,"미션 스페셜리스트"],[240,"커맨더"]];
@@ -455,6 +455,47 @@ function astronautSVG(pts,suit,size){
   <path d="M110 86 q10 8 20 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M118 76 q2 3 0 5" stroke="#c98f72" stroke-width="1.5" fill="none"/>
   ${H("helmet")?`<circle cx="120" cy="66" r="50" fill="url(#${uid}v)" stroke="#e6ecff" stroke-width="5"/><path d="M80 52 q20 -34 60 -22" stroke="#fff" stroke-width="4" fill="none" opacity=".55" stroke-linecap="round"/><path d="M158 86 q-6 18 -24 26" stroke="#fff" stroke-width="2" fill="none" opacity=".35" stroke-linecap="round"/><rect x="100" y="110" width="40" height="8" rx="3" fill="#9aa3bd" stroke="${bodyD}"/>`:""}
   ${H("robot")?`<g><rect x="6" y="196" width="34" height="40" rx="9" fill="url(#${uid}m)" stroke="#5fe3ff" stroke-width="2"/><rect x="12" y="206" width="22" height="12" rx="4" fill="#0a0f2c"/><circle cx="18" cy="212" r="2.5" fill="#5fe3ff"/><circle cx="28" cy="212" r="2.5" fill="#5fe3ff"/><rect x="14" y="224" width="18" height="3" rx="1.5" fill="#3b4a9a"/><line x1="23" y1="196" x2="23" y2="184" stroke="#5fe3ff" stroke-width="2"/><circle cx="23" cy="181" r="3.5" fill="#ffb13b"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle><rect x="2" y="238" width="42" height="6" rx="3" fill="#3b4a9a"/></g>`:""}
+  </svg>`;
+}
+const isT=()=>!!(me&&me.cls==="T");
+/* 센터장(플라이트 디렉터) 캐릭터 — 관제복·헤드셋·태블릿 */
+function directorSVG(size){
+  const sz=size||200, uid="d"+Math.floor(Math.random()*1e6);
+  return `<svg viewBox="0 0 240 320" width="${sz}" height="${sz*1.33}" style="display:block;max-width:100%;height:auto">
+  <defs><linearGradient id="${uid}c" x1="0" x2="1"><stop offset="0" stop-color="#1d2a5e"/><stop offset="1" stop-color="#0e1640"/></linearGradient>
+  <radialGradient id="${uid}f" cx=".4" cy=".35"><stop offset="0" stop-color="#ffe3c9"/><stop offset="1" stop-color="#e2b48f"/></radialGradient>
+  <linearGradient id="${uid}t" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#5fe3ff"/><stop offset="1" stop-color="#2a6fd6"/></linearGradient></defs>
+  <!-- 다리 -->
+  <path d="M86 214 q-4 30 -2 54 h30 q0 -26 4 -54z" fill="#1a2250"/><path d="M122 214 q4 30 4 54 h30 q2 -24 -2 -54z" fill="#1a2250"/>
+  <path d="M84 266 h34 v16 q0 6 -6 6 h-30 q-6 0 -6 -6 v-4 q0 -8 8 -12z" fill="#0b0f28"/><path d="M122 266 h34 q8 4 8 12 v4 q0 6 -6 6 h-30 q-6 0 -6 -6z" fill="#0b0f28"/>
+  <!-- 관제복 -->
+  <path d="M80 108 q40 -14 80 0 q14 6 14 24 v70 q0 16 -16 16 h-76 q-16 0 -16 -16 v-70 q0 -18 14 -24z" fill="url(#${uid}c)" stroke="#3b4a9a" stroke-width="2.5"/>
+  <path d="M100 108 l20 26 l20 -26" fill="#f3f5ff"/><path d="M114 134 l6 70 l6 -70z" fill="#ffb13b"/>
+  <path d="M86 110 q-6 50 4 100 M154 110 q6 50 -4 100" stroke="#3b4a9a" stroke-width="1.5" fill="none" opacity=".6"/>
+  <!-- 어깨 견장 + 명찰 -->
+  <rect x="74" y="108" width="30" height="10" rx="3" fill="#ffd166" stroke="#b8860b"/><rect x="136" y="108" width="30" height="10" rx="3" fill="#ffd166" stroke="#b8860b"/>
+  <g stroke="#b8860b" stroke-width="1.5"><path d="M80 113 h18 M142 113 h18"/><path d="M84 110 v6 M90 110 v6 M96 110 v6 M146 110 v6 M152 110 v6 M158 110 v6"/></g>
+  <rect x="134" y="140" width="30" height="12" rx="2" fill="#f3f5ff"/><text x="149" y="149" text-anchor="middle" font-size="7.5" fill="#0e1640" font-weight="900">센터장</text>
+  <circle cx="92" cy="146" r="11" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><circle cx="92" cy="146" r="5.5" fill="none" stroke="#5fe3ff" stroke-width="1.5"/><text x="92" y="149.5" text-anchor="middle" font-size="7.5" fill="#ffb13b" font-weight="900">고천</text>
+  <!-- 팔 -->
+  <path d="M80 118 q-26 10 -34 60 q-2 14 8 18 l14 2 q10 -2 10 -14 q0 -30 10 -50z" fill="url(#${uid}c)" stroke="#3b4a9a" stroke-width="2.5"/>
+  <path d="M160 118 q26 10 34 60 q2 14 -8 18 l-14 2 q-10 -2 -10 -14 q0 -30 -10 -50z" fill="url(#${uid}c)" stroke="#3b4a9a" stroke-width="2.5"/>
+  <circle cx="58" cy="204" r="12" fill="url(#${uid}f)"/><circle cx="182" cy="204" r="12" fill="url(#${uid}f)"/>
+  <!-- 태블릿 -->
+  <g transform="rotate(-12 170 196)"><rect x="150" y="176" width="44" height="58" rx="5" fill="#0b0f28" stroke="#9aa3bd" stroke-width="2"/><rect x="155" y="182" width="34" height="42" rx="2" fill="url(#${uid}t)" opacity=".85"/><path d="M158 212 l8 -10 l6 6 l8 -14 l6 8" stroke="#fff" stroke-width="2" fill="none"/></g>
+  <!-- 목·머리 -->
+  <ellipse cx="120" cy="108" rx="16" ry="7" fill="#e2b48f"/>
+  <ellipse cx="120" cy="66" rx="34" ry="38" fill="url(#${uid}f)"/>
+  <path d="M86 60 q4 -34 34 -34 q30 0 34 34 q-6 -10 -14 -12 q-20 -6 -40 0 q-8 2 -14 12z" fill="#4a3a33"/><path d="M92 50 q10 -12 26 -12" stroke="#6b5a52" stroke-width="3" fill="none" opacity=".5"/>
+  <path d="M90 58 q8 -5 16 0 M134 58 q8 -5 16 0" stroke="#4a3a33" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="106" cy="68" rx="4" ry="4.5" fill="#1a120e"/><ellipse cx="134" cy="68" rx="4" ry="4.5" fill="#1a120e"/><circle cx="107.5" cy="66.5" r="1.3" fill="#fff"/><circle cx="135.5" cy="66.5" r="1.3" fill="#fff"/>
+  <path d="M108 86 q12 9 24 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- 안경 -->
+  <g fill="none" stroke="#c9d0e3" stroke-width="2"><rect x="94" y="60" width="22" height="16" rx="6"/><rect x="124" y="60" width="22" height="16" rx="6"/><path d="M116 67 h8 M94 66 l-8 -4 M146 66 l8 -4"/></g>
+  <!-- 헤드셋 -->
+  <path d="M86 62 q0 -40 34 -40 q34 0 34 40" stroke="#2a3050" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <rect x="78" y="58" width="12" height="22" rx="5" fill="#2a3050" stroke="#5fe3ff" stroke-width="1.5"/><rect x="150" y="58" width="12" height="22" rx="5" fill="#2a3050" stroke="#5fe3ff" stroke-width="1.5"/>
+  <path d="M90 78 q6 18 22 18" stroke="#2a3050" stroke-width="3" fill="none"/><circle cx="114" cy="96" r="3.5" fill="#ffb13b"><animate attributeName="opacity" values="1;.4;1" dur="1.4s" repeatCount="indefinite"/></circle>
   </svg>`;
 }
 function checkUnlock(before,after){ITEMS.forEach(it=>{if(before<it.at&&after>=it.at)setTimeout(()=>toast(`${it.e} 장비 획득: ${it.n}!`),600);});
@@ -688,7 +729,9 @@ const EXAM=[
 /* ═══════ 공통 ═══════ */
 const app=document.getElementById("app"), stage=document.getElementById("stage"), gate=document.getElementById("gate");
 let view="home", deck=null, examPage=0;
-function drawHud(){const h=document.getElementById("hud");if(!h)return;const{r,next}=rank();const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
+function drawHud(){const h=document.getElementById("hud");if(!h)return;
+ if(isT()){h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${directorSVG(34)}</span><span class="rk">센터장</span><span class="small">고천 관제센터 · 플라이트 디렉터</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`;setSync(syncState);const ho=h.querySelector("#hudOut");if(ho)ho.onclick=logout;return;}
+ const{r,next}=rank();const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
  h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${astronautSVG(null,null,34)}</span><span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`; setSync(syncState);
  const ho=h.querySelector("#hudOut"); if(ho)ho.onclick=logout;}
 function logout(){me=null;deck=null;TPIN="";try{localStorage.removeItem(LS_ME);}catch(e){}S=freshState();view="home";render();}
@@ -703,7 +746,7 @@ function render(){
  if(!me){document.body.classList.add("gate");gate.hidden=false;renderGate();return;}
  document.body.classList.remove("gate");gate.hidden=true;
  document.body.classList.toggle("deckmode",!!deck); stage.hidden=!deck;
- document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+ document.querySelectorAll("#tabs button").forEach(b=>{b.classList.toggle("on",b.dataset.v===view);if(b.dataset.v==="crew")b.hidden=isT();});
  if(deck){renderSlide();return;}
  ({home:renderHome,crew:renderCrew,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,teacher:renderTeacher})[view]();
  showAI();
@@ -764,10 +807,10 @@ function renderHome(){
   <div class="flow"><span>📚 <b>미션 학습</b> 5개 장</span><span>🔭 <b>수배 파일</b> 추리</span><span>✍️ <b>자격 논술 시험</b></span></div></div><div></div></div>
  <div class="row2">
   <div class="card"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-    <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${astronautSVG(null,null,150)}</div>
-    <div style="flex:1;min-width:220px"><div class="comms">CREW ID</div><div style="font-family:var(--disp);font-size:1.6rem">${esc(me.name)}</div><div class="small">${esc(me.cls)}반 ${esc(me.num)}번 · 고천 관제센터</div>
-     <div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
-     <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">👨‍🚀 승무원실 — 장비·꾸미기·보급</button></div></div>
+    <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${isT()?directorSVG(150):astronautSVG(null,null,150)}</div>
+    <div style="flex:1;min-width:220px"><div class="comms">${isT()?"FLIGHT DIRECTOR":"CREW ID"}</div><div style="font-family:var(--disp);font-size:1.6rem">${isT()?"센터장":esc(me.name)}</div><div class="small">${isT()?"고천 관제센터 총괄 · 임무 지시와 승인":esc(me.cls)+"반 "+esc(me.num)+"번 · 고천 관제센터"}</div>
+     ${isT()?`<button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">📋 센터장 콘솔로</button>`:`<div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
+     <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">👨‍🚀 승무원실 — 장비·꾸미기·보급</button>`}</div></div>
    <h3 style="margin-top:18px">훈장</h3>
    <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.no} ${p.d}/${p.total}</span>`;}).join("")}
    <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
@@ -776,12 +819,14 @@ function renderHome(){
    <p class="small" style="margin-top:10px">${API?"모든 기록은 자동으로 센터장께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
  </div>`;
  drawHud();
- const goCrew=()=>{view="crew";render();}; document.getElementById("goCrew").onclick=goCrew; document.getElementById("avatarGo").onclick=goCrew;
+ const goCrew=()=>{view=isT()?"teacher":"crew";render();}; document.getElementById("goCrew").onclick=goCrew; document.getElementById("avatarGo").onclick=goCrew;
 }
 
 /* ═══════ 승무원실 — 캐릭터·장비·보급 ═══════ */
+const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (최대 15건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
 function renderCrew(){
- const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at);
+ if(isT()){view="teacher";render();return;}
+ const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at); const ri=RANKS.filter(x=>S.pts>=x[0]).length-1;
  const sw=(t,obj,cur,shape,lockFn)=>`<div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">${Object.entries(obj).map(([k,v])=>{const lock=lockFn&&lockFn(k);return `<button class="stybtn" data-t="${t}" data-v="${k}" title="${v[v.length-1]}" ${lock?'disabled':''} style="min-height:0;width:44px;height:44px;padding:0;border-radius:${shape};background:${t==='visor'?`radial-gradient(circle at 35% 30%,${v[1]},${v[0]})`:v[0]};border:3px solid ${cur===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`;
  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실</h2>
  <p class="small" style="margin:0 4px 12px">점수를 모으면 장비가 지급되고, 지급된 장비는 색과 모양을 고를 수 있어요.</p>
@@ -797,7 +842,11 @@ function renderCrew(){
   <div class="card"><h3>장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
    <div style="display:grid;gap:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);${have(it.k)?'border-color:var(--sun);border-style:solid':'opacity:.5'}"><span style="font-size:1.6rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill ${have(it.k)?'g':''}">${have(it.k)?'보유':it.at+'점'}</span></div>`).join("")}</div>
    <div id="cpnBox">${cpnHTML()}</div></div>
- </div>`;
+ </div>
+ <div class="row2"><div class="card"><h3>🎖️ 승급 경로</h3><p class="small">점수가 쌓이면 자동으로 승급합니다. 지금 ${S.pts}점 — ${next?`<b style="color:var(--sun)">${next[1]}</b>까지 ${next[0]-S.pts}점`:"최고 등급!"}</p>
+   <div style="display:grid;gap:8px">${RANKS.map((x,i)=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);${i===ri?'border-color:var(--sun);border-style:solid;background:#ffb13b14':i<ri?'opacity:.75':'opacity:.5'}"><span class="pill ${i<=ri?'g':''}" style="min-width:64px;text-align:center">${x[0]}점</span><b style="font-family:var(--disp);font-size:1.1rem">${x[1]}</b>${i===ri?'<span class="pill w" style="margin-left:auto">현재</span>':i===ri+1?'<span class="pill" style="margin-left:auto">다음</span>':''}</div>`).join("")}</div></div>
+  <div class="card"><h3>⭐ 점수는 이렇게 모여요</h3><table class="t" style="margin-top:6px"><tr><th style="text-align:left">활동</th><th>점수</th></tr>${HOWPTS.map(x=>`<tr><td style="text-align:left;color:var(--fg);font-weight:400">${x[0]}</td><td style="color:var(--sun);font-weight:700">+${x[1]}</td></tr>`).join("")}</table>
+   <p class="small" style="margin-top:8px">같은 카드·퀴즈·논술은 처음 한 번만 점수가 붙어요. 점수보다 중요한 건 글이 좋아지는 것!</p></div></div>`;
  drawHud();
  document.querySelectorAll(".stybtn").forEach(b=>b.onclick=()=>{S.sty=S.sty||{};S.sty[b.dataset.t]=b.dataset.v;save();render();});
  cpnBind(app);
