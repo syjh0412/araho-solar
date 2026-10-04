@@ -100,7 +100,7 @@ svg text{font-family:var(--body)}
 <script>
 "use strict";
 /* ───────── 상태 ───────── */
-const LS="araho_v1", TEACHER_CODE="7001";
+const LS="araho_v1", TEACHER_CODE="0726";
 let S={name:"",cls:"",pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},tdone:false};
 try{const j=localStorage.getItem(LS); if(j)S={...S,...JSON.parse(j)};}catch(e){}
 function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){} drawHud();}
