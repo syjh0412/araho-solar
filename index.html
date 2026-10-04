@@ -749,7 +749,7 @@ function render(){
  if(!me){document.body.classList.add("gate");gate.hidden=false;renderGate();return;}
  document.body.classList.remove("gate");gate.hidden=true;
  document.body.classList.toggle("deckmode",!!deck); stage.hidden=!deck;
- document.querySelectorAll("#tabs button").forEach(b=>{b.classList.toggle("on",b.dataset.v===view);if(b.dataset.v==="crew")b.hidden=isT();});
+ document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
  if(deck){renderSlide();return;}
  ({home:renderHome,crew:renderCrew,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,teacher:renderTeacher})[view]();
  showAI();
@@ -828,7 +828,20 @@ function renderHome(){
 /* ═══════ 승무원실 — 캐릭터·장비·보급 ═══════ */
 const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (최대 15건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
 function renderCrew(){
- if(isT()){view="teacher";render();return;}
+ if(isT()){
+  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실 <span class="small">— 센터장 참고용</span></h2>
+  <p class="small" style="margin:0 4px 12px">학생이 보는 승급·장비·점수 기준입니다. 센터장은 점수가 쌓이지 않습니다.</p>
+  <div class="crew3">
+   <div class="card" style="text-align:center;margin:0"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${directorSVG(220)}</div><div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">센터장</div><div class="small">고천 관제센터 · 플라이트 디렉터</div>
+    <div style="text-align:left;margin-top:16px"><div class="small">학생 캐릭터는 장비를 얻을 때마다 이렇게 변합니다</div><div style="display:flex;gap:6px;justify-content:space-between;margin-top:6px">${[0,30,80,150,190].map(pt=>`<div style="text-align:center"><div style="filter:drop-shadow(0 6px 12px #0008)">${astronautSVG(pt,"white",52)}</div><div class="small">${pt}</div></div>`).join("")}</div></div></div>
+   <div class="card" style="margin:0"><h3>장비 지급 기준</h3><div style="display:grid;gap:8px;margin-top:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);margin:0"><span style="font-size:1.5rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill w">${it.at}점</span></div>`).join("")}</div></div>
+   <div class="card" style="margin:0"><h3>🍬 보급 쿠폰 조건</h3><div style="display:grid;gap:8px;margin-top:8px">${CPNS.map(c=>`<div class="frame" style="display:flex;gap:10px;align-items:center;color:var(--fg);margin:0"><span style="font-size:1.4rem">🍬</span><div style="flex:1"><b>${c.n}</b><div class="small">${c.c}</div></div></div>`).join("")}</div><p class="small" style="margin-top:8px">학생이 신청하면 센터장 콘솔 '보급 신청 결재'에 올라옵니다.</p></div>
+  </div>
+  <div class="row2"><div class="card"><h3>🎖️ 승급 경로</h3><div style="display:grid;gap:8px;margin-top:8px">${RANKS.map((x,i)=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg)"><span class="pill" style="min-width:64px;text-align:center">${x[0]}점</span><b style="font-family:var(--disp);font-size:1.1rem">${x[1]}</b></div>`).join("")}</div>
+    <p class="small" style="margin-top:8px">미션 1개 ≈ 24~36점(교신 포함). 미션 01~04 ≈ 100~120점, 수배 파일 32점, 논술 시험 24점, 교신 응답 최대 30점.</p></div>
+   <div class="card"><h3>⭐ 점수표</h3><table class="t" style="margin-top:6px"><tr><th style="text-align:left">활동</th><th>점수</th></tr>${HOWPTS.map(x=>`<tr><td style="text-align:left;color:var(--fg);font-weight:400">${x[0]}</td><td style="color:var(--sun);font-weight:700">+${x[1]}</td></tr>`).join("")}</table><p class="small" style="margin-top:8px">같은 카드·퀴즈·논술은 처음 한 번만 점수가 붙습니다.</p></div></div>`;
+  drawHud(); return;
+ }
  const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at); const ri=RANKS.filter(x=>S.pts>=x[0]).length-1;
  const sw=(t,obj,cur,shape,lockFn)=>`<div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">${Object.entries(obj).map(([k,v])=>{const lock=lockFn&&lockFn(k);return `<button class="stybtn" data-t="${t}" data-v="${k}" title="${v[v.length-1]}" ${lock?'disabled':''} style="min-height:0;width:44px;height:44px;padding:0;border-radius:${shape};background:${t==='visor'?`radial-gradient(circle at 35% 30%,${v[1]},${v[0]})`:v[0]};border:3px solid ${cur===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`;
  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실</h2>
