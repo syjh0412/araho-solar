@@ -61,7 +61,7 @@ a{color:var(--cyan)}
 
 /* 하단 탭 */
 nav#tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#070b22ee;border-top:1.5px solid var(--line);backdrop-filter:blur(10px);display:flex;justify-content:center;gap:6px;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px))}
-nav#tabs button{background:transparent;min-height:62px;min-width:62px;flex:0 1 180px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.95rem;color:var(--mut);border-radius:14px;padding:6px 4px}
+nav#tabs button{background:transparent;min-height:62px;min-width:54px;flex:0 1 150px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.95rem;color:var(--mut);border-radius:14px;padding:6px 4px}
 nav#tabs button .ic{font-size:1.5rem}
 nav#tabs button.on{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)}
 body.deckmode nav#tabs,body.gate nav#tabs{display:none}
@@ -321,6 +321,7 @@ body.deckmode .toast{bottom:110px}
 <div id="stage" hidden></div>
 <nav id="tabs">
   <button data-v="home"><span class="ic">🛰️</span>관제센터</button>
+  <button data-v="crew"><span class="ic">👨‍🚀</span>승무원실</button>
   <button data-v="learn"><span class="ic">📚</span>미션 학습</button>
   <button data-v="wanted"><span class="ic">🔭</span>수배 파일</button>
   <button data-v="exam"><span class="ic">✍️</span>논술 시험</button>
@@ -704,7 +705,7 @@ function render(){
  document.body.classList.toggle("deckmode",!!deck); stage.hidden=!deck;
  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
  if(deck){renderSlide();return;}
- ({home:renderHome,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,teacher:renderTeacher})[view]();
+ ({home:renderHome,crew:renderCrew,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,teacher:renderTeacher})[view]();
  showAI();
 }
 
@@ -756,35 +757,51 @@ function renderGate(){
 
 /* ═══════ 홈 ═══════ */
 function renderHome(){
- const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at);
+ const {r,next}=rank();
  app.innerHTML=`${hudBlock()}
  <div class="hero" style="margin-top:14px"><div><div class="log">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1>
   <p class="lead"><b style="color:var(--sun)">아라</b>는 '바다'를 뜻하는 옛 우리말. 고천(古川), 오래된 냇물은 흘러 바다에 닿는다 — 그리고 별들의 바다, 우주로. 고천중학교 관제센터가 쏘아 올린 태양계 탐사선 <b style="color:var(--sun)">아라호</b>가 발사대에 섰다. 너는 신입 훈련생. 탐사선이 보내오는 자료를 읽고, 판단하고, 글로 보고하라. 임무를 완수할수록 장비가 갖춰지고, 마지막엔 <b style="color:var(--cyan)">커맨더</b>가 된다.</p>
   <div class="flow"><span>📚 <b>미션 학습</b> 5개 장</span><span>🔭 <b>수배 파일</b> 추리</span><span>✍️ <b>자격 논술 시험</b></span></div></div><div></div></div>
  <div class="row2">
   <div class="card"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-    <div id="avatar" style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008)">${astronautSVG(null,null,190)}</div>
-    <div style="flex:1;min-width:220px"><div class="comms">CREW ID</div><div class="nm" style="font-family:var(--disp);font-size:1.6rem">${esc(me.name)}</div><div class="small">${esc(me.cls)}반 ${esc(me.num)}번 · 고천 관제센터</div>
+    <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${astronautSVG(null,null,150)}</div>
+    <div style="flex:1;min-width:220px"><div class="comms">CREW ID</div><div style="font-family:var(--disp);font-size:1.6rem">${esc(me.name)}</div><div class="small">${esc(me.cls)}반 ${esc(me.num)}번 · 고천 관제센터</div>
      <div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
-     ${have("suit")?`<div class="small" style="margin-top:8px">우주복</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${Object.entries(SUITS).map(([k,v])=>`<button class="stybtn" data-t="suit" data-v="${k}" title="${v[2]}" style="min-height:0;width:34px;height:34px;padding:0;border-radius:50%;background:${v[0]};border:3px solid ${sty().suit===k?'var(--sun)':'#0000'}"></button>`).join("")}</div>`:'<div class="small" style="margin-top:8px">우주복 (30점에 지급 — 색을 고를 수 있어요)</div>'}
-     ${have("gloves")?`<div class="small" style="margin-top:8px">장갑·부츠</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${Object.entries(GLOVES).map(([k,v])=>`<button class="stybtn" data-t="glove" data-v="${k}" title="${v[2]}" style="min-height:0;width:34px;height:34px;padding:0;border-radius:8px;background:${v[0]};border:3px solid ${sty().glove===k?'var(--sun)':'#0000'}"></button>`).join("")}</div>`:''}
-     ${have("helmet")?`<div class="small" style="margin-top:8px">헬멧 바이저</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${Object.entries(VISORS).map(([k,v])=>{const lock=k==="gold"&&!have("visor");return `<button class="stybtn" data-t="visor" data-v="${k}" title="${v[3]}" ${lock?'disabled':''} style="min-height:0;width:34px;height:34px;padding:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,${v[1]},${v[0]});border:3px solid ${sty().visor===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`:''}
-     <button class="btn-g" id="logout" style="margin-top:12px;min-height:40px;font-size:.95rem">다른 승무원으로</button></div></div>
-   <h3 style="margin-top:18px">장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
-   <div class="badgerow">${ITEMS.map(it=>`<span class="badge ${have(it.k)?'on':''}" title="${esc(it.d)}" style="${have(it.k)?'':'opacity:.45'}">${it.e} ${it.n}${have(it.k)?'':` <span class="small">${it.at}</span>`}</span>`).join("")}</div>
-   <div id="cpnBox">${cpnHTML()}</div></div>
-  <div class="card"><h3>오늘의 임무 순서</h3><ol class="steps"><li><b>미션 학습</b> — 장을 열면 전체 화면 슬라이드. 시작할 때 <b>출발 전 교신</b>(질문) 하나, 마칠 때 <b>귀환 후 교신</b> 하나</li><li><b>수배 파일</b> — 단서로 천체의 정체를 추리</li><li><b>논술 시험</b> — 실제 평가와 같은 3문항, 자동 점검 + AI 코치</li><li><b>교신 채널</b> — 다른 승무원의 질문에 응답하면 +2점</li></ol>
-   <h3 style="margin-top:14px">훈장</h3>
+     <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">👨‍🚀 승무원실 — 장비·꾸미기·보급</button></div></div>
+   <h3 style="margin-top:18px">훈장</h3>
    <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.no} ${p.d}/${p.total}</span>`;}).join("")}
    <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
-   <span class="badge ${[1,2,3].every(n=>S.exam[n])?'on':''}">✍️ 시험 ${[1,2,3].filter(n=>S.exam[n]).length}/3</span></div>
+   <span class="badge ${[1,2,3].every(n=>S.exam[n])?'on':''}">✍️ 시험 ${[1,2,3].filter(n=>S.exam[n]).length}/3</span></div></div>
+  <div class="card"><h3>오늘의 임무 순서</h3><ol class="steps"><li><b>미션 학습</b> — 장을 열면 전체 화면 슬라이드. 시작할 때 <b>출발 전 교신</b>(질문) 하나, 마칠 때 <b>귀환 교신</b></li><li><b>수배 파일</b> — 단서로 천체의 정체를 추리</li><li><b>논술 시험</b> — 실제 평가와 같은 3문항, 자동 점검 + AI 코치</li><li><b>교신 채널</b> — 다른 승무원의 질문에 응답하면 +2점</li></ol>
    <p class="small" style="margin-top:10px">${API?"모든 기록은 자동으로 센터장께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
+ </div>`;
+ drawHud();
+ const goCrew=()=>{view="crew";render();}; document.getElementById("goCrew").onclick=goCrew; document.getElementById("avatarGo").onclick=goCrew;
+}
+
+/* ═══════ 승무원실 — 캐릭터·장비·보급 ═══════ */
+function renderCrew(){
+ const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at);
+ const sw=(t,obj,cur,shape,lockFn)=>`<div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">${Object.entries(obj).map(([k,v])=>{const lock=lockFn&&lockFn(k);return `<button class="stybtn" data-t="${t}" data-v="${k}" title="${v[v.length-1]}" ${lock?'disabled':''} style="min-height:0;width:44px;height:44px;padding:0;border-radius:${shape};background:${t==='visor'?`radial-gradient(circle at 35% 30%,${v[1]},${v[0]})`:v[0]};border:3px solid ${cur===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`;
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실</h2>
+ <p class="small" style="margin:0 4px 12px">점수를 모으면 장비가 지급되고, 지급된 장비는 색과 모양을 고를 수 있어요.</p>
+ <div class="row2">
+  <div class="card" style="text-align:center"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${astronautSVG(null,null,260)}</div>
+   <div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">${esc(me.name)}</div><div style="font-family:var(--disp);color:var(--sun);font-size:1.2rem">${r}</div>
+   <div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
+   <div style="text-align:left;margin-top:16px">
+    <div class="small">우주복 ${have("suit")?"":"<span class='pill'>30점에 지급</span>"}</div>${have("suit")?sw("suit",SUITS,sty().suit,"50%"):""}
+    <div class="small" style="margin-top:12px">장갑·부츠 ${have("gloves")?"":"<span class='pill'>15점에 지급</span>"}</div>${have("gloves")?sw("glove",GLOVES,sty().glove,"10px"):""}
+    <div class="small" style="margin-top:12px">헬멧 바이저 ${have("helmet")?"":"<span class='pill'>50점에 지급</span>"}</div>${have("helmet")?sw("visor",VISORS,sty().visor,"50%",k=>k==="gold"&&!have("visor")):""}
+   </div></div>
+  <div class="card"><h3>장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
+   <div style="display:grid;gap:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);${have(it.k)?'border-color:var(--sun);border-style:solid':'opacity:.5'}"><span style="font-size:1.6rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill ${have(it.k)?'g':''}">${have(it.k)?'보유':it.at+'점'}</span></div>`).join("")}</div>
+   <div id="cpnBox">${cpnHTML()}</div></div>
  </div>`;
  drawHud();
  document.querySelectorAll(".stybtn").forEach(b=>b.onclick=()=>{S.sty=S.sty||{};S.sty[b.dataset.t]=b.dataset.v;save();render();});
  cpnBind(app);
  if(API&&me&&me.cls!=="T")call({action:'myCoupons',cls:me.cls,num:me.num}).then(r=>{COUP=r.coupons||{};const bx=document.getElementById("cpnBox");if(bx){bx.innerHTML=cpnHTML();cpnBind(bx);}}).catch(()=>{});
- document.getElementById("logout").onclick=logout;
 }
 
 /* ═══════ 학습 목록 ═══════ */
@@ -1148,7 +1165,7 @@ document.addEventListener("keydown",e=>{if(!deck)return;if(e.target.closest("tex
  if(e.key==="Escape"){deck=null;view="learn";render();}});
 (function(){const h=(location.hash||"").replace("#","");const m=h.match(/^(c[1-5])s(\d+)$/);
  if(m){const ci=CH.findIndex(c=>c.id===m[1]);if(ci>=0){deck={ch:ci,i:Math.min(+m[2]-1,CH[ci].slides.length-1)};view="learn";}}
- else if(["home","learn","wanted","exam","comms","teacher"].includes(h))view=h;})();
+ else if(["home","crew","learn","wanted","exam","comms","teacher"].includes(h))view=h;})();
 if(me){loadLocal(); if(API){call({action:'ping'}).then(r=>{AI_ON=!!r.ai;setSync('on');showAI();}).catch(()=>setSync('err'));}}
 render();
 </script>
