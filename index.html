@@ -121,7 +121,7 @@ body.deckmode nav#tabs,body.gate nav#tabs{display:none}
 .stg-nav button{font-size:1.15rem;min-height:58px}
 .stg-nav .prev{flex:0 0 160px}.stg-nav .next{flex:1;max-width:420px;margin-left:auto}
 .stg-nav .hintkey{color:var(--dim);font-size:.85rem;flex:1;text-align:center}
-@media (max-width:700px){.stg-nav .hintkey{display:none}.stg-nav .prev{flex:1}.stg-nav .next{max-width:none}.stg-body{padding:14px 16px 8px}}
+@media (max-width:700px){.stg-nav{flex-wrap:wrap}.stg-nav .hintkey:not(.lockmsg){display:none}.stg-nav .lockmsg{flex:1 1 100%;order:-1;font-size:.9rem}.stg-nav .prev{flex:1}.stg-nav .next{max-width:none}.stg-body{padding:14px 16px 8px}}
 
 /* 슬라이드 타이포 — 뷰포트 기준으로 크게 */
 .s-kicker{font-family:var(--disp);color:var(--cyan);font-size:clamp(.95rem,1.2vw,1.15rem);letter-spacing:.14em;margin-bottom:6px}
@@ -134,6 +134,13 @@ body.deckmode nav#tabs,body.gate nav#tabs{display:none}
 @media (max-width:900px){.s-grid,.s-grid.rev{grid-template-columns:1fr;gap:16px}}
 .key{background:#080c24;border:1.5px solid var(--line);border-left:6px solid var(--sun);border-radius:14px;padding:14px 20px;margin:16px 0;font-size:clamp(1.08rem,1.4vw,1.3rem)}
 .key .kt{font-family:var(--disp);color:var(--sun);display:block;margin-bottom:2px;font-size:1.05em}
+/* 빈칸 — 핵심어는 눌러야 보인다 */
+.blank{cursor:pointer;border-radius:6px;transition:background .2s}
+.blank:not(.on){color:transparent!important;background:linear-gradient(0deg,#ffb13b33,#ffb13b33);box-shadow:inset 0 -2px 0 var(--sun);padding:0 .15em;text-shadow:none}
+.blank:not(.on)::selection{color:transparent}
+.blank.on{background:#ffb13b1a}
+@media (prefers-reduced-motion:no-preference){.blank:not(.on){animation:bl 2.2s ease-in-out infinite}@keyframes bl{0%,100%{box-shadow:inset 0 -2px 0 var(--sun)}50%{box-shadow:inset 0 -2px 0 var(--cyan)}}}
+.lockmsg{color:var(--sun);font-size:.95rem;text-align:center;flex:1}
 .fig{position:relative;border-radius:20px;overflow:hidden;border:1.5px solid var(--line);background:#000}
 .fig img{display:block;width:100%;height:100%;object-fit:cover}
 .fig .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 16px 10px;background:linear-gradient(180deg,transparent,#000c);font-size:.95rem;color:#e8ecff}
@@ -350,7 +357,7 @@ const LS="araho_v2", LS_ME="araho_me";
 const SESSION_VER=3; // 입장 방식이 바뀌면 올려서 저장된 세션을 무효화
 let me=null; try{me=JSON.parse(localStorage.getItem(LS_ME)||'null'); if(me&&me.ver!==SESSION_VER)me=null;}catch(e){}
 let S=freshState();
-function freshState(){return {pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},slide:{}};}
+function freshState(){return {pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},slide:{},done:{}};}
 function loadLocal(){try{const j=localStorage.getItem(LS+'_'+(me?me.cls+'_'+me.num:'x')); if(j)S={...freshState(),...JSON.parse(j)};}catch(e){}}
 let saveTimer=null, syncState='off';
 function save(){
@@ -779,7 +786,22 @@ function renderSlide(){
   <div class="pbar"><i style="width:${((i+1)/c.slides.length*100).toFixed(1)}%"></i></div>
   <div class="stg-body" id="stgbody"><div class="slide">${body}</div></div>
   <div class="stg-nav"><button class="btn-s prev" id="prev" ${i===0?"disabled":""}>◀ 이전</button><span class="hintkey">← → 키 · 스페이스 · 밀어서 넘기기</span><button class="btn-p next" id="next">${i===c.slides.length-1?"목록으로 🏁":"다음 ▶"}</button></div>`;
- const go=(d)=>{const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
+ /* ── 단계 잠금: 빈칸을 모두 열고(학습), 퀴즈를 맞히고, 게임을 끝내고, 논술을 점검받아야 다음으로 ── */
+ S.done=S.done||{}; let locked=false, lockWhy="";
+ const unlock=()=>{locked=false;S.done[k]=1;save();const n=stage.querySelector("#next");if(n){n.disabled=false;}const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey";lm.textContent="← → 키 · 스페이스 · 밀어서 넘기기";}};
+ const setLock=(why)=>{locked=true;lockWhy=why;const n=stage.querySelector("#next");if(n)n.disabled=true;const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey lockmsg";lm.textContent=why;}};
+ if(!S.done[k]){
+   if(sl.t==="learn"){
+     const els=[...stage.querySelectorAll(".s-body b, .s-body em")].filter(e=>!e.closest(".pcard,.cap,.figcap,.chain,.cklist,.frame,table"));
+     if(els.length){let left=els.length; els.forEach(e=>{e.classList.add("blank");e.setAttribute("role","button");e.onclick=(ev)=>{ev.stopPropagation();if(e.classList.contains("on"))return;e.classList.add("on");left--;if(left>0)setLock(`빈칸 ${els.length-left}/${els.length} — 빈칸을 모두 눌러 확인하세요`);else unlock();};});
+       setLock(`빈칸 0/${els.length} — 노란 빈칸을 눌러 핵심어를 확인하세요`);}
+     else S.done[k]=1;
+   }else if(sl.t==="quiz"){ if(!S.quiz[k])setLock("퀴즈를 맞혀야 다음으로 갈 수 있어요"); else S.done[k]=1; }
+   else if(sl.t==="game2"){ if(!S.quiz[k])setLock("분류를 모두 마쳐야 다음으로 갈 수 있어요"); else S.done[k]=1; }
+   else if(sl.t==="write"){ if(!(S.writes[sl.key]&&S.writes[sl.key].t))setLock("한 줄 논술을 쓰고 점검을 한 번 받아야 넘어갈 수 있어요"); else S.done[k]=1; }
+   else S.done[k]=1;
+ }
+ const go=(d)=>{if(d>0&&locked){toast("🔒 "+lockWhy);return;}const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
  stage.querySelector("#exit").onclick=()=>{deck=null;view="learn";render();};
  stage.querySelector("#prev").onclick=()=>go(-1); stage.querySelector("#next").onclick=()=>go(1);
  const bodyEl=stage.querySelector("#stgbody"); let tx=null,ty=null;
@@ -790,17 +812,17 @@ function renderSlide(){
  if(sl.t==="hero")bindCompose(stage,c.no,"출발 전"); if(sl.t==="clear")bindCompose(stage,c.no,"귀환 후");
  stage.querySelectorAll(".pcard").forEach(b=>b.onclick=()=>b.classList.toggle("on"));
  if(sl.t==="quiz"){stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const j=+b.dataset.j;
-   if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();}
+   if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();unlock();}
    else{b.classList.add("no");stage.querySelector("#qfb").innerHTML=`<div class="fb no"><b>🛰️ 다시 생각!</b> 힌트: ${esc(sl.ex)}</div>`;}});}
- if(sl.t==="game2")mountG2(stage.querySelector("#g2"),k);
+ if(sl.t==="game2")mountG2(stage.querySelector("#g2"),k,unlock);
  if(sl.t==="write"){const out=stage.querySelector("#wout");
    stage.querySelector("#wchk").onclick=()=>{const t=stage.querySelector("#wt").value;const r=checkWrite(t,sl.spec);out.innerHTML=fbHTML(r);
      const first=!(S.writes[sl.key]&&S.writes[sl.key].ok); S.writes[sl.key]={t,ok:r.pass||((S.writes[sl.key]||{}).ok),g:r.got+"/"+r.need,ts:Date.now()};
-     logSrv('한줄논술',c.no+' '+sl.key,t,r.got+"/"+r.need,''); if(r.pass&&first)addPts(5); else save();};
+     logSrv('한줄논술',c.no+' '+sl.key,t,r.got+"/"+r.need,''); if(r.pass&&first)addPts(5); else save(); if(t.trim().length>=10)unlock();};
    stage.querySelector("#wai").onclick=()=>aiFeedback(c.no+' '+sl.key,sl.ai,()=>stage.querySelector("#wt").value,out,(S.writes[sl.key]||{}).g);}
  showAI();
 }
-function mountG2(root,k){
+function mountG2(root,k,onDone){
  /* 정체를 가린 행성의 '관측 자료'를 보고 분류한다. 이름·사진은 분류한 뒤에 공개. */
  let q=[...PL].sort(()=>Math.random()-.5), idx=0, miss=0, got={rock:[],gas:[]}, reason=null;
  const comp={rock:"단단한 암석",gas:"수소·헬륨 등 기체"};
@@ -812,7 +834,7 @@ function mountG2(root,k){
    <tr><td>고리</td><td style="text-align:left"><b style="color:var(--sun)">${p.ring}</b></td></tr></table>
    <p class="small" style="margin:8px 0 0">힌트: 밀도와 크기를 먼저 보세요. ‘크기가 크다’와 ‘밀도가 크다’는 다른 말! 밀도는 ‘얼마나 꽉 찼나’.</p></div>`;
  function draw(){
-  if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>밀도·크기·위성·고리</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();return;}
+  if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>밀도·크기·위성·고리</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();if(onDone)onDone();return;}
   const p=q[idx];
   root.innerHTML=`<div class="s-grid"><div><div class="qPlanet" style="margin-bottom:10px"><span class="ball" style="width:min(${Math.round(90+p.r*16)}px,50vw);height:min(${Math.round(90+p.r*16)}px,50vw);background-image:url(img/${p.img}.jpg);filter:blur(10px) brightness(.6)"></span><span class="small" style="display:block;margin-top:6px">상대 크기대로 — 정체는 분류 후 공개</span></div>${card(p,true)}</div>
   <div><p class="s-body" style="margin-top:0">자료의 <b>어떤 특징</b> 때문에 그 격납고로 보내나요? 근거를 고르고 격납고를 누르세요.</p>
