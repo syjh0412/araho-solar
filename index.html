@@ -376,7 +376,7 @@ function logSrv(type,item,text,score,ai){ if(API&&me) post({action:'log',...me,t
 function addPts(n){if(isT()){save();return;}const b=S.pts;S.pts+=n;save();toast("+"+n+"점!");checkUnlock(b,S.pts);}
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),400);},1500);}
 /* 등급: 우주 비행사 경력 순서 */
-const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[100,"우주 비행사"],[170,"미션 스페셜리스트"],[240,"커맨더"]];
+const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[90,"우주 비행사"],[140,"미션 스페셜리스트"],[190,"커맨더"]];
 function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length;i++){if(S.pts>=RANKS[i][0]){r=RANKS[i][1];next=RANKS[i+1]||null;}}return{r,next};}
 /* 장비: 점수를 모으면 우주복이 한 점씩 갖춰진다 */
 const ITEMS=[
@@ -385,10 +385,10 @@ const ITEMS=[
  {k:"helmet",at:50,n:"헬멧",e:"🪖",d:"이제 선외 활동(EVA) 자격이 생겼다. 바이저를 고를 수 있다."},
  {k:"pack",at:75,n:"생명유지 배낭",e:"🎒",d:"산소·물·냉각수. 8시간 버틸 수 있다."},
  {k:"jet",at:100,n:"제트팩",e:"🚀",d:"우주 공간에서 방향을 바꾸는 추진 장치."},
- {k:"patch",at:130,n:"고천 미션 패치",e:"🏷️",d:"고천중 관제센터 공식 패치. 가슴에 단다."},
- {k:"robot",at:165,n:"반려 로봇 '아라'",e:"🤖",d:"아라호가 보내준 작은 친구. 계산이 빠르다."},
- {k:"visor",at:200,n:"황금 바이저",e:"✨",d:"태양빛을 막는 금 코팅. 베테랑의 상징."},
- {k:"cmd",at:240,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
+ {k:"patch",at:125,n:"고천 미션 패치",e:"🏷️",d:"고천중 관제센터 공식 패치. 가슴에 단다."},
+ {k:"robot",at:150,n:"반려 로봇 '아라'",e:"🤖",d:"아라호가 보내준 작은 친구. 계산이 빠르다."},
+ {k:"visor",at:170,n:"황금 바이저",e:"✨",d:"태양빛을 막는 금 코팅. 베테랑의 상징."},
+ {k:"cmd",at:190,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
 const have=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&S.pts>=it.at;};
 /* 센터장 보급 쿠폰 (마이쭈) */
 const CPNS=[
@@ -397,7 +397,7 @@ const CPNS=[
  {id:"wd",n:"명추리 보급",c:"수배 파일 8건 모두 해결",t:()=>Object.keys(S.wanted||{}).length>=WANTED.length},
  {id:"ex",n:"자격 시험 응시 보급",c:"논술 시험 3문항 모두 제출",t:()=>[1,2,3].every(n=>S.exam&&S.exam[n])},
  {id:"cm",n:"통신병 보급",c:"교신 응답 5건",t:()=>((S.comms||{}).ans||0)>=5},
- {id:"cmd",n:"커맨더 취임 선물",c:"커맨더 승급(240점)",t:()=>S.pts>=240}];
+ {id:"cmd",n:"커맨더 취임 선물",c:"커맨더 승급(190점)",t:()=>S.pts>=190}];
 let COUP={};
 function cpnState(c){const st=COUP[c.id]; if(st==="Y")return "y"; if(st==="W")return "w"; return c.t()?"ready":"lock";}
 function cpnHTML(){
