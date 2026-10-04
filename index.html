@@ -376,9 +376,9 @@ const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[100,"우주 
 function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length;i++){if(S.pts>=RANKS[i][0]){r=RANKS[i][1];next=RANKS[i+1]||null;}}return{r,next};}
 /* 장비: 점수를 모으면 우주복이 한 점씩 갖춰진다 */
 const ITEMS=[
- {k:"gloves",at:15,n:"장갑·부츠",e:"🧤",d:"지상 훈련 통과 기념. 손끝이 따뜻해졌다."},
+ {k:"gloves",at:15,n:"장갑·부츠",e:"🧤",d:"선외 활동용 두꺼운 장갑과 부츠. 색을 고를 수 있다."},
  {k:"suit",at:30,n:"우주복",e:"👨‍🚀",d:"고천 관제센터 지급품. 색은 네가 고른다."},
- {k:"helmet",at:50,n:"헬멧",e:"🪖",d:"이제 선외 활동(EVA) 자격이 생겼다."},
+ {k:"helmet",at:50,n:"헬멧",e:"🪖",d:"이제 선외 활동(EVA) 자격이 생겼다. 바이저를 고를 수 있다."},
  {k:"pack",at:75,n:"생명유지 배낭",e:"🎒",d:"산소·물·냉각수. 8시간 버틸 수 있다."},
  {k:"jet",at:100,n:"제트팩",e:"🚀",d:"우주 공간에서 방향을 바꾸는 추진 장치."},
  {k:"patch",at:130,n:"고천 미션 패치",e:"🏷️",d:"고천중 관제센터 공식 패치. 가슴에 단다."},
@@ -386,30 +386,54 @@ const ITEMS=[
  {k:"visor",at:200,n:"황금 바이저",e:"✨",d:"태양빛을 막는 금 코팅. 베테랑의 상징."},
  {k:"cmd",at:240,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
 const have=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&S.pts>=it.at;};
-const SUITS={white:["#eef1ff","#c9d0ea"],orange:["#ff9a3c","#d9741b"],blue:["#6fb6ff","#3b7fd8"],mint:["#8df0d2","#4cc7a6"]};
+const SUITS={white:["#f2f4fa","#c3c9dc","흰색"],orange:["#ff9a3c","#c9641a","주황"],blue:["#6fb6ff","#2f6fc9","파랑"],mint:["#8df0d2","#3fae8e","민트"],black:["#3a4160","#1b2038","검정"]};
+const GLOVES={white:["#eef0f6","#b9c0d6","흰색"],black:["#2a3050","#141830","검정"],orange:["#ff9a3c","#c9641a","주황"],red:["#ff6b6b","#b83a3a","빨강"]};
+const VISORS={clear:["#bfe8ff","#e9f7ff",.28,"투명"],blue:["#4f8fe8","#bfe0ff",.55,"파랑 미러"],gold:["#ffd166","#fff3c4",.62,"황금(✨ 황금 바이저 필요)"]};
+function sty(){S.sty=S.sty||{};return {suit:S.sty.suit||S.suit||"white",glove:S.sty.glove||"white",visor:(S.sty.visor==="gold"&&!have("visor"))?"clear":(S.sty.visor||"clear")};}
 function astronautSVG(pts,suit,size){
   const p=pts==null?S.pts:pts; const H=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&p>=it.at;};
-  const [c1,c2]=SUITS[suit||S.suit||"white"]||SUITS.white; const sz=size||200;
-  const suitOn=H("suit"); const body=suitOn?c1:"#5b6b9a", bodyD=suitOn?c2:"#3f4c74";
-  return `<svg viewBox="0 0 200 240" width="${sz}" height="${sz*1.2}" style="display:block;max-width:100%;height:auto">
-  ${H("jet")?`<g><rect x="52" y="110" width="22" height="60" rx="8" fill="#8891b8"/><rect x="126" y="110" width="22" height="60" rx="8" fill="#8891b8"/><path d="M57 170 q6 22 12 0z" fill="#ffb13b"><animate attributeName="d" values="M57 170 q6 22 12 0z;M57 170 q6 34 12 0z;M57 170 q6 22 12 0z" dur="0.5s" repeatCount="indefinite"/></path><path d="M131 170 q6 22 12 0z" fill="#ffb13b"><animate attributeName="d" values="M131 170 q6 30 12 0z;M131 170 q6 18 12 0z;M131 170 q6 30 12 0z" dur="0.45s" repeatCount="indefinite"/></path></g>`:""}
-  ${H("pack")?`<rect x="58" y="95" width="84" height="80" rx="16" fill="#9aa4cf" stroke="#6d78b3" stroke-width="3"/><rect x="92" y="100" width="16" height="70" rx="6" fill="#7f8ab8"/>`:""}
+  const st=sty(); const [c1,c2]=SUITS[suit||st.suit]||SUITS.white; const [g1,g2]=GLOVES[st.glove]||GLOVES.white; const [v1,v2,vo]=VISORS[st.visor]||VISORS.clear;
+  const sz=size||200, uid="a"+Math.floor(Math.random()*1e6);
+  const suitOn=H("suit"), body=suitOn?c1:"#6b7390", bodyD=suitOn?c2:"#454c6b";
+  return `<svg viewBox="0 0 240 320" width="${sz}" height="${sz*1.33}" style="display:block;max-width:100%;height:auto">
+  <defs>
+   <linearGradient id="${uid}s" x1="0" x2="1"><stop offset="0" stop-color="${body}"/><stop offset=".6" stop-color="${body}"/><stop offset="1" stop-color="${bodyD}"/></linearGradient>
+   <radialGradient id="${uid}f" cx=".4" cy=".35"><stop offset="0" stop-color="#ffe3c9"/><stop offset="1" stop-color="#e2b48f"/></radialGradient>
+   <radialGradient id="${uid}v" cx=".35" cy=".3"><stop offset="0" stop-color="${v2}" stop-opacity=".9"/><stop offset=".5" stop-color="${v1}" stop-opacity="${vo}"/><stop offset="1" stop-color="#0a0f2c" stop-opacity=".55"/></radialGradient>
+   <linearGradient id="${uid}m" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c9d0e3"/><stop offset="1" stop-color="#7e879f"/></linearGradient>
+  </defs>
+  ${H("jet")?`<g><rect x="54" y="150" width="26" height="78" rx="9" fill="url(#${uid}m)"/><rect x="160" y="150" width="26" height="78" rx="9" fill="url(#${uid}m)"/><rect x="58" y="226" width="18" height="8" rx="3" fill="#3b4160"/><rect x="164" y="226" width="18" height="8" rx="3" fill="#3b4160"/>
+    <path d="M60 234 q7 30 14 0z" fill="#ffb13b" opacity=".9"><animate attributeName="d" values="M60 234 q7 26 14 0z;M60 234 q7 44 14 0z;M60 234 q7 26 14 0z" dur="0.5s" repeatCount="indefinite"/></path><path d="M166 234 q7 30 14 0z" fill="#ffb13b" opacity=".9"><animate attributeName="d" values="M166 234 q7 40 14 0z;M166 234 q7 24 14 0z;M166 234 q7 40 14 0z" dur="0.45s" repeatCount="indefinite"/></path>
+    <path d="M63 234 q4 18 8 0z" fill="#fff6d6"/><path d="M169 234 q4 18 8 0z" fill="#fff6d6"/></g>`:""}
+  ${H("pack")?`<rect x="56" y="112" width="128" height="124" rx="20" fill="url(#${uid}m)" stroke="#5c6480" stroke-width="2.5"/><rect x="62" y="150" width="14" height="60" rx="5" fill="#3fe6a6" opacity=".85"/><rect x="164" y="150" width="14" height="60" rx="5" fill="#5fe3ff" opacity=".85"/><rect x="60" y="226" width="120" height="8" rx="3" fill="#5c6480"/>`:""}
   <!-- 다리 -->
-  <rect x="72" y="160" width="24" height="48" rx="10" fill="${body}"/><rect x="104" y="160" width="24" height="48" rx="10" fill="${body}"/>
-  <rect x="68" y="200" width="32" height="20" rx="8" fill="${H("gloves")?"#2d3561":"#8891b8"}"/><rect x="100" y="200" width="32" height="20" rx="8" fill="${H("gloves")?"#2d3561":"#8891b8"}"/>
+  <path d="M86 214 q-4 30 -2 54 h30 q0 -26 4 -54z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2"/><path d="M122 214 q4 30 4 54 h30 q2 -24 -2 -54z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2"/>
+  <path d="M90 240 h24 M126 240 h24" stroke="${bodyD}" stroke-width="2" opacity=".6"/>
+  ${H("gloves")?`<path d="M80 262 h38 v22 q0 8 -8 8 h-30 q-8 0 -8 -8 v-6 q0 -10 8 -16z" fill="${g1}" stroke="${g2}" stroke-width="2"/><path d="M122 262 h38 q8 6 8 16 v6 q0 8 -8 8 h-30 q-8 0 -8 -8z" fill="${g1}" stroke="${g2}" stroke-width="2"/><rect x="72" y="284" width="48" height="8" rx="3" fill="${g2}"/><rect x="122" y="284" width="48" height="8" rx="3" fill="${g2}"/><rect x="84" y="262" width="30" height="6" rx="3" fill="${g2}" opacity=".7"/><rect x="126" y="262" width="30" height="6" rx="3" fill="${g2}" opacity=".7"/>`
+   :`<path d="M84 264 h32 v14 q0 6 -6 6 h-30 q-6 0 -6 -6 v-2 q0 -8 10 -12z" fill="#8b93ad"/><path d="M124 264 h32 q10 4 10 12 v2 q0 6 -6 6 h-30 q-6 0 -6 -6z" fill="#8b93ad"/>`}
   <!-- 몸통 -->
-  <rect x="58" y="92" width="84" height="84" rx="26" fill="${body}" stroke="${bodyD}" stroke-width="3"/>
-  ${suitOn?`<rect x="78" y="120" width="44" height="34" rx="8" fill="${bodyD}" opacity=".55"/><circle cx="88" cy="130" r="4" fill="#3fe6a6"/><circle cx="100" cy="130" r="4" fill="#ffb13b"/><circle cx="112" cy="130" r="4" fill="#5fe3ff"/>`:`<path d="M80 100 h40 v12 h-40z" fill="#3f4c74"/>`}
-  ${H("patch")?`<circle cx="124" cy="110" r="10" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><text x="124" y="114" text-anchor="middle" font-size="9" fill="#ffb13b" font-weight="700">고천</text>`:""}
+  <path d="M80 108 q40 -14 80 0 q14 6 14 24 v70 q0 16 -16 16 h-76 q-16 0 -16 -16 v-70 q0 -18 14 -24z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2.5"/>
+  <path d="M120 112 v100" stroke="${bodyD}" stroke-width="2" opacity=".5"/><path d="M84 160 h72" stroke="${bodyD}" stroke-width="1.5" opacity=".4"/>
+  ${suitOn?`<rect x="92" y="138" width="56" height="36" rx="8" fill="#0d1335" stroke="${bodyD}" stroke-width="2"/><circle cx="104" cy="150" r="4" fill="#3fe6a6"/><circle cx="120" cy="150" r="4" fill="#ffb13b"/><circle cx="136" cy="150" r="4" fill="#5fe3ff"/><rect x="100" y="160" width="40" height="6" rx="3" fill="#3b4a9a"/><rect x="82" y="188" width="18" height="10" rx="3" fill="${bodyD}" opacity=".7"/><rect x="140" y="188" width="18" height="10" rx="3" fill="${bodyD}" opacity=".7"/>`
+   :`<path d="M100 110 l20 22 l20 -22" fill="none" stroke="#454c6b" stroke-width="3"/><rect x="110" y="140" width="20" height="26" rx="4" fill="#454c6b" opacity=".6"/>`}
+  ${H("patch")?`<circle cx="150" cy="128" r="12" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><circle cx="150" cy="128" r="6" fill="none" stroke="#5fe3ff" stroke-width="1.5"/><text x="150" y="131.5" text-anchor="middle" font-size="8" fill="#ffb13b" font-weight="900">고천</text>`:""}
   <!-- 팔 -->
-  <rect x="34" y="98" width="26" height="62" rx="12" fill="${body}" stroke="${bodyD}" stroke-width="3" transform="rotate(12 47 98)"/><rect x="140" y="98" width="26" height="62" rx="12" fill="${body}" stroke="${bodyD}" stroke-width="3" transform="rotate(-12 153 98)"/>
-  <circle cx="40" cy="162" r="12" fill="${H("gloves")?"#2d3561":"#f1c9a5"}"/><circle cx="160" cy="162" r="12" fill="${H("gloves")?"#2d3561":"#f1c9a5"}"/>
-  ${H("cmd")?`<rect x="60" y="94" width="22" height="9" rx="3" fill="#ffd166"/><rect x="118" y="94" width="22" height="9" rx="3" fill="#ffd166"/>`:""}
+  <path d="M80 118 q-26 10 -34 60 q-2 14 8 18 l14 2 q10 -2 10 -14 q0 -30 10 -50z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2.5"/>
+  <path d="M160 118 q26 10 34 60 q2 14 -8 18 l-14 2 q-10 -2 -10 -14 q0 -30 -10 -50z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2.5"/>
+  <path d="M56 160 q10 2 18 -2 M184 160 q-10 2 -18 -2" stroke="${bodyD}" stroke-width="2" opacity=".6"/>
+  ${H("gloves")?`<rect x="42" y="186" width="30" height="10" rx="4" fill="${g2}"/><rect x="168" y="186" width="30" height="10" rx="4" fill="${g2}"/><path d="M44 196 q-4 22 12 26 q14 2 18 -10 q2 -10 -2 -16z" fill="${g1}" stroke="${g2}" stroke-width="2"/><path d="M196 196 q4 22 -12 26 q-14 2 -18 -10 q-2 -10 2 -16z" fill="${g1}" stroke="${g2}" stroke-width="2"/>`
+   :`<circle cx="58" cy="204" r="12" fill="url(#${uid}f)"/><circle cx="182" cy="204" r="12" fill="url(#${uid}f)"/>`}
+  ${H("cmd")?`<rect x="78" y="110" width="26" height="10" rx="3" fill="#ffd166" stroke="#b8860b"/><rect x="136" y="110" width="26" height="10" rx="3" fill="#ffd166" stroke="#b8860b"/><path d="M82 115 h18 M140 115 h18" stroke="#b8860b" stroke-width="1.5"/>`:""}
+  <!-- 목 고리 -->
+  <ellipse cx="120" cy="108" rx="30" ry="9" fill="${suitOn?"#9aa3bd":"#5a6180"}" stroke="${bodyD}" stroke-width="2"/>
   <!-- 머리 -->
-  <circle cx="100" cy="60" r="34" fill="#f1c9a5"/><path d="M68 54 q6 -30 32 -30 q26 0 32 30 q-10 -14 -32 -14 q-22 0 -32 14z" fill="#3b2a22"/>
-  <circle cx="88" cy="62" r="3.2" fill="#2a1f1a"/><circle cx="112" cy="62" r="3.2" fill="#2a1f1a"/><path d="M90 76 q10 8 20 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  ${H("helmet")?`<circle cx="100" cy="60" r="44" fill="${H("visor")?"#ffd166":"#bfe8ff"}" opacity="${H("visor")?".55":".28"}" stroke="#e6ecff" stroke-width="4"/><path d="M66 48 q34 -30 68 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/>`:""}
-  ${H("robot")?`<g><rect x="4" y="150" width="30" height="34" rx="8" fill="#9aa4cf" stroke="#5fe3ff" stroke-width="2"/><circle cx="13" cy="164" r="3" fill="#5fe3ff"/><circle cx="25" cy="164" r="3" fill="#5fe3ff"/><rect x="12" y="174" width="14" height="3" rx="1.5" fill="#0a0f2c"/><line x1="19" y1="150" x2="19" y2="140" stroke="#5fe3ff" stroke-width="2"/><circle cx="19" cy="138" r="3" fill="#ffb13b"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle></g>`:""}
+  <ellipse cx="120" cy="66" rx="34" ry="38" fill="url(#${uid}f)"/>
+  <path d="M86 62 q2 -36 34 -38 q34 2 36 38 q-8 -16 -36 -16 q-28 0 -34 16z" fill="#2b1d16"/><path d="M90 48 q10 -14 30 -12" stroke="#4a3328" stroke-width="3" fill="none" opacity=".6"/>
+  <ellipse cx="106" cy="68" rx="4" ry="4.5" fill="#1a120e"/><ellipse cx="134" cy="68" rx="4" ry="4.5" fill="#1a120e"/><circle cx="107.5" cy="66.5" r="1.3" fill="#fff"/><circle cx="135.5" cy="66.5" r="1.3" fill="#fff"/>
+  <path d="M99 58 q7 -4 14 0 M127 58 q7 -4 14 0" stroke="#2b1d16" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M110 86 q10 8 20 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M118 76 q2 3 0 5" stroke="#c98f72" stroke-width="1.5" fill="none"/>
+  ${H("helmet")?`<circle cx="120" cy="66" r="50" fill="url(#${uid}v)" stroke="#e6ecff" stroke-width="5"/><path d="M80 52 q20 -34 60 -22" stroke="#fff" stroke-width="4" fill="none" opacity=".55" stroke-linecap="round"/><path d="M158 86 q-6 18 -24 26" stroke="#fff" stroke-width="2" fill="none" opacity=".35" stroke-linecap="round"/><rect x="100" y="110" width="40" height="8" rx="3" fill="#9aa3bd" stroke="${bodyD}"/>`:""}
+  ${H("robot")?`<g><rect x="6" y="196" width="34" height="40" rx="9" fill="url(#${uid}m)" stroke="#5fe3ff" stroke-width="2"/><rect x="12" y="206" width="22" height="12" rx="4" fill="#0a0f2c"/><circle cx="18" cy="212" r="2.5" fill="#5fe3ff"/><circle cx="28" cy="212" r="2.5" fill="#5fe3ff"/><rect x="14" y="224" width="18" height="3" rx="1.5" fill="#3b4a9a"/><line x1="23" y1="196" x2="23" y2="184" stroke="#5fe3ff" stroke-width="2"/><circle cx="23" cy="181" r="3.5" fill="#ffb13b"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle><rect x="2" y="238" width="42" height="6" rx="3" fill="#3b4a9a"/></g>`:""}
   </svg>`;
 }
 function checkUnlock(before,after){ITEMS.forEach(it=>{if(before<it.at&&after>=it.at)setTimeout(()=>toast(`${it.e} 장비 획득: ${it.n}!`),600);});
@@ -722,7 +746,9 @@ function renderHome(){
     <div id="avatar" style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008)">${astronautSVG(null,null,190)}</div>
     <div style="flex:1;min-width:220px"><div class="comms">CREW ID</div><div class="nm" style="font-family:var(--disp);font-size:1.6rem">${esc(me.name)}</div><div class="small">${esc(me.cls)}반 ${esc(me.num)}번 · 고천 관제센터</div>
      <div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
-     <div class="small" style="margin-top:8px">우주복 색</div><div style="display:flex;gap:8px;margin-top:4px">${Object.entries(SUITS).map(([k,v])=>`<button class="suitbtn" data-s="${k}" title="${k}" style="min-height:0;width:34px;height:34px;padding:0;border-radius:50%;background:${v[0]};border:3px solid ${(S.suit||'white')===k?'var(--sun)':'#0000'}"></button>`).join("")}</div>
+     ${have("suit")?`<div class="small" style="margin-top:8px">우주복</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${Object.entries(SUITS).map(([k,v])=>`<button class="stybtn" data-t="suit" data-v="${k}" title="${v[2]}" style="min-height:0;width:34px;height:34px;padding:0;border-radius:50%;background:${v[0]};border:3px solid ${sty().suit===k?'var(--sun)':'#0000'}"></button>`).join("")}</div>`:'<div class="small" style="margin-top:8px">우주복 (30점에 지급 — 색을 고를 수 있어요)</div>'}
+     ${have("gloves")?`<div class="small" style="margin-top:8px">장갑·부츠</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${Object.entries(GLOVES).map(([k,v])=>`<button class="stybtn" data-t="glove" data-v="${k}" title="${v[2]}" style="min-height:0;width:34px;height:34px;padding:0;border-radius:8px;background:${v[0]};border:3px solid ${sty().glove===k?'var(--sun)':'#0000'}"></button>`).join("")}</div>`:''}
+     ${have("helmet")?`<div class="small" style="margin-top:8px">헬멧 바이저</div><div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${Object.entries(VISORS).map(([k,v])=>{const lock=k==="gold"&&!have("visor");return `<button class="stybtn" data-t="visor" data-v="${k}" title="${v[3]}" ${lock?'disabled':''} style="min-height:0;width:34px;height:34px;padding:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,${v[1]},${v[0]});border:3px solid ${sty().visor===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`:''}
      <button class="btn-g" id="logout" style="margin-top:12px;min-height:40px;font-size:.95rem">다른 승무원으로</button></div></div>
    <h3 style="margin-top:18px">장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
    <div class="badgerow">${ITEMS.map(it=>`<span class="badge ${have(it.k)?'on':''}" title="${esc(it.d)}" style="${have(it.k)?'':'opacity:.45'}">${it.e} ${it.n}${have(it.k)?'':` <span class="small">${it.at}</span>`}</span>`).join("")}</div></div>
@@ -734,7 +760,7 @@ function renderHome(){
    <p class="small" style="margin-top:10px">${API?"모든 기록은 자동으로 센터장께 전송됩니다.":"⚠ 서버 미연결: 기록이 이 기기에만 남습니다."}</p></div>
  </div>`;
  drawHud();
- document.querySelectorAll(".suitbtn").forEach(b=>b.onclick=()=>{S.suit=b.dataset.s;save();render();});
+ document.querySelectorAll(".stybtn").forEach(b=>b.onclick=()=>{S.sty=S.sty||{};S.sty[b.dataset.t]=b.dataset.v;save();render();});
  document.getElementById("logout").onclick=logout;
 }
 
