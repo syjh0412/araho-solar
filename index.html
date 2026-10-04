@@ -826,7 +826,7 @@ function renderSlide(){
 }
 function mountG2(root,k,onDone){
  /* 정체를 가린 행성의 '관측 자료'를 보고 분류한다. 이름·사진은 분류한 뒤에 공개. */
- let q=[...PL].sort(()=>Math.random()-.5), idx=0, miss=0, got={rock:[],gas:[]}, reason=null;
+ let q=[...PL].sort(()=>Math.random()-.5), idx=0, miss=0, got={rock:[],gas:[]};
  const comp={rock:"단단한 암석",gas:"수소·헬륨 등 기체"};
  const bins=()=>`<div class="hangars"><div class="hangar rock"><h4>🪨 지구형 격납고</h4><div class="got">${got.rock.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div><div class="hangar gas"><h4>🎈 목성형 격납고</h4><div class="got">${got.gas.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div></div>`;
  const card=(p,hide)=>`<div class="doc" style="background:#0a0f2c;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)"><h4 style="color:var(--cyan)">관측 자료 — ${hide?`행성 <b>${String.fromCharCode(65+idx)}</b> (정체 미공개)`:`<b style="color:var(--sun)">${p.n}</b>`}</h4>
@@ -838,21 +838,28 @@ function mountG2(root,k,onDone){
  function draw(){
   if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>밀도·크기·위성·고리</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();if(onDone)onDone();return;}
   const p=q[idx];
+  const RS=[ // [문구, 이 행성에서 참인가, 어느 팀의 근거인가]
+    ["밀도가 크다 (암석)",p.d>3,"rock"],["밀도가 작다 (기체)",p.d<=3,"gas"],
+    ["크기가 작다",p.r<2,"rock"],["크기가 크다",p.r>=2,"gas"],
+    ["위성이 없거나 적다",p.sat<=2,"rock"],["위성이 많다",p.sat>2,"gas"],
+    ["고리가 없다",p.ring==="없음","rock"],["고리가 있다",p.ring==="있음","gas"]];
+  let picked=new Set();
   root.innerHTML=`<div class="s-grid"><div><div class="qPlanet" style="margin-bottom:10px"><span class="ball" style="width:min(${Math.round(90+p.r*16)}px,50vw);height:min(${Math.round(90+p.r*16)}px,50vw);background-image:url(img/${p.img}.jpg);filter:blur(10px) brightness(.6)"></span><span class="small" style="display:block;margin-top:6px">상대 크기대로 — 정체는 분류 후 공개</span></div>${card(p,true)}</div>
-  <div><p class="s-body" style="margin-top:0">자료의 <b>어떤 특징</b> 때문에 그 격납고로 보내나요? 근거를 고르고 격납고를 누르세요.</p>
-   <div style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px">${["밀도가 크다/작다","크기가 작다/크다","위성이 적다/많다","고리가 없다/있다"].map((t,i)=>`<button class="btn-g rsn" data-r="${i}" style="min-height:44px;font-size:1rem">${t}</button>`).join("")}</div>
+  <div><p class="s-body" style="margin-top:0">자료에서 <b>근거를 두 가지 이상</b> 고르고 격납고를 누르세요. (논술 1번과 같은 방식!)</p>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px">${RS.map((t,i)=>`<button class="btn-g rsn" data-r="${i}" style="min-height:46px;font-size:1rem;text-align:left">${t[0]}</button>`).join("")}</div>
    <div class="binbtns"><button class="btn-s" data-b="rock" style="border-color:#d08f5a">🪨 지구형 격납고</button><button class="btn-s" data-b="gas" style="border-color:var(--cyan)">🎈 목성형 격납고</button></div>${bins()}<div id="g2fb"></div></div></div>`;
-  root.querySelectorAll(".rsn").forEach(b=>b.onclick=()=>{reason=+b.dataset.r;root.querySelectorAll(".rsn").forEach(x=>x.style.borderColor="");b.style.borderColor="var(--sun)";b.style.color="var(--sun)";});
+  root.querySelectorAll(".rsn").forEach(b=>b.onclick=()=>{const i=+b.dataset.r; if(picked.has(i)){picked.delete(i);b.style.borderColor="";b.style.color="";}else{picked.add(i);b.style.borderColor="var(--sun)";b.style.color="var(--sun)";}});
   root.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{
     const fb=root.querySelector("#g2fb");
-    if(reason==null){fb.innerHTML='<div class="fb no">먼저 <b>근거</b>를 하나 고르세요 — 그래야 진짜 분류!</div>';return;}
-    if(b.dataset.b===p.t){got[p.t].push(p.n);
-      fb.innerHTML=`<div class="fb ok"><b>🎯 정답! 행성 ${String.fromCharCode(65+idx)}의 정체는 <span style="color:var(--sun)">${p.n}</span>.</b> ${p.t==="rock"?`밀도 ${p.d} → ${comp.rock}, 지름 ${p.r}배`:`밀도 ${p.d} → ${comp.gas}, 지름 ${p.r}배`}. <span class="small">${p.f.replace(/<[^>]+>/g,"")}</span></div>`;
-      root.querySelector(".ball").style.filter="none"; root.querySelectorAll("[data-b],.rsn").forEach(x=>x.disabled=true);
-      setTimeout(()=>{idx++;reason=null;draw();},1900);}
-    else{miss++;b.classList.add("no");
-      const why=p.t==="rock"?`밀도 ${p.d} g/cm³는 돌덩이 수준(물의 ${Math.round(p.d)}배) → 암석 행성. 위성 ${p.sat}개, 고리 ${p.ring}.`:`밀도 ${p.d} g/cm³는 물과 비슷 → 기체 행성. 반지름은 지구의 ${p.r}배, 위성 ${p.sat}개.`;
-      fb.innerHTML=`<div class="fb no">🛰️ 다시 보자. ${why}</div>`;setTimeout(()=>b.classList.remove("no"),400);}});
+    if(picked.size<2){fb.innerHTML='<div class="fb no">근거를 <b>두 가지 이상</b> 고르세요 — 한 가지로는 분류가 아니라 추측!</div>';return;}
+    const wrongFact=[...picked].filter(i=>!RS[i][1]); const otherTeam=[...picked].filter(i=>RS[i][1]&&RS[i][2]!==b.dataset.b);
+    if(wrongFact.length){miss++;fb.innerHTML=`<div class="fb no">🛰️ 자료와 다른 근거가 있어요: <b>${wrongFact.map(i=>RS[i][0]).join(", ")}</b> — 표의 숫자를 다시 보세요. (밀도 ${p.d}, 반지름 ${p.r}, 위성 ${p.sat}개, 고리 ${p.ring})</div>`;return;}
+    if(b.dataset.b!==p.t||otherTeam.length){miss++;b.classList.add("no");
+      fb.innerHTML=`<div class="fb no">🛰️ 고른 근거(${[...picked].map(i=>RS[i][0]).join(", ")})는 ${p.t==="rock"?"<b>지구형</b>":"<b>목성형</b>"}의 특징이에요. 근거와 격납고가 맞는지 다시 생각해 보세요.</div>`;setTimeout(()=>b.classList.remove("no"),400);return;}
+    got[p.t].push(p.n);
+    fb.innerHTML=`<div class="fb ok"><b>🎯 정답! 행성 ${String.fromCharCode(65+idx)}의 정체는 <span style="color:var(--sun)">${p.n}</span>.</b> 근거: ${[...picked].map(i=>RS[i][0]).join(" · ")} → ${p.t==="rock"?comp.rock:comp.gas}. <span class="small">${p.f.replace(/<[^>]+>/g,"")}</span></div>`;
+    root.querySelector(".ball").style.filter="none"; root.querySelectorAll("[data-b],.rsn").forEach(x=>x.disabled=true);
+    setTimeout(()=>{idx++;draw();},2200);});
  } draw();
 }
 
