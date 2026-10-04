@@ -429,7 +429,7 @@ function checkWrite(text,spec){
   if(spec.link!==false){need++;if(LINKS.test(t)){got++;msgs.push({y:1,m:"이유·결론 연결어 사용 (때문에, 따라서 등)"});}else msgs.push({y:0,m:"'왜냐하면 ~ 때문이다', '따라서 ~'로 근거와 주장을 이어 보세요"});}
   return {pass:got>=need, got, need, msgs};
 }
-function fbHTML(r){return `<div class="fb ${r.pass?'ok':'no'}"><b>${r.pass?'✅ 통과! 논리가 잘 이어졌어요.':'🛰️ 관제센터 점검 '+r.got+'/'+r.need}</b><ul class="cklist">${r.msgs.map(m=>`<li class="${m.y?'y':'n'}">${esc(m.m)}</li>`).join("")}</ul>${r.pass?'':'<div class="small">✦ 표시만 고쳐서 다시 점검해 보세요. 고칠수록 좋아지는 게 진짜 글쓰기!</div>'}</div>`;}
+function fbHTML(r){return `<div class="fb ${r.pass?'ok':'no'}"><b>${r.pass?'✅ 통과! 논리가 잘 이어졌어요.':'🛰️ 관제센터 점검 '+r.got+'/'+r.need}</b><ul class="cklist">${r.msgs.map(m=>`<li class="${m.y?'y':'n'}">${esc(m.m)}</li>`).join("")}</ul>${r.pass?'':'<div class="small">✦ 표시만 고쳐서 다시 점검해 보세요. 고칠수록 좋아지는 게 진짜 글쓰기! 두세 번 해도 안 되면 옆 승무원에게 묻거나 센터장을 부르세요.</div>'}</div>`;}
 let AI_ON=false;
 function showAI(){document.querySelectorAll(".aibtn").forEach(b=>b.hidden=!AI_ON);}
 async function aiFeedback(item,rubric,textGetter,outEl,score){
@@ -778,7 +778,7 @@ function renderSlide(){
    body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div><p class="s-body">아라호에서 행성 <b>관측 자료</b>만 도착했다 — 이름도 사진도 없이. 자료만 보고 어느 격납고(지구형/목성형)로 보낼지 판단하고, <em>근거</em>를 함께 보고하라.</p><div id="g2"></div>`;}
  if(sl.t==="write"){const w=S.writes[sl.key]||{};
    body=`<div class="s-kicker">✍️ ${sl.h}</div><div class="s-grid rev">${IMG(sl.img,"",'tall')}<div><div class="s-title" style="font-size:clamp(1.3rem,2.2vw,1.9rem)">${sl.prompt}</div>
-   <div class="frame">💬 문장 틀 — ${sl.frame}</div>
+   <div class="frame">💬 문장 틀 — ${sl.frame}</div><p class="small" style="margin:4px 0 0">점검을 <b>통과</b>해야 다음으로 갑니다. 막히면 옆 승무원에게 묻거나 센터장을 부르세요 — 혼자 오래 붙잡지 않기!</p>
    <textarea id="wt" placeholder="자료 속 말을 근거로, 완전한 문장으로 써 보세요.">${esc(w.t||"")}</textarea>
    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn-p" id="wchk" style="flex:1">관제센터 점검받기</button><button class="btn-s aibtn" id="wai" style="flex:1" hidden>🤖 AI 코치 피드백</button></div>
    <div id="wout">${w.ok?'<div class="fb ok"><b>✅ 통과한 논술이에요. 더 다듬어 다시 점검해도 좋아요!</b></div>':""}</div></div></div>`;}
@@ -798,10 +798,10 @@ function renderSlide(){
      else S.done[k]=1;
    }else if(sl.t==="quiz"){ if(!S.quiz[k])setLock("퀴즈를 맞혀야 다음으로 갈 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="game2"){ if(!S.quiz[k])setLock("분류를 모두 마쳐야 다음으로 갈 수 있어요"); else S.done[k]=1; }
-   else if(sl.t==="write"){ if(!(S.writes[sl.key]&&S.writes[sl.key].t))setLock("한 줄 논술을 쓰고 점검을 한 번 받아야 넘어갈 수 있어요"); else S.done[k]=1; }
+   else if(sl.t==="write"){ if(!(S.writes[sl.key]&&S.writes[sl.key].ok))setLock("한 줄 논술이 점검을 통과해야 넘어갈 수 있어요"); else S.done[k]=1; }
    else S.done[k]=1;
  }
- const go=(d)=>{if(d>0&&locked){toast("🔒 "+lockWhy);return;}const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
+ const go=(d)=>{if(d>0&&locked){toast("🔒 "+lockWhy+" · 막히면 옆 승무원이나 센터장에게!");return;}const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
  stage.querySelector("#exit").onclick=()=>{deck=null;view="learn";render();};
  stage.querySelector("#prev").onclick=()=>go(-1); stage.querySelector("#next").onclick=()=>go(1);
  const bodyEl=stage.querySelector("#stgbody"); let tx=null,ty=null;
@@ -813,12 +813,14 @@ function renderSlide(){
  stage.querySelectorAll(".pcard").forEach(b=>b.onclick=()=>b.classList.toggle("on"));
  if(sl.t==="quiz"){stage.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const j=+b.dataset.j;
    if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();unlock();}
-   else{b.classList.add("no");stage.querySelector("#qfb").innerHTML=`<div class="fb no"><b>🛰️ 다시 생각!</b> 힌트: ${esc(sl.ex)}</div>`;}});}
+   else{b.classList.add("no");S.tries=S.tries||{};S.tries[k]=(S.tries[k]||0)+1;stage.querySelector("#qfb").innerHTML=`<div class="fb no"><b>🛰️ 다시 생각!</b> 힌트: ${esc(sl.ex)}${S.tries[k]>=2?'<br><span class="small">🤝 헷갈리면 옆 승무원과 의논하거나 센터장을 부르세요.</span>':''}</div>`;}});}
  if(sl.t==="game2")mountG2(stage.querySelector("#g2"),k,unlock);
  if(sl.t==="write"){const out=stage.querySelector("#wout");
    stage.querySelector("#wchk").onclick=()=>{const t=stage.querySelector("#wt").value;const r=checkWrite(t,sl.spec);out.innerHTML=fbHTML(r);
      const first=!(S.writes[sl.key]&&S.writes[sl.key].ok); S.writes[sl.key]={t,ok:r.pass||((S.writes[sl.key]||{}).ok),g:r.got+"/"+r.need,ts:Date.now()};
-     logSrv('한줄논술',c.no+' '+sl.key,t,r.got+"/"+r.need,''); if(r.pass&&first)addPts(5); else save(); if(t.trim().length>=10)unlock();};
+     logSrv('한줄논술',c.no+' '+sl.key,t,r.got+"/"+r.need,''); if(r.pass&&first)addPts(5); else save();
+     S.tries=S.tries||{}; S.tries[sl.key]=(S.tries[sl.key]||0)+1;
+     if(r.pass)unlock(); else if(S.tries[sl.key]>=3) out.insertAdjacentHTML("beforeend",'<div class="fb no" style="border-color:var(--cyan)"><b>🤝 막히면 혼자 끙끙대지 마세요.</b> 옆자리 승무원에게 "내 글에서 뭐가 빠졌어?" 하고 물어보거나, 손을 들어 <b>센터장</b>을 부르세요. 글쓰기는 원래 같이 고치는 거예요.</div>');};
    stage.querySelector("#wai").onclick=()=>aiFeedback(c.no+' '+sl.key,sl.ai,()=>stage.querySelector("#wt").value,out,(S.writes[sl.key]||{}).g);}
  showAI();
 }
