@@ -77,6 +77,10 @@ function handle(p){
   if(a==='save')      return save(p);
   if(a==='log')       return log(p);
   if(a==='feedback')  return feedback(p);
+  if(a==='couponClaim') return couponClaim(p);
+  if(a==='myCoupons')   return myCoupons(p);
+  if(a==='couponList')  return couponList(p);
+  if(a==='couponGive')  return couponGive(p);
   if(a==='qadd')      return qadd(p);
   if(a==='qlist')     return qlist(p);
   if(a==='qanswer')   return qanswer(p);
@@ -179,6 +183,35 @@ function log(p){
   var name = itemSheetName(p);
   if(name){ var s2 = sheet(name, head); s2.appendRow(row); }
   return {ok:true};
+}
+
+/* ───────── 센터장 보급 쿠폰 (마이쭈) ─────────
+   학생이 조건을 채우면 '보급 신청' → '쿠폰' 탭에 W(대기)로 기록 → 센터장 콘솔에서 지급(Y) */
+var SHEET_CP='쿠폰';
+function cpSheet(){ return sheet(SHEET_CP, ['key','반','번호','이름','쿠폰','상태','신청시각','지급시각']); }
+function couponClaim(p){
+  if(!p.cls||!p.num||!p.cid) throw new Error('신청 정보가 부족해요');
+  var s=cpSheet(), k=[String(p.cls).trim(),String(p.num).trim(),String(p.cid).trim()].join('|');
+  var v=s.getDataRange().getValues();
+  for(var i=1;i<v.length;i++){ if(String(v[i][0])===k) return {ok:true, st:String(v[i][5])}; }
+  s.appendRow([k, p.cls, p.num, p.name||'', p.cid, 'W', new Date(), '']);
+  return {ok:true, st:'W'};
+}
+function myCoupons(p){
+  var s=cpSheet(), v=s.getDataRange().getValues(), out={};
+  for(var i=1;i<v.length;i++){ if(String(v[i][1])===String(p.cls)&&String(v[i][2])===String(p.num)) out[String(v[i][4])]=String(v[i][5]); }
+  return {ok:true, coupons:out};
+}
+function couponList(p){
+  checkPin(p); var s=cpSheet(), v=s.getDataRange().getValues(), rows=[];
+  for(var i=1;i<v.length;i++){ if(p.cls&&String(v[i][1])!==String(p.cls)) continue;
+    rows.push({key:v[i][0], cls:v[i][1], num:v[i][2], name:v[i][3], cid:v[i][4], st:v[i][5], t:v[i][6]?new Date(v[i][6]).toISOString():''}); }
+  return {ok:true, rows:rows};
+}
+function couponGive(p){
+  checkPin(p); var s=cpSheet(), v=s.getDataRange().getValues();
+  for(var i=1;i<v.length;i++){ if(String(v[i][0])===String(p.key)){ s.getRange(i+1,6).setValue(p.undo?'W':'Y'); s.getRange(i+1,8).setValue(p.undo?'':new Date()); return {ok:true}; } }
+  throw new Error('신청을 찾지 못했어요');
 }
 
 /* ───────── 교신(질문) 게시판 ───────── */
