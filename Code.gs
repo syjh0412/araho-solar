@@ -13,6 +13,9 @@
  *     (가) 스크립트 속성: 왼쪽 ⚙ 프로젝트 설정 → 맨 아래 '스크립트 속성' → 속성 추가
  *          GEMINI_KEY = 발급받은 키 / PIN = 센터장 코드 (예: 0726)
  *     (나) 시트 '설정' 탭 (웹 앱을 한 번 열면 자동 생성): GEMINI_KEY, PIN 의 B칸
+ *  6) (선택) 학생 명단: 아무 탭에나 '반 | 번호 | 이름' 머리글로 명단을 붙여넣으면
+ *     학생은 반·번호를 고르고 자기 이름을 확인한 뒤 '콜사인'(비밀번호)으로 입장합니다.
+ *     콜사인은 첫 입장 때 학생이 정하고 명단 탭의 '콜사인' 열에 저장됩니다.
  * 이후 학생 기록은 '학생' / '기록' 탭에 자동으로 쌓이고,
  * 앱의 센터장 탭에서 실시간으로 볼 수 있습니다.
  */
@@ -67,7 +70,9 @@ function handle(p){
   var a = p.action;
   conf('PIN'); // 설정 탭 보장
   if(a==='ping')      return {ok:true, t:new Date().toISOString(), ai: !!conf('GEMINI_KEY')};
+  if(a==='names')     return rosterPublic(p);
   if(a==='login')     return login(p);
+  if(a==='resetcode') return resetCode(p);
   if(a==='save')      return save(p);
   if(a==='log')       return log(p);
   if(a==='feedback')  return feedback(p);
@@ -89,18 +94,62 @@ function findRow(s, k){
   return -1;
 }
 
-function login(p){
-  if(!p.cls || !p.num || !p.name) throw new Error('반·번호·이름을 모두 입력하세요');
-  var s = sheet(SHEET_STUDENTS, ['key','반','번호','이름','점수','등급','진도','상태JSON','최근접속']);
-  var k = key(p), r = findRow(s,k), state = null;
-  if(r<0){
-    s.appendRow([k, p.cls, p.num, p.name, 0, '훈련생', '', '', new Date()]);
-  }else{
-    var raw = s.getRange(r,8).getValue();
-    try{ state = raw ? JSON.parse(raw) : null; }catch(e){ state=null; }
-    s.getRange(r,9).setValue(new Date());
+/* ───────── 명단(학생 명부) ─────────
+   시트 아무 탭이든 첫 3줄 안에 '반' '번호' '이름' 머리글이 있으면 명단으로 인식합니다.
+   '콜사인' 열이 없으면 자동으로 만들어 학생이 처음 입장할 때 정한 콜사인(비밀번호)을 저장합니다. */
+function findRoster(){
+  var sheets = ss().getSheets();
+  for(var i=0;i<sheets.length;i++){
+    var sh = sheets[i]; if(sh.getLastRow()<1) continue;
+    var top = sh.getRange(1,1,Math.min(3,sh.getLastRow()),Math.max(1,sh.getLastColumn())).getValues();
+    for(var r=0;r<top.length;r++){
+      var row = top[r].map(function(x){return String(x).replace(/\s/g,'');});
+      var ci=row.indexOf('반'), ni=row.indexOf('번호'), mi=row.indexOf('이름');
+      if(ci>=0 && ni>=0 && mi>=0){
+        var ki = row.indexOf('콜사인'); if(ki<0) ki = row.indexOf('비밀번호');
+        if(ki<0){ ki = row.length; sh.getRange(r+1, ki+1).setValue('콜사인'); }
+        return {sh:sh, head:r+1, ci:ci, ni:ni, mi:mi, ki:ki};
+      }
+    }
   }
-  return {ok:true, state:state};
+  return null;
+}
+function rosterPublic(p){
+  var R = findRoster(); if(!R) return {ok:true, roster:null};
+  var v = R.sh.getRange(R.head+1,1,Math.max(0,R.sh.getLastRow()-R.head),Math.max(R.ki+1,R.sh.getLastColumn())).getValues();
+  var out = {};
+  for(var i=0;i<v.length;i++){ var c=String(v[i][R.ci]).trim(), n=String(v[i][R.ni]).trim(), m=String(v[i][R.mi]).trim();
+    if(!c||!n||!m) continue; (out[c]=out[c]||[]).push({num:n,name:m,set:!!String(v[i][R.ki]||'').trim()}); }
+  return {ok:true, roster:out};
+}
+function rosterRow(R, cls, num){
+  var v = R.sh.getRange(R.head+1,1,Math.max(0,R.sh.getLastRow()-R.head),Math.max(R.ki+1,R.sh.getLastColumn())).getValues();
+  for(var i=0;i<v.length;i++){ if(String(v[i][R.ci]).trim()===String(cls).trim() && String(v[i][R.ni]).trim()===String(num).trim()) return {row:R.head+1+i, name:String(v[i][R.mi]).trim(), code:String(v[i][R.ki]||'').trim()}; }
+  return null;
+}
+function login(p){
+  if(!p.cls || !p.num) throw new Error('반과 번호를 입력하세요');
+  var R = findRoster(), name = String(p.name||'').trim();
+  if(R){
+    var row = rosterRow(R, p.cls, p.num);
+    if(!row) throw new Error('명단에 없는 반·번호예요. 센터장에게 확인하세요');
+    name = row.name;
+    var code = String(p.code||'').trim();
+    if(!row.code){
+      if(code.length<2) throw new Error('처음 입장이에요. 콜사인(2~8자)을 정해 주세요');
+      R.sh.getRange(row.row, R.ki+1).setValue(code);
+    }else if(code!==row.code){ throw new Error('콜사인이 달라요'); }
+  }else if(!name){ throw new Error('이름을 입력하세요'); }
+  var s = sheet(SHEET_STUDENTS, ['key','반','번호','이름','점수','등급','진도','상태JSON','최근접속']);
+  var k = key({cls:p.cls,num:p.num,name:name}), r = findRow(s,k), state = null;
+  if(r<0){ s.appendRow([k, p.cls, p.num, name, 0, '지상 훈련생', '', '', new Date()]); }
+  else{ var raw = s.getRange(r,8).getValue(); try{ state = raw ? JSON.parse(raw) : null; }catch(e){ state=null; } s.getRange(r,9).setValue(new Date()); }
+  return {ok:true, name:name, state:state};
+}
+function resetCode(p){
+  checkPin(p); var R = findRoster(); if(!R) throw new Error('명단 탭이 없어요');
+  var row = rosterRow(R, p.cls, p.num); if(!row) throw new Error('명단에 없어요');
+  R.sh.getRange(row.row, R.ki+1).setValue(''); return {ok:true};
 }
 
 function save(p){
@@ -201,11 +250,12 @@ function tlogin(p){ checkPin(p); return {ok:true, ai: !!conf('GEMINI_KEY')}; }
 
 function roster(p){
   checkPin(p);
+  var R=findRoster(), codes={}; if(R){ var rv=R.sh.getRange(R.head+1,1,Math.max(0,R.sh.getLastRow()-R.head),Math.max(R.ki+1,R.sh.getLastColumn())).getValues(); rv.forEach(function(x){ codes[String(x[R.ci]).trim()+'|'+String(x[R.ni]).trim()]=String(x[R.ki]||'').trim(); }); }
   var s = sheet(SHEET_STUDENTS, ['key','반','번호','이름','점수','등급','진도','상태JSON','최근접속']);
   var v = s.getDataRange().getValues(), rows = [];
   for(var i=1;i<v.length;i++){
     if(p.cls && String(v[i][1])!==String(p.cls)) continue;
-    rows.push({cls:v[i][1], num:v[i][2], name:v[i][3], pts:v[i][4], rank:v[i][5], prog:v[i][6], state:v[i][7]||'', seen:v[i][8]?new Date(v[i][8]).toISOString():''});
+    rows.push({cls:v[i][1], num:v[i][2], name:v[i][3], pts:v[i][4], rank:v[i][5], prog:v[i][6], state:v[i][7]||'', seen:v[i][8]?new Date(v[i][8]).toISOString():'', code:codes[String(v[i][1]).trim()+'|'+String(v[i][2]).trim()]||''});
   }
   return {ok:true, rows:rows};
 }

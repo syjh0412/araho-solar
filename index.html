@@ -654,25 +654,48 @@ function render(){
 }
 
 /* ═══════ 로그인 게이트 ═══════ */
+let ROSTER=null, ROSTER_TRIED=false;
 function renderGate(){
- gate.innerHTML=`<div class="gatebox"><div class="comms">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1><p class="sub">승무원 신분을 확인합니다. 반·번호·이름을 입력하세요.</p>
-  <div class="row2"><div><label>반</label><input type="text" id="gCls" inputmode="numeric" placeholder="예) 3"></div><div><label>번호</label><input type="text" id="gNum" inputmode="numeric" placeholder="예) 12"></div></div>
-  <label>이름</label><input type="text" id="gName" placeholder="이름">
+ const hasR=ROSTER&&Object.keys(ROSTER).length;
+ const classes=hasR?Object.keys(ROSTER).sort((x,y)=>x.localeCompare(y,'ko',{numeric:true})):[];
+ gate.innerHTML=`<div class="gatebox"><div class="comms">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1><p class="sub">승무원 신분을 확인합니다.</p>
+  ${hasR?`<div class="row2"><div><label>반</label><select id="gCls"><option value="">선택</option>${classes.map(c=>`<option>${esc(c)}</option>`).join("")}</select></div><div><label>번호</label><select id="gNum" disabled><option value="">반 먼저</option></select></div></div>
+   <div id="gName" class="idcard" style="margin-top:12px;min-height:72px"><div class="av">👩‍🚀</div><div class="small">반과 번호를 고르면 이름이 나와요</div></div>
+   <label>콜사인 <span class="small">— 나만의 호출 부호(비밀번호). 처음이면 지금 정하세요 (2~8자)</span></label><input type="password" id="gCode" placeholder="예) 독수리, 블루문" autocomplete="off">`
+  :`<div class="row2"><div><label>반</label><input type="text" id="gCls" inputmode="numeric" placeholder="예) 3"></div><div><label>번호</label><input type="text" id="gNum" inputmode="numeric" placeholder="예) 12"></div></div>
+   <label>이름</label><input type="text" id="gNameIn" placeholder="이름">`}
   <button class="btn-p" id="gGo" style="width:100%;margin-top:16px">관제센터 입장</button>
-  <div id="gMsg" class="small" style="margin-top:10px">${API?"기록은 센터장의 구글 시트에 자동 저장됩니다.":"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
+  <div id="gMsg" class="small" style="margin-top:10px">${API?(ROSTER_TRIED&&!hasR?"명단이 아직 없어 이름을 직접 입력합니다.":"기록은 센터장의 구글 시트에 자동 저장됩니다."):"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
   <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장으로 입장</button></div>`;
- const go=async()=>{const cls=gate.querySelector("#gCls").value.trim(),num=gate.querySelector("#gNum").value.trim(),name=gate.querySelector("#gName").value.trim();
-   if(!cls||!num||!name)return gate.querySelector("#gMsg").textContent="반·번호·이름을 모두 입력하세요.";
-   const b=gate.querySelector("#gGo");b.disabled=true;b.textContent="확인 중…";
-   me={cls,num,name}; loadLocal();
-   if(API){try{const r=await call({action:'login',...me}); if(r.state){ // 서버 기록이 더 많으면 서버 것을 쓴다
-        const sv=r.state; if((sv.pts||0)>=(S.pts||0)) S={...freshState(),...sv}; } setSync('on');}
-     catch(e){ setSync('err'); toast("서버 연결 실패 — 기기에 저장합니다"); }}
+ if(hasR){
+   const cs=gate.querySelector("#gCls"),ns=gate.querySelector("#gNum"),nm=gate.querySelector("#gName");
+   cs.onchange=()=>{const list=(ROSTER[cs.value]||[]).slice().sort((x,y)=>Number(x.num)-Number(y.num));
+     ns.disabled=!list.length; ns.innerHTML='<option value="">선택</option>'+list.map(x=>`<option value="${esc(x.num)}">${esc(x.num)}번</option>`).join(""); nm.innerHTML='<div class="av">👩‍🚀</div><div class="small">번호를 고르세요</div>';};
+   ns.onchange=()=>{const st=(ROSTER[cs.value]||[]).find(x=>x.num===ns.value); if(!st)return;
+     nm.innerHTML=`<div class="av">👩‍🚀</div><div><div class="nm">${esc(st.name)}</div><div class="small">${esc(cs.value)}반 ${esc(st.num)}번 · ${st.set?"콜사인을 입력하세요":"<b style='color:var(--sun)'>첫 입장!</b> 콜사인을 새로 정하세요"}</div></div>`;
+     gate.querySelector("#gCode").placeholder=st.set?"콜사인":"새 콜사인 (2~8자)";};
+ }
+ const go=async()=>{
+   const m=gate.querySelector("#gMsg"); const b=gate.querySelector("#gGo");
+   let cls,num,name,code;
+   if(hasR){cls=gate.querySelector("#gCls").value;num=gate.querySelector("#gNum").value;code=gate.querySelector("#gCode").value.trim();
+     if(!cls||!num)return m.textContent="반과 번호를 고르세요.";
+     if(code.length<2||code.length>8)return m.textContent="콜사인은 2~8자로 정하세요.";
+     name=((ROSTER[cls]||[]).find(x=>x.num===num)||{}).name||"";}
+   else{cls=gate.querySelector("#gCls").value.trim();num=gate.querySelector("#gNum").value.trim();name=gate.querySelector("#gNameIn").value.trim();
+     if(!cls||!num||!name)return m.textContent="반·번호·이름을 모두 입력하세요.";}
+   b.disabled=true;b.textContent="확인 중…";
+   const cand={cls,num,name};
+   if(API){try{const r=await call({action:'login',...cand,code:code||''}); if(r.name)cand.name=r.name; me=cand; loadLocal();
+        if(r.state){const sv=r.state; if((sv.pts||0)>=(S.pts||0)) S={...freshState(),...sv};} setSync('on');}
+     catch(e){ b.disabled=false;b.textContent="관제센터 입장"; m.innerHTML='<span style="color:var(--red)">'+esc(e)+'</span>'; return; }}
+   else{ me=cand; loadLocal(); }
    try{localStorage.setItem(LS_ME,JSON.stringify(me));}catch(e){}
-   save(); view="home"; render(); toast("환영합니다, "+name+" 훈련생! 🫡");};
+   save(); view="home"; render(); toast("환영합니다, "+me.name+" 훈련생! 🫡");};
  gate.querySelector("#gGo").onclick=go;
  gate.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter")go();});
  gate.querySelector("#gT").onclick=()=>{me={cls:"T",num:"0",name:"센터장"};loadLocal();view="teacher";render();};
+ if(API&&!ROSTER_TRIED){ROSTER_TRIED=true; call({action:'names'}).then(r=>{ROSTER=r.roster||null; if(!me)renderGate();}).catch(()=>{if(!me)renderGate();});}
 }
 
 /* ═══════ 홈 ═══════ */
@@ -883,7 +906,7 @@ function renderTeacher(){
  app.innerHTML=`${hudBlock()}<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 4px 6px"><h2 style="font-size:1.9rem">📋 센터장 콘솔 — 학급 학습 현황</h2><span class="pill ${AI_ON?'g':'w'}">${AI_ON?'AI 코치 켜짐':'AI 키 없음 (시트 설정 탭)'}</span>
   <select id="tcls" style="width:auto;min-width:120px;padding:8px 12px"><option value="">전체 반</option>${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option ${TCLS==String(n)?'selected':''}>${n}</option>`).join("")}</select>
   <button class="btn-s" id="treload" style="min-height:44px">새로고침</button><button class="btn-g" id="tlock" style="min-height:44px;margin-left:auto">잠그기</button></div>
-  ${setup}<div class="card" style="padding:0;overflow:hidden"><div style="overflow:auto;max-height:52vh"><table class="r" id="rtable"><tr><th>반</th><th>번호</th><th>이름</th><th class="c">점수</th><th>등급</th><th>진도 (01·02·03·04·보너스)</th><th class="c">논술 통과</th><th class="c">시험 제출</th><th>최근</th></tr><tr><td colspan="9" class="small">불러오는 중…</td></tr></table></div></div>
+  ${setup}<div class="card" style="padding:0;overflow:hidden"><div style="overflow:auto;max-height:52vh"><table class="r" id="rtable"><tr><th>반</th><th>번호</th><th>이름</th><th class="c">점수</th><th>등급</th><th>진도 (01·02·03·04·보너스)</th><th class="c">논술 통과</th><th class="c">시험 제출</th><th>최근</th><th>콜사인</th></tr><tr><td colspan="10" class="small">불러오는 중…</td></tr></table></div></div>
   <div id="tdetail"></div>`;
  drawHud(); bindSec(app);
  document.getElementById("tcls").onchange=e=>{TCLS=e.target.value;loadRoster();};
@@ -900,7 +923,8 @@ async function loadRoster(){
    tb.innerHTML=head+(TROWS.length?TROWS.map((x,i)=>{let st={};try{st=JSON.parse(x.state||'{}');}catch(e){}
      const wr=Object.values(st.writes||{}),wok=wr.filter(w=>w.ok).length,ex=Object.keys(st.exam||{}).length;
      const prog=CH.map(c=>{const p=chapProgFrom(c,st);return `<span class="pill ${p.d>=p.total?'g':p.d>0?'w':''}">${p.d}/${p.total}</span>`;}).join(" ");
-     return `<tr data-i="${i}" class="${TSEL===i?'sel':''}" style="cursor:pointer"><td>${esc(x.cls)}</td><td>${esc(x.num)}</td><td><b>${esc(x.name)}</b></td><td class="c">${esc(x.pts)}</td><td>${esc(x.rank)}</td><td>${prog}</td><td class="c">${wok}/${wr.length}</td><td class="c">${ex}/3</td><td class="small">${x.seen?x.seen.slice(5,16).replace('T',' '):''}</td></tr>`;}).join(""):'<tr><td colspan="9" class="small">아직 접속한 학생이 없어요.</td></tr>');
+     return `<tr data-i="${i}" class="${TSEL===i?'sel':''}" style="cursor:pointer"><td>${esc(x.cls)}</td><td>${esc(x.num)}</td><td><b>${esc(x.name)}</b></td><td class="c">${esc(x.pts)}</td><td>${esc(x.rank)}</td><td>${prog}</td><td class="c">${wok}/${wr.length}</td><td class="c">${ex}/3</td><td class="small">${x.seen?x.seen.slice(5,16).replace('T',' '):''}</td><td>${x.code?`<span class="small">${esc(x.code)}</span> <button class="btn-g rc" data-c="${esc(x.cls)}" data-n="${esc(x.num)}" style="min-height:30px;padding:2px 8px;font-size:.8rem">초기화</button>`:'<span class="small">—</span>'}</td></tr>`;}).join(""):'<tr><td colspan="10" class="small">아직 접속한 학생이 없어요.</td></tr>');
+   tb.querySelectorAll(".rc").forEach(bt=>bt.onclick=async(ev)=>{ev.stopPropagation(); if(!bt.dataset.ok){bt.dataset.ok=1;bt.textContent="정말 초기화?";return;} try{await call({action:'resetcode',pin:TPIN,cls:bt.dataset.c,num:bt.dataset.n});toast("콜사인 초기화 — 학생이 다음 입장 때 새로 정합니다");loadRoster();}catch(e){toast("실패: "+e);} });
    tb.querySelectorAll("tr[data-i]").forEach(tr=>tr.onclick=()=>{TSEL=+tr.dataset.i;tb.querySelectorAll("tr").forEach(t=>t.classList.remove("sel"));tr.classList.add("sel");showDetail(TROWS[TSEL]);});
  }catch(e){tb.innerHTML=tb.rows[0].outerHTML+`<tr><td colspan="9"><div class="fb no">불러오기 실패: ${esc(e)}</div></td></tr>`;}
 }
