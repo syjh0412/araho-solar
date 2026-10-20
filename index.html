@@ -317,6 +317,30 @@ table.r td.c{text-align:center}
 body.deckmode .toast{bottom:110px}
 @media (max-width:460px){body{font-size:16.5px}.card{padding:18px 16px}.wrap{padding:14px 14px 112px}}
 [hidden]{display:none!important}
+/* ── 관제팀 분류 회의 (MISSION 02 모둠 탐구) ── */
+.rawgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0}
+@media (max-width:900px){.rawgrid{grid-template-columns:1fr 1fr}}
+.rawcard{display:block;width:100%;text-align:left;background:#0a0f2c;border:2px solid var(--line2);border-radius:16px;padding:10px 12px;min-height:0;font-size:.98rem;line-height:1.5;position:relative}
+.rawcard h5{margin:0 0 4px;font-family:var(--disp);font-size:1.25rem;color:var(--cyan)}
+.rawcard dl{display:grid;grid-template-columns:auto 1fr;gap:0 10px;margin:0}
+.rawcard dt{color:var(--mut);font-size:.88rem} .rawcard dd{margin:0;font-weight:700;color:var(--fg);text-align:right}
+.rawcard .tm{position:absolute;top:8px;right:10px;font-size:.85rem;font-weight:900;padding:1px 10px;border-radius:99px;background:var(--panel2);color:var(--mut)}
+.rawcard.t1{border-color:var(--sun);background:linear-gradient(160deg,#3a2508,#0a0f2c 70%)} .rawcard.t1 .tm{background:var(--sun);color:#2a1500}
+.rawcard.t2{border-color:var(--cyan);background:linear-gradient(160deg,#08303a,#0a0f2c 70%)} .rawcard.t2 .tm{background:var(--cyan);color:#04202a}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.chips button{min-height:42px;padding:4px 16px;font-size:1rem;border-radius:99px;background:transparent;border:1.5px solid var(--line2);color:var(--mut)}
+.chips button.on{border-color:var(--sun);color:var(--sun);background:#ffb13b1a;font-weight:700}
+.meetrow{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.meetrow{grid-template-columns:1fr}}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.bteam{background:#0a0f2c;border:1.5px solid var(--line2);border-radius:16px;padding:12px 14px;font-size:1.05rem}
+.bteam h4{margin:0 0 6px;font-family:var(--disp);color:var(--sun);font-size:1.2rem}
+.bteam .grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:3px 0}
+.bteam .grp i{font-style:normal;font-weight:900;border-radius:8px;padding:0 8px}
+.bteam .g1 i{background:#ffb13b33;color:var(--sun)} .bteam .g2 i{background:#5fe3ff26;color:var(--cyan)}
+.tally{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
+.tally span{background:var(--panel2);border-radius:99px;padding:2px 14px} .tally b{color:var(--sun)}
+.revtab td.a{background:#ffb13b22} .revtab td.b{background:#5fe3ff1c}
 </style>
 </head>
 <body class="gate">
@@ -619,6 +643,15 @@ const PL=[
  {n:"토성",img:"saturn",surf:"saturn2",t:"gas",m:95.1,r:9.45,d:0.7,sat:83,ring:"있음",f:"얼음과 암석 조각으로 된 <b>뚜렷한 고리</b>. 평균 밀도 0.7 g/cm³로 <b>물보다 밀도가 작은</b> 유일한 행성."},
  {n:"천왕성",img:"uranus",surf:"uranus_ring",t:"gas",m:14.5,r:4.0,d:1.3,sat:27,ring:"있음",f:"메테인 때문에 <b>청록색</b>. <b>자전축이 거의 누워</b> 있어 굴러가듯 공전한다."},
  {n:"해왕성",img:"neptune",surf:"neptune_surf",t:"gas",m:17.1,r:3.9,d:1.6,sat:14,ring:"있음",f:"태양에서 가장 먼 <b>푸른 행성</b>. 천왕성과 성분이 비슷하고 거대한 소용돌이 <b>대흑점</b>이 있다."}];
+/* 관제팀 분류 회의용: 이름을 가린 행성 코드 (모든 모둠이 같은 글자를 보도록 고정) */
+const RAW=["화성","목성","금성","천왕성","수성","토성","지구","해왕성"].map((n,i)=>({c:String.fromCharCode(65+i),p:PL.find(x=>x.n===n)}));
+const RAW_OFFICIAL=()=>{const a=RAW.filter(x=>x.p.t==="rock").map(x=>x.c),b=RAW.filter(x=>x.p.t==="gas").map(x=>x.c);return{a,b};};
+const REVEAL_TABLE=`<div class="twrap"><table class="t revtab"><tr><th>코드</th>${RAW.map(x=>`<th class="${x.p.t==='rock'?'a':'b'}">${x.c}</th>`).join("")}</tr>
+<tr><td>정체</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}" style="font-weight:700">${x.p.n}</td>`).join("")}</tr>
+<tr><td>반지름</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.r}</td>`).join("")}</tr>
+<tr><td>평균 밀도</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.d}</td>`).join("")}</tr>
+<tr><td>위성 수</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.sat}</td>`).join("")}</tr>
+<tr><td>고리</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.ring}</td>`).join("")}</tr></table></div>`;
 const planetGallery=(type)=>`<div class="pgal">${PL.filter(p=>p.t===type).map(p=>`<button class="pcard" data-p="${p.n}"><div class="ph" style="background-image:url(img/${p.img}.jpg)"></div><div class="nm">${p.n}</div><div class="ft">${p.f}</div></button>`).join("")}</div>`;
 const planetSurf=(type)=>`<div class="figs c4">${PL.filter(p=>p.t===type).map(p=>IMG(p.surf,`<b>${p.n}의 표면</b>`,'sq')).join("")}</div>`;
 const DATA_TABLE=`<div class="twrap"><table class="t"><tr><th>행성</th>${PL.map(p=>`<th class="${p.t==='rock'?'grpA':'grpB'}">${p.n}</th>`).join("")}</tr>
@@ -646,8 +679,10 @@ const CH=[
  {t:"write",key:"w_c1",h:"관제 일지 · 한 줄 논술",img:"comet",prompt:`우주 신문에 <b>"행성이 아닌 혜성은 태양계 구성원이 아니다"</b>라는 기사가 실렸어요. 이 기사가 잘못된 까닭을 한두 문장으로 반박해 보세요.`,frame:"혜성은 행성은 아니지만 <b>______을/를 공전</b>하기 때문에 <b>______</b>이다.",spec:{min:25,groups:[{name:"'공전'이라는 말",words:["공전","주위를 돌","주위를 도는","태양 주위"]},{name:"'태양계 구성원'이라는 판단",words:["구성원","태양계에 포함","태양계이다","태양계에 속"]}]},ai:"평가 요소: ① 혜성이 태양 주위를 공전한다는 사실을 근거로 들었는가 ② 그러므로 (행성이 아니어도) 태양계 구성원이라고 판단했는가 ③ 신문 기사가 틀렸다고 분명히 말했는가. 수준: 상=①②③ 모두, 근거→결론 연결어 사용 / 중=판단은 맞으나 공전 근거가 없거나 흐릿함 / 하=판단이 틀리거나 근거 없음. 중1 범위: 태양계=태양+태양 주위를 공전하는 천체."},
  {t:"clear",vids:[0],pts:["태양계 = 태양 + 공전하는 모든 천체","태양은 유일한 별(스스로 빛)","행성 8개: 수금지화목토천해","위성·소행성·혜성·왜소행성도 구성원 (공전!)","혜성 꼬리: 태양 가까이, 태양 반대쪽"]}
 ]},
-{id:"c2",cover:"jupiter",title:"쌍둥이가 아니야",no:"MISSION 02",sub:"행성의 특징과 분류 · 9분",slides:[
+{id:"c2",cover:"jupiter",title:"쌍둥이가 아니야",no:"MISSION 02",sub:"행성의 특징과 분류 · 모둠 탐구 포함 25분",slides:[
  {t:"hero",log:"통신 로그 · D+12 · 행성 관측 자료 수신",h:"쌍둥이가 아니야",sub:"아라호가 8개 행성의 사진과 자료를 보내왔다. 겉모습은 제각각이지만 두 팀으로 나뉜다 — 분류 기준을 마스터하라. — 센터장",art:SIZE_FIG,img:"planets4"},
+ {t:"meet",h:"관제팀 분류 회의"},
+ {t:"learn",h:"정체 공개 — 관제센터 공식 분류",wide:true,b:REVEAL_TABLE+`<div class="key"><span class="kt">관제센터 공식 기록</span>노란 칸 네 행성은 <b>지구형 행성</b>, 파란 칸 네 행성은 <b>목성형 행성</b>. 여러분 관제팀의 두 팀과 비교해 보세요 — 어떤 기준으로 나눠도 같은 두 무리가 나왔다면, 그 기준들이 <em>함께 움직인다</em>는 뜻이에요.</div><p class="small">질량·반지름이 큰 쪽이 밀도는 오히려 작다 — 이 반전은 몇 장 뒤에서 다시 만나요.</p>`},
  {t:"learn",h:"지구형 행성 — 수·금·지·화",wide:true,b:planetGallery("rock")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>작다</em> · 단단한 <b>암석</b> → 밀도 <em>크다</em> · 위성이 <em>없거나 적다</em> · 고리 <em>없음</em></div>`},
  {t:"learn",h:"지구형 행성의 표면",wide:true,b:planetSurf("rock")+`<p style="margin-top:12px">네 행성 모두 <b>단단한 땅</b>이 있어요. 수성의 충돌구, 금성의 화산, 지구의 바다, 화성의 극관 — 모두 <em>암석 표면</em> 위에서 벌어지는 일.</p>`},
  {t:"learn",h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>크다</em> · 주로 <b>기체</b> → 밀도 <em>작다</em> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
@@ -743,7 +778,7 @@ function logout(){me=null;deck=null;TPIN="";try{localStorage.removeItem(LS_ME);}
 const hudBlock=()=>`<div id="hud" class="hud"></div>`;
 function slideDone(c,sl,idx){const k=c.id+"_"+idx;
  if(sl.t==="learn"||sl.t==="hero"||sl.t==="clear")return !!S.seen[k];
- if(sl.t==="quiz"||sl.t==="game2")return !!S.quiz[k];
+ if(sl.t==="quiz"||sl.t==="game2"||sl.t==="meet")return !!S.quiz[k];
  if(sl.t==="write")return !!(S.writes[sl.key]&&S.writes[sl.key].ok); return false;}
 function chapProg(c){let d=0;c.slides.forEach((sl,i)=>{if(slideDone(c,sl,i))d++;});return{d,total:c.slides.length};}
 
@@ -909,6 +944,7 @@ function renderSlide(){
    <div id="qfb">${S.quiz[k]?`<div class="fb ok"><b>✅ 해결한 퀴즈!</b> ${esc(sl.ex)}</div>`:""}</div></div>${IMG(c.cover,"",'tall')}</div>`;}
  if(sl.t==="game2"){
    body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div><p class="s-body">아라호에서 행성 <b>관측 자료</b>만 도착했다 — 이름도 사진도 없이. 자료만 보고 어느 격납고(지구형/목성형)로 보낼지 판단하고, <em>근거</em>를 함께 보고하라.</p><div id="g2"></div>`;}
+ if(sl.t==="meet"){ body=`<div class="s-kicker">🧑‍🚀 모둠 탐구 · ${sl.h}</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">이름이 지워진 8개 행성 — 두 팀으로 나눠라</div><div id="meet"></div>`;}
  if(sl.t==="write"){const w=S.writes[sl.key]||{};
    body=`<div class="s-kicker">✍️ ${sl.h}</div><div class="s-grid rev">${IMG(sl.img,"",'tall')}<div><div class="s-title" style="font-size:clamp(1.3rem,2.2vw,1.9rem)">${sl.prompt}</div>
    <div class="frame">💬 문장 틀 — ${sl.frame}</div><p class="small" style="margin:4px 0 0">점검을 <b>통과</b>해야 다음으로 갑니다. 막히면 옆 승무원에게 묻거나 센터장을 부르세요 — 혼자 오래 붙잡지 않기!</p>
@@ -931,6 +967,7 @@ function renderSlide(){
      else S.done[k]=1;
    }else if(sl.t==="quiz"){ if(!S.quiz[k])setLock("퀴즈를 맞혀야 다음으로 갈 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="game2"){ if(!S.quiz[k])setLock("분류를 모두 마쳐야 다음으로 갈 수 있어요"); else S.done[k]=1; }
+   else if(sl.t==="meet"){ if(!S.quiz[k])setLock("관제팀 분류 보고를 보내야 다음으로 갈 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="write"){ if(!(S.writes[sl.key]&&S.writes[sl.key].ok))setLock("한 줄 논술이 점검을 통과해야 넘어갈 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="hero"){ if(!(S.comms&&S.comms["q_"+c.no+"_출발 전"]))setLock("출발 전 교신(궁금한 것 하나)을 보내야 임무를 시작할 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="clear"){ if(!(S.comms&&(S.comms["q_"+c.no+"_귀환 후"]||S.comms["q_"+c.no+"_귀환 보고"])))setLock("귀환 교신(질문 또는 알게 된 점)을 보내야 임무가 종료돼요"); else S.done[k]=1; }
@@ -950,6 +987,7 @@ function renderSlide(){
    if(j===sl.a){b.classList.add("ok");stage.querySelector("#qfb").innerHTML=`<div class="fb ok"><b>🎯 정답!</b> ${esc(sl.ex)}</div>`;if(!S.quiz[k]){S.quiz[k]=1;addPts(2);}else save();unlock();}
    else{b.classList.add("no");S.tries=S.tries||{};S.tries[k]=(S.tries[k]||0)+1;stage.querySelector("#qfb").innerHTML=`<div class="fb no"><b>🛰️ 다시 생각!</b> 힌트: ${esc(sl.ex)}${S.tries[k]>=2?'<br><span class="small">🤝 헷갈리면 옆 승무원과 의논하거나 센터장을 부르세요.</span>':''}</div>`;}});}
  if(sl.t==="game2")mountG2(stage.querySelector("#g2"),k,unlock);
+ if(sl.t==="meet")mountMeet(stage.querySelector("#meet"),k,c,unlock);
  if(sl.t==="write"){const out=stage.querySelector("#wout");
    stage.querySelector("#wchk").onclick=()=>{const t=stage.querySelector("#wt").value;const r=checkWrite(t,sl.spec);out.innerHTML=fbHTML(r);
      const first=!(S.writes[sl.key]&&S.writes[sl.key].ok); S.writes[sl.key]={t,ok:r.pass||((S.writes[sl.key]||{}).ok),g:r.got+"/"+r.need,ts:Date.now()};
@@ -958,6 +996,44 @@ function renderSlide(){
      if(r.pass)unlock(); else if(S.tries[sl.key]>=3) out.insertAdjacentHTML("beforeend",'<div class="fb no" style="border-color:var(--cyan)"><b>🤝 막히면 혼자 끙끙대지 마세요.</b> 옆자리 승무원에게 "내 글에서 뭐가 빠졌어?" 하고 물어보거나, 손을 들어 <b>센터장</b>을 부르세요. 글쓰기는 원래 같이 고치는 거예요.</div>');};
    stage.querySelector("#wai").onclick=()=>aiFeedback(c.no+' '+sl.key,sl.ai,()=>stage.querySelector("#wt").value,out,(S.writes[sl.key]||{}).g);}
  showAI();
+}
+function mountMeet(root,k,c,onDone){
+ /* 관제팀 분류 회의: 정답을 알려주기 전에, 모둠이 원자료만 보고 스스로 기준을 세워 두 팀으로 나눈다 */
+ const M=S.meet=S.meet||{}; M.as=M.as||{}; M.cr=M.cr||[]; M.tx=M.tx||""; M.g=M.g||"";
+ const CR=["반지름","질량","평균 밀도","위성 수","고리"];
+ const tag=t=>t===1?"1팀":t===2?"2팀":"미정";
+ function draw(){
+  root.innerHTML=`<p class="s-body" style="margin:0 0 6px">아라호의 데이터 로그가 손상돼 행성 이름이 지워졌다. 남은 것은 <em>숫자뿐</em>. 관제팀(모둠)이 <b>직접 기준을 세워</b> 8개 행성을 두 팀으로 나눠라. 카드를 누를 때마다 <span style="color:var(--sun)">1팀</span> → <span style="color:var(--cyan)">2팀</span> → 미정으로 바뀐다.</p>
+  <div class="rawgrid">${RAW.map(x=>{const t=M.as[x.c]||0;return `<button class="rawcard ${t?'t'+t:''}" data-c="${x.c}"><span class="tm">${tag(t)}</span><h5>행성 ${x.c}</h5><dl><dt>반지름 (지구=1)</dt><dd>${x.p.r}</dd><dt>질량 (지구=1)</dt><dd>${x.p.m}</dd><dt>평균 밀도 (g/cm³)</dt><dd>${x.p.d}</dd><dt>위성 수</dt><dd>${x.p.sat}개</dd><dt>고리</dt><dd>${x.p.ring}</dd></dl></button>`;}).join("")}</div>
+  <div class="meetrow"><div>
+   <label class="small" style="display:block">우리 관제팀(모둠) 번호 <select id="mg" style="width:auto;min-width:110px;padding:6px 10px;margin-left:6px"><option value="">선택</option>${[1,2,3,4,5,6,7,8].map(n=>`<option ${String(M.g)===String(n)?'selected':''}>${n}</option>`).join("")}</select></label>
+   <p class="small" style="margin:10px 0 0">나눌 때 실제로 쓴 기준을 <b>두 가지 이상</b> 고르세요.</p>
+   <div class="chips">${CR.map(x=>`<button data-cr="${x}" class="${M.cr.includes(x)?'on':''}">${x}</button>`).join("")}</div></div>
+   <div><div class="frame">💬 문장 틀 — 1팀은 ___이/가 ___고, 2팀은 ___이/가 ___다. 그래서 ___을/를 기준으로 나눴다.</div>
+   <textarea id="mt" style="min-height:84px" placeholder="모둠이 합의한 기준을 한두 문장으로">${esc(M.tx)}</textarea>
+   <button class="btn-p" id="mgo" style="width:100%;margin-top:8px">📡 관제센터에 분류 보고</button><div id="mfb">${S.quiz[k]?'<div class="fb ok"><b>✅ 보고 접수 완료.</b> 기준을 고치면 다시 보고해도 돼요.</div>':''}</div></div></div>`;
+  root.querySelectorAll(".rawcard").forEach(b=>b.onclick=()=>{const cc=b.dataset.c;M.as[cc]=((M.as[cc]||0)+1)%3;save();const t=M.as[cc];b.className="rawcard"+(t?" t"+t:"");b.querySelector(".tm").textContent=tag(t);});
+  root.querySelectorAll("[data-cr]").forEach(b=>b.onclick=()=>{const x=b.dataset.cr;M.cr=M.cr.includes(x)?M.cr.filter(y=>y!==x):[...M.cr,x];b.classList.toggle("on");save();});
+  root.querySelector("#mg").onchange=e=>{M.g=e.target.value;save();};
+  root.querySelector("#mt").oninput=e=>{M.tx=e.target.value;};
+  root.querySelector("#mgo").onclick=()=>{
+   M.tx=root.querySelector("#mt").value.trim(); const fb=root.querySelector("#mfb");
+   const t1=RAW.filter(x=>M.as[x.c]===1).map(x=>x.c), t2=RAW.filter(x=>M.as[x.c]===2).map(x=>x.c), un=RAW.filter(x=>!M.as[x.c]).map(x=>x.c);
+   const miss=[];
+   if(!M.g)miss.push("모둠 번호");
+   if(un.length)miss.push(`아직 팀이 없는 행성 ${un.join(", ")}`);
+   else if(!t1.length||!t2.length)miss.push("두 팀 모두에 행성이 있어야 해요");
+   if(M.cr.length<2)miss.push("기준 두 가지 이상");
+   if(M.tx.replace(/\s/g,"").length<12)miss.push("기준 설명 문장");
+   if(miss.length){fb.innerHTML=`<div class="fb no">🛰️ 보고 전에 채울 것: <b>${miss.join(" · ")}</b></div>`;return;}
+   const off=RAW_OFFICIAL(), same=(a,b)=>a.length===b.length&&a.every(x=>b.includes(x));
+   const match=(same(t1,off.a)&&same(t2,off.b))||(same(t1,off.b)&&same(t2,off.a));
+   const line=`1팀: ${t1.join(",")} / 2팀: ${t2.join(",")} / 기준: ${M.cr.join(",")} / 설명: ${M.tx}`;
+   logSrv('분류회의',`c2 모둠${M.g}`,line,match?'공식분류와 같음':'다른 분류','');
+   const first=!S.quiz[k]; S.quiz[k]=1; if(first)addPts(5); else save();
+   fb.innerHTML=`<div class="fb ok"><b>📡 보고 접수!</b> 센터장 화면에 모든 관제팀의 분류가 모입니다. <br>발표 준비: <em>왜 그 기준을 골랐는지</em>, 그리고 다른 기준으로 나눠도 같은 두 팀이 나오는지 생각해 두세요. <span class="small">다음 장(정체 공개)은 센터장 신호가 있을 때 넘기세요.</span></div>`;
+   if(onDone)onDone();};
+ } draw();
 }
 function mountG2(root,k,onDone){
  /* 정체를 가린 행성의 '관측 자료'를 보고 분류한다. 이름·사진은 분류한 뒤에 공개. */
@@ -1080,8 +1156,11 @@ function renderTeacher(){
   <button class="btn-s" id="treload" style="min-height:44px">새로고침</button><button class="btn-g" id="tlock" style="min-height:44px;margin-left:auto">잠그기</button></div>
   ${setup}<div class="card" style="padding:0;overflow:hidden"><div style="overflow:auto;max-height:52vh"><table class="r" id="rtable"><tr><th>반</th><th>번호</th><th>이름</th><th class="c">점수</th><th>등급</th><th>진도 (01·02·03·04·보너스)</th><th class="c">논술 통과</th><th class="c">시험 제출</th><th>최근</th><th>콜사인</th></tr><tr><td colspan="10" class="small">불러오는 중…</td></tr></table></div></div>
   <div class="card"><h3>🍬 보급 신청 결재 <span class="small">— 지급하고 나서 ‘지급’을 누르세요</span></h3><div id="cpList"><p class="small">불러오는 중…</p></div></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0">🛰️ 관제팀 분류 회의 보드 <span class="small">— MISSION 02 모둠 탐구 결과 (반을 고른 뒤 불러오기)</span></h3><button class="btn-s" id="mbLoad" style="min-height:40px;margin-left:auto">불러오기</button><button class="btn-g" id="mbAns" style="min-height:40px">공식 분류 표시</button></div><div id="mboard"><p class="small">발표 직전에 ‘불러오기’를 눌러 전자칠판에 띄우세요. 공식 분류 표시는 정체 공개 뒤에 켜세요.</p></div></div>
   <div id="tdetail"></div>`;
  drawHud(); bindSec(app); loadCoupons();
+ document.getElementById("mbLoad").onclick=()=>loadMeetBoard();
+ document.getElementById("mbAns").onclick=(e)=>{MB_ANS=!MB_ANS;e.target.textContent=MB_ANS?"공식 분류 숨기기":"공식 분류 표시";if(MB_ROWS)drawMeetBoard();};
  document.getElementById("tcls").onchange=e=>{TCLS=e.target.value;loadRoster();loadCoupons();};
  document.getElementById("treload").onclick=()=>{loadRoster();loadCoupons();}; document.getElementById("tlock").onclick=()=>{TPIN="";TROWS=null;render();};
  loadRoster();
@@ -1100,6 +1179,22 @@ async function loadCoupons(){
     L.querySelectorAll(".cpu").forEach(b=>b.onclick=async()=>{try{await call({action:'couponGive',pin:TPIN,key:b.dataset.k,undo:'1'});loadCoupons();}catch(e){toast("실패: "+e);}});
   }catch(e){L.innerHTML=`<p class="small">불러오기 실패: ${esc(e)} (Code.gs를 새 버전으로 배포했는지 확인)</p>`;}
 }
+let MB_ROWS=null, MB_ANS=false;
+async function loadMeetBoard(){const B=document.getElementById("mboard");if(!B)return;B.innerHTML='<p class="small">불러오는 중…</p>';
+ try{const r=await call({action:'logs',pin:TPIN,cls:TCLS});const latest={};
+  (r.rows||[]).filter(x=>x.type==='분류회의').forEach(x=>{const key=x.cls+'|'+x.item;if(!latest[key])latest[key]=x;}); /* 최신순 → 모둠별 마지막 보고만 */
+  MB_ROWS=Object.values(latest).sort((a,b)=>String(a.cls).localeCompare(String(b.cls),'ko',{numeric:true})||String(a.item).localeCompare(String(b.item),'ko',{numeric:true}));drawMeetBoard();
+ }catch(e){B.innerHTML=`<div class="fb no">불러오기 실패: ${esc(e)}</div>`;}}
+function drawMeetBoard(){const B=document.getElementById("mboard");if(!B)return;
+ if(!MB_ROWS.length){B.innerHTML='<p class="small">아직 보고한 관제팀이 없어요.</p>';return;}
+ const P=t=>{const o={};String(t).split(" / ").forEach(seg=>{const i=seg.indexOf(": ");if(i>0)o[seg.slice(0,i)]=seg.slice(i+2);});return o;};
+ const cnt={};MB_ROWS.forEach(x=>String(P(x.text)["기준"]||"").split(",").filter(Boolean).forEach(c=>cnt[c]=(cnt[c]||0)+1));
+ const multi=new Set(MB_ROWS.map(x=>x.cls)).size>1;
+ B.innerHTML=`<div class="tally">🧭 관제팀들이 고른 기준: ${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<span>${esc(c)} <b>${n}</b></span>`).join("")}</div>
+ <div class="board">${MB_ROWS.map(x=>{const o=P(x.text);const chips=s=>String(s||"").split(",").filter(Boolean).map(c=>`<i>${esc(c)}</i>`).join("");
+  return `<div class="bteam"><h4>${multi?esc(x.cls)+'반 ':''}${esc(String(x.item).replace('c2 ',''))} <span class="small" style="font-family:var(--body);color:var(--mut)">${esc(x.name)} 보고</span>${MB_ANS?` <span class="pill ${x.score==='공식분류와 같음'?'g':'w'}">${esc(x.score)}</span>`:''}</h4>
+   <div class="grp g1">1팀 ${chips(o["1팀"])}</div><div class="grp g2">2팀 ${chips(o["2팀"])}</div>
+   <div class="small" style="margin-top:6px">기준: ${esc(o["기준"]||"")}</div><div style="margin-top:4px">${esc(o["설명"]||"")}</div></div>`;}).join("")}</div>`;}
 async function loadRoster(){
  const tb=document.getElementById("rtable"); if(!tb)return;
  try{const r=await call({action:'roster',pin:TPIN,cls:TCLS}); TROWS=r.rows||[];
@@ -1115,7 +1210,7 @@ async function loadRoster(){
 }
 function chapProgFrom(c,st){let d=0;c.slides.forEach((sl,i)=>{const k=c.id+"_"+i;
  if((sl.t==="learn"||sl.t==="hero"||sl.t==="clear")&&st.seen&&st.seen[k])d++;
- else if((sl.t==="quiz"||sl.t==="game2")&&st.quiz&&st.quiz[k])d++;
+ else if((sl.t==="quiz"||sl.t==="game2"||sl.t==="meet")&&st.quiz&&st.quiz[k])d++;
  else if(sl.t==="write"&&st.writes&&st.writes[sl.key]&&st.writes[sl.key].ok)d++;});return{d,total:c.slides.length};}
 async function showDetail(x){
  const D=document.getElementById("tdetail"); let st={};try{st=JSON.parse(x.state||'{}');}catch(e){}
