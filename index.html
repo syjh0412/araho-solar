@@ -958,7 +958,7 @@ function renderSlide(){
  /* ── 단계 잠금: 빈칸을 모두 열고(학습), 퀴즈를 맞히고, 게임을 끝내고, 논술을 점검받아야 다음으로 ── */
  S.done=S.done||{}; let locked=false, lockWhy="";
  const unlock=()=>{locked=false;S.done[k]=1;save();const n=stage.querySelector("#next");if(n){n.disabled=false;}const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey";lm.textContent="← → 키 · 스페이스 · 밀어서 넘기기";}};
- const setLock=(why)=>{locked=true;lockWhy=why;const n=stage.querySelector("#next");if(n)n.disabled=true;const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey lockmsg";lm.textContent=why;}};
+ const setLock=(why)=>{if(isT())return; /* 센터장은 잠금 없이 자유롭게 넘김 (빈칸·게임은 그대로 시연 가능) */ locked=true;lockWhy=why;const n=stage.querySelector("#next");if(n)n.disabled=true;const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey lockmsg";lm.textContent=why;}};
  if(!S.done[k]){
    if(sl.t==="learn"){
      const els=[...stage.querySelectorAll(".s-body b, .s-body em")].filter(e=>!e.closest(".pcard,.cap,.figcap,.chain,.cklist,.frame,table"));
