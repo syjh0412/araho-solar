@@ -417,13 +417,13 @@ const ITEMS=[
  {k:"cmd",at:190,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
 const have=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&S.pts>=it.at;};
 /* 센터장 보급 쿠폰 (마이쭈) */
+/* 보급 쿠폰은 3개만 (2026-10 축소): 태양계 완주 · 논술 시험 제출 · 커맨더 승급 */
 const CPNS=[
- {id:"m1",n:"첫 임무 완수 보급",c:"미션 1개 MISSION CLEAR",t:()=>CH.filter(c=>c.id!=="c5").some(c=>{const p=chapProg(c);return p.d>=p.total;})},
  {id:"m4",n:"태양계 완주 보급",c:"MISSION 01~04 모두 완수",t:()=>CH.filter(c=>c.id!=="c5").every(c=>{const p=chapProg(c);return p.d>=p.total;})},
- {id:"wd",n:"명추리 보급",c:"수배 파일 8건 모두 해결",t:()=>Object.keys(S.wanted||{}).length>=WANTED.length},
  {id:"ex",n:"자격 시험 응시 보급",c:"논술 시험 3문항 모두 제출",t:()=>[1,2,3].every(n=>S.exam&&S.exam[n])},
- {id:"cm",n:"통신병 보급",c:"교신 응답 5건",t:()=>((S.comms||{}).ans||0)>=5},
  {id:"cmd",n:"커맨더 취임 선물",c:"커맨더 승급(190점)",t:()=>S.pts>=190}];
+/* 없앤 쿠폰: 이미 신청된 건이 센터장 결재 목록에 이름으로 보이도록만 남겨 둠 */
+const CPN_OLD={m1:"첫 임무 완수 보급 (폐지)",wd:"명추리 보급 (폐지)",cm:"통신병 보급 (폐지)"};
 let COUP={};
 function cpnState(c){const st=COUP[c.id]; if(st==="Y")return "y"; if(st==="W")return "w"; return c.t()?"ready":"lock";}
 function cpnHTML(){
@@ -1170,7 +1170,7 @@ function bindSec(root){root.querySelectorAll("[data-sec]").forEach(b=>b.onclick=
 async function loadCoupons(){
   const L=document.getElementById("cpList"); if(!L)return;
   try{const r=await call({action:'couponList',pin:TPIN,cls:TCLS}); const rows=(r.rows||[]);
-    const nm=id=>(CPNS.find(c=>c.id===id)||{}).n||id;
+    const nm=id=>(CPNS.find(c=>c.id===id)||{}).n||CPN_OLD[id]||id;
     const wait=rows.filter(x=>x.st==="W"), done=rows.filter(x=>x.st==="Y");
     L.innerHTML=(wait.length?`<table class="r"><tr><th>신청</th><th>반</th><th>번호</th><th>이름</th><th>쿠폰</th><th></th></tr>${wait.map(x=>`<tr><td class="small">${esc((x.t||'').slice(5,16).replace('T',' '))}</td><td>${esc(x.cls)}</td><td>${esc(x.num)}</td><td><b>${esc(x.name)}</b></td><td>🍬 ${esc(nm(x.cid))}</td><td><button class="btn-p cpg" data-k="${esc(x.key)}" style="min-height:36px;padding:4px 14px;font-size:.95rem">지급</button></td></tr>`).join("")}</table>`:'<p class="small">대기 중인 신청이 없어요.</p>')
      +(done.length?`<div class="sec" style="margin-top:10px"><button data-sec>▶ 지급 완료 ${done.length}건</button><div hidden>${done.map(x=>`<span class="pill g">${esc(x.cls)}반 ${esc(x.num)}번 ${esc(x.name)} · ${esc(nm(x.cid))}</span> <button class="btn-g cpu" data-k="${esc(x.key)}" style="min-height:26px;padding:0 8px;font-size:.78rem">취소</button><br>`).join("")}</div></div>`:'');
