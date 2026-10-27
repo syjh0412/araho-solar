@@ -341,6 +341,27 @@ body.deckmode .toast{bottom:110px}
 .tally{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
 .tally span{background:var(--panel2);border-radius:99px;padding:2px 14px} .tally b{color:var(--sun)}
 .revtab td.a{background:#ffb13b22} .revtab td.b{background:#5fe3ff1c}
+/* ── 교신 채널: 미션별 칸 (힘탐정사무소 차시별 칸 방식) ── */
+.cmstat{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.cmstat span,.cmstat button{background:var(--panel);border:1.5px solid var(--line);border-radius:99px;padding:4px 14px;font-size:.95rem;color:var(--mut);min-height:0}
+.cmstat b{color:var(--fg)} .cmstat button{cursor:pointer;border-color:var(--sun);color:var(--sun)} .cmstat button b{color:var(--sun)} .cmstat button.on{background:#ffb13b22}
+.cmboard{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch}
+.cmcol{flex:1 0 320px;max-width:520px;display:flex;flex-direction:column;max-height:calc(100vh - 290px);min-height:240px}
+.cmcol>h3{font-family:var(--disp);font-size:1.05rem;background:var(--panel2);border:1.5px solid var(--line2);border-radius:14px;padding:9px 14px;margin:0 0 10px;flex-shrink:0;color:var(--fg)}
+.cmcol>h3 span{float:right;color:var(--cyan);font-family:var(--body)}
+.cmcol .inner{overflow-y:auto;padding-right:4px;flex:1}
+.cmcol .inner::-webkit-scrollbar{width:7px} .cmcol .inner::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.cmq{background:#0a0f2c;border:1.5px solid var(--line);border-left:5px solid var(--sun);border-radius:14px;padding:10px 12px;margin:0 0 10px}
+.cmq.done{border-left-color:var(--cyan)} .cmq.mine{box-shadow:inset 0 0 0 1.5px #ffb13b55}
+.cmmeta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-size:.82rem;color:var(--dim)}
+.cmph{color:var(--mut);font-weight:700} .cmn{margin-left:auto;color:var(--sun);font-weight:700} .cmq.done .cmn{color:var(--cyan)}
+.cmtx{margin:6px 0 4px;font-size:1.08rem;line-height:1.55;color:var(--fg);word-break:keep-all;overflow-wrap:anywhere}
+.cma{border-top:1px dashed var(--line);padding:6px 0 2px;font-size:.95rem;line-height:1.5}
+.cma b{color:var(--cyan);font-size:.9rem} .cma.t b{color:var(--sun)} .cma.t{background:#ffb13b12;border-radius:8px;padding:6px 8px}
+.cmmore,.cmrep{min-height:34px;padding:2px 10px;font-size:.88rem;background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:10px;margin-top:6px}
+.cmrep{color:var(--cyan);border-color:var(--line2)}
+.cmbox textarea{min-height:70px;margin-top:6px}
+@media (max-width:760px){.cmboard{display:block}.cmcol{max-width:none;max-height:none}.cmcol .inner{overflow:visible}}
 </style>
 </head>
 <body class="gate">
@@ -1288,38 +1309,59 @@ function bindCompose(root,mission,phase,after){
     catch(e){m.innerHTML='<div class="fb no">발신 실패: '+esc(e)+'</div>';}
     b.disabled=false;b.textContent=t2El?"귀환 교신 발신":"교신 발신 (+3점)";};
 }
-let CM={mission:"",mine:false,noans:false};
+let CM={mission:"",mine:false,noans:false,compose:false,open:{}};
 function renderComms(){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">📡 교신 채널</h2>
-  <p class="small" style="margin:0 4px 10px">승무원들의 질문(교신)과 응답이 모이는 곳. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — 응답 1건에 +2점.</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
-   <select id="cmMission" style="width:auto;padding:8px 12px"><option value="">모든 미션</option>${CH.map(c=>`<option value="${c.no}" ${CM.mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select>
-   <button class="btn-g" id="cmMine" style="min-height:44px;${CM.mine?'border-color:var(--sun);color:var(--sun)':''}">내 교신만</button>
-   <button class="btn-g" id="cmNoans" style="min-height:44px;${CM.noans?'border-color:var(--sun);color:var(--sun)':''}">응답 없는 교신</button>
-   <button class="btn-s" id="cmReload" style="min-height:44px;margin-left:auto">새로고침</button></div>
-  <div class="row2"><div id="cmList"><p class="small">불러오는 중…</p></div><div id="cmCompose">${commsComposeHTML(CM.mission||CH[0].no,"출발 전",{pick:true})}
-   ${API?"":'<div class="fb no">서버 미연결: 교신이 이 기기에만 저장됩니다. 센터장이 시트를 연결하면 학급 전체가 함께 봅니다.</div>'}</div></div>`;
+  <p class="small" style="margin:0 4px 10px">승무원들의 질문(교신)과 응답이 미션별 칸에 모입니다. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — 응답 1건에 +2점.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+   <select id="cmMission" style="width:auto;padding:8px 12px"><option value="">모든 미션 (미션별 칸)</option>${CH.map(c=>`<option value="${c.no}" ${CM.mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select>
+   <button class="btn-g" id="cmMine" style="min-height:44px;${CM.mine?'border-color:var(--sun);color:var(--sun)':''}">${CM.mine?'✓ ':''}내 교신만</button>
+   <button class="btn-g" id="cmNoans" style="min-height:44px;${CM.noans?'border-color:var(--sun);color:var(--sun)':''}">${CM.noans?'✓ ':''}응답 없는 교신</button>
+   <button class="btn-s" id="cmReload" style="min-height:44px">새로고침</button>
+   <button class="btn-p" id="cmNew" style="min-height:44px;margin-left:auto;font-size:1rem">${CM.compose?'✕ 닫기':'✏️ 새 교신 보내기'}</button></div>
+  <div id="cmCompose" ${CM.compose?'':'hidden'}>${commsComposeHTML(CM.mission||CH[0].no,"출발 전",{pick:true})}
+   ${API?"":'<div class="fb no">서버 미연결: 교신이 이 기기에만 저장됩니다. 센터장이 시트를 연결하면 학급 전체가 함께 봅니다.</div>'}</div>
+  <div id="cmStat"></div><div id="cmList"><p class="small">불러오는 중…</p></div>`;
   drawHud();
-  bindCompose(app.querySelector("#cmCompose"),CM.mission||CH[0].no,"출발 전",loadComms);
+  bindCompose(app.querySelector("#cmCompose"),CM.mission||CH[0].no,"출발 전",()=>{CM.compose=false;setTimeout(()=>{toast("📡 교신 발신 완료!");render();},400);});
   app.querySelector("#cmMission").onchange=e=>{CM.mission=e.target.value;render();};
   app.querySelector("#cmMine").onclick=()=>{CM.mine=!CM.mine;render();}; app.querySelector("#cmNoans").onclick=()=>{CM.noans=!CM.noans;render();};
   app.querySelector("#cmReload").onclick=loadComms;
+  app.querySelector("#cmNew").onclick=()=>{CM.compose=!CM.compose;render();};
   loadComms();
 }
+const CM_PH={"출발 전":["❓","출발 전 질문"],"귀환 후":["❓","귀환 후 질문"],"귀환 보고":["💡","알게 된 점"]};
+function cmCard(r){
+  const ans=r.answers||[], open=CM.open&&CM.open[r.id], shown=open?ans:ans.slice(-2), ph=CM_PH[r.phase]||["❓",r.phase];
+  const who=r.name==="익명 승무원"?"익명":`${esc(r.cls)}반 ${esc(r.name)}`;
+  return `<div class="cmq ${ans.length?'done':'wait'} ${r.mine?'mine':''}" data-q="${esc(r.id)}">
+   <div class="cmmeta">${CM.mission?'':`<span class="cmph">${ph[0]} ${ph[1]}</span>`}<span>${who}</span><span>${esc((r.t||'').slice(5,16).replace('T',' '))}</span>${r.mine?'<span class="pill w" style="margin:0">내 교신</span>':''}<span class="cmn">${ans.length?`응답 ${ans.length}`:'응답 기다림'}</span></div>
+   <p class="cmtx">${esc(r.text)}</p>
+   ${ans.length>shown.length?`<button class="cmmore" data-more="${esc(r.id)}">이전 응답 ${ans.length-shown.length}개 더 보기</button>`:''}
+   ${shown.map(a=>`<div class="cma ${a.teacher?'t':''}"><b>${a.teacher?'🎖️ 센터장':'💬 '+esc(a.name)}</b> <span class="small">${esc((a.t||'').slice(5,16).replace('T',' '))}</span><div>${esc(a.text)}</div></div>`).join("")}
+   <button class="cmrep" data-rep="${esc(r.id)}">응답하기</button>
+   <div class="cmbox" hidden><textarea class="ansIn" placeholder="아는 만큼, 근거와 함께"></textarea><button class="btn-s ansBtn" style="min-height:44px;width:100%;margin-top:6px">응답 보내기 (+2점)</button></div></div>`;
+}
 async function loadComms(){
-  const L=document.getElementById("cmList"); if(!L)return;
-  try{let rows=await commsList({cls:"",mission:CM.mission});
+  const L=document.getElementById("cmList"), ST=document.getElementById("cmStat"); if(!L)return;
+  try{const all=await commsList({cls:"",mission:CM.mission}); let rows=all;
     if(CM.mine)rows=rows.filter(r=>r.mine); if(CM.noans)rows=rows.filter(r=>!(r.answers||[]).length);
+    const wait=all.filter(r=>!(r.answers||[]).length).length, mineN=all.filter(r=>r.mine).length;
+    if(ST)ST.innerHTML=all.length?`<div class="cmstat"><span>📡 교신 <b>${all.length}</b></span><span>✅ 응답 받음 <b>${all.length-wait}</b></span><button id="cmWaitBtn" class="${CM.noans?'on':''}">🔍 응답 기다리는 교신 <b>${wait}</b> ${CM.noans?'· 전체 보기':'· 보러 가기'}</button><span>🧑‍🚀 내 교신 <b>${mineN}</b></span></div>`:"";
+    const wb=document.getElementById("cmWaitBtn"); if(wb)wb.onclick=()=>{CM.noans=!CM.noans;render();};
     if(!rows.length){const f=[CM.mission&&CM.mission,CM.mine&&"내 교신만",CM.noans&&"응답 없는 교신"].filter(Boolean);
       L.innerHTML=f.length?`<div class="card"><p class="small">조건(<b>${esc(f.join(" · "))}</b>)에 맞는 교신이 없어요.</p><button class="btn-s" id="cmClear" style="min-height:44px">조건 모두 풀고 전체 보기</button></div>`:'<div class="card"><p class="small">아직 교신이 없어요. 첫 교신을 보내 보세요!</p></div>';
       const cb=L.querySelector("#cmClear"); if(cb)cb.onclick=()=>{CM.mission="";CM.mine=false;CM.noans=false;render();}; return;}
-    L.innerHTML=rows.map(r=>`<div class="card" style="margin:0 0 12px" data-q="${esc(r.id)}">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tag">${esc(r.mission)}</span><span class="tag">${esc(r.phase)}</span><span class="small">${esc(r.cls)}반 ${esc(r.name)} · ${esc((r.t||'').slice(5,16).replace('T',' '))}</span>${r.mine?'<span class="pill w">내 교신</span>':''}</div>
-      <p class="s-body" style="font-size:1.15rem;margin:8px 0">${r.phase==="귀환 보고"?"💡":"❓"} ${esc(r.text)}</p>
-      ${(r.answers||[]).map(a=>`<div class="frame" style="color:var(--fg);${a.teacher?'border-color:var(--sun);border-style:solid':''}"><b style="color:${a.teacher?'var(--sun)':'var(--cyan)'}">${a.teacher?'🎖️ 센터장':'💬 '+esc(a.name)}</b> <span class="small">${esc((a.t||'').slice(5,16).replace('T',' '))}</span><br>${esc(a.text)}</div>`).join("")}
-      <div style="display:flex;gap:8px;margin-top:8px"><input type="text" class="ansIn" placeholder="응답 쓰기 — 아는 만큼, 근거와 함께" style="flex:1"><button class="btn-s ansBtn" style="min-height:48px">응답</button></div></div>`).join("");
+    /* 칸 나누기: 모든 미션 → 미션별 칸 / 미션 하나 → 단계별 칸 (힘탐정사무소 차시별 칸과 같은 방식) */
+    const cols=CM.mission
+      ? PHASES.map(ph=>({h:CM_PH[ph][0]+" "+CM_PH[ph][1],items:rows.filter(r=>r.phase===ph)}))
+      : CH.map(c=>({h:`${c.no} · ${c.title}`,items:rows.filter(r=>r.mission===c.no)}));
+    const shown=cols.filter(c=>c.items.length);
+    L.innerHTML=`<div class="cmboard">${shown.map(c=>`<div class="cmcol"><h3>${esc(c.h)}<span>${c.items.length}</span></h3><div class="inner">${c.items.map(cmCard).join("")}</div></div>`).join("")}</div>`;
+    L.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{CM.open=CM.open||{};CM.open[b.dataset.more]=1;loadComms();});
+    L.querySelectorAll("[data-rep]").forEach(b=>b.onclick=()=>{const bx=b.nextElementSibling;bx.hidden=!bx.hidden;b.textContent=bx.hidden?"응답하기":"취소";if(!bx.hidden)bx.querySelector("textarea").focus();});
     L.querySelectorAll(".ansBtn").forEach(b=>b.onclick=async()=>{const card=b.closest("[data-q]"),inp=card.querySelector(".ansIn"),t=inp.value.trim(); if(t.length<2)return toast("응답을 적어 주세요");
-      b.disabled=true; try{await commsAnswer(card.dataset.q,t); S.comms=S.comms||{}; S.comms.ans=(S.comms.ans||0)+1; if(S.comms.ans<=15)addPts(2); else save(); loadComms();}catch(e){toast("응답 실패: "+e);b.disabled=false;}});
+      b.disabled=true; try{await commsAnswer(card.dataset.q,t); S.comms=S.comms||{}; S.comms.ans=(S.comms.ans||0)+1; if(S.comms.ans<=15)addPts(2); else save(); CM.open=CM.open||{};CM.open[card.dataset.q]=1; loadComms();}catch(e){toast("응답 실패: "+e);b.disabled=false;}});
   }catch(e){L.innerHTML=`<div class="fb no">교신 채널 연결 실패: ${esc(e)}</div>`;}
 }
 
