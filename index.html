@@ -1236,11 +1236,13 @@ const LSC="araho_comms_local";
 function localComms(){try{return JSON.parse(localStorage.getItem(LSC)||"[]");}catch(e){return [];}}
 function saveLocalComms(a){try{localStorage.setItem(LSC,JSON.stringify(a.slice(0,300)));}catch(e){}}
 async function commsList(f){
-  if(API){const r=await call({action:'qlist',cls:f.cls||'',num:me?me.num:'',mission:f.mission||''});return r.rows;}
+  if(API){const r=await call({action:'qlist',cls:f.cls||'',num:me?me.num:'',mission:f.mission||''});
+    const my=new Set((S.myq||[]).map(String));
+    return (r.rows||[]).map(x=>({...x,mine:!!(x.mine||my.has(String(x.id))||(me&&x.num!==''&&String(x.cls)===String(me.cls)&&String(x.num)===String(me.num)))}));}
   let rows=localComms(); if(f.mission)rows=rows.filter(x=>x.mission===f.mission); return rows.map(x=>({...x,mine:me&&x.cls===me.cls&&x.num===me.num}));
 }
 async function commsAdd(o){
-  if(API){return post({action:'qadd',...me,...o});}
+  if(API){const r=await post({action:'qadd',...me,...o}); if(r&&r.id){S.myq=S.myq||[];S.myq.push(String(r.id));if(S.myq.length>200)S.myq=S.myq.slice(-200);save();} return r;}
   const rows=localComms(); rows.unshift({id:'l'+Date.now(),t:new Date().toISOString(),cls:me.cls,num:o.anon==='1'?'':me.num,name:o.anon==='1'?'익명 승무원':me.name,mission:o.mission,phase:o.phase,text:o.text,answers:[]}); saveLocalComms(rows); return {ok:true};
 }
 async function commsAnswer(qid,text){
@@ -1308,7 +1310,9 @@ async function loadComms(){
   const L=document.getElementById("cmList"); if(!L)return;
   try{let rows=await commsList({cls:"",mission:CM.mission});
     if(CM.mine)rows=rows.filter(r=>r.mine); if(CM.noans)rows=rows.filter(r=>!(r.answers||[]).length);
-    if(!rows.length){L.innerHTML='<div class="card"><p class="small">아직 교신이 없어요. 첫 교신을 보내 보세요!</p></div>';return;}
+    if(!rows.length){const f=[CM.mission&&CM.mission,CM.mine&&"내 교신만",CM.noans&&"응답 없는 교신"].filter(Boolean);
+      L.innerHTML=f.length?`<div class="card"><p class="small">조건(<b>${esc(f.join(" · "))}</b>)에 맞는 교신이 없어요.</p><button class="btn-s" id="cmClear" style="min-height:44px">조건 모두 풀고 전체 보기</button></div>`:'<div class="card"><p class="small">아직 교신이 없어요. 첫 교신을 보내 보세요!</p></div>';
+      const cb=L.querySelector("#cmClear"); if(cb)cb.onclick=()=>{CM.mission="";CM.mine=false;CM.noans=false;render();}; return;}
     L.innerHTML=rows.map(r=>`<div class="card" style="margin:0 0 12px" data-q="${esc(r.id)}">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tag">${esc(r.mission)}</span><span class="tag">${esc(r.phase)}</span><span class="small">${esc(r.cls)}반 ${esc(r.name)} · ${esc((r.t||'').slice(5,16).replace('T',' '))}</span>${r.mine?'<span class="pill w">내 교신</span>':''}</div>
       <p class="s-body" style="font-size:1.15rem;margin:8px 0">${r.phase==="귀환 보고"?"💡":"❓"} ${esc(r.text)}</p>
