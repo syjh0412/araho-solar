@@ -362,6 +362,10 @@ body.deckmode .toast{bottom:110px}
 .cmrep{color:var(--cyan);border-color:var(--line2)}
 .cmbox textarea{min-height:70px;margin-top:6px}
 @media (max-width:760px){.cmboard{display:block}.cmcol{max-width:none;max-height:none}.cmcol .inner{overflow:visible}}
+.skybar{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:-2px 0 12px;padding:6px 12px;background:#080c24;border:1.5px dashed var(--line2);border-radius:16px}
+.skyh{font-family:var(--disp);color:var(--cyan);margin-right:4px}
+.skybtn{display:inline-flex;align-items:center;min-height:36px;padding:2px 12px;border-radius:99px;background:var(--panel2);border:1.5px solid var(--line2);color:var(--fg);text-decoration:none;font-size:.98rem}
+.skybtn:hover{border-color:var(--cyan);color:var(--cyan)} .skyn{margin-left:auto;color:var(--dim)}
 </style>
 </head>
 <body class="gate">
@@ -691,10 +695,10 @@ const CH=[
  {t:"hero",log:"통신 로그 · D-1 · 발사 전 브리핑",h:"태양계 가족을 찾아라",sub:"훈련생, 아라호가 내일 떠난다. 첫 임무는 간단하다 — 태양계에 누가 사는지 한 명도 빠짐없이 파악하라. — 센터장",scene:"orbit"},
  {t:"learn",h:"태양계란 무엇일까",img:"solarsys",cap:"<b>태양계</b> — 태양과, 태양 주위를 도는 모든 천체의 세계 (교과서 그림)",b:`<p>태양계는 <b>태양</b>과, 태양의 영향 안에서 <em>태양을 중심으로 도는(공전하는)</em> 모든 천체를 말해요.</p>${FAMILY_FIG}<div class="key"><span class="kt">판단 기준은 단 하나</span>행성이냐 아니냐가 아니라, <b>공전으로 태양과 이어져 있는가</b>!</div>`},
  {t:"learn",h:"태양 — 태양계의 유일한 별",img:"sun_full",cap:"<b>태양</b> — 지름이 지구의 109배, 표면 온도 약 6000℃",b:`<p>태양은 태양계에서 <b>스스로 빛을 내는 유일한 천체</b>, 즉 <em>별(항성)</em>이에요.</p><p>행성과 달이 밝게 보이는 건? 태양 빛을 <b>반사</b>하기 때문!</p><div class="key"><span class="kt">한 줄 정리</span>스스로 빛을 낸다 → 별 · 빛을 반사한다 → 행성, 위성, 소행성, 혜성</div>`},
- {t:"learn",h:"행성 8형제",img:"solarsys2",cap:"태양에서 가까운 순서 — <b>수·금·지·화·목·토·천·해</b>",b:`<p>태양 주위를 공전하는 8개의 행성.</p><p style="font-family:var(--disp);font-size:1.4em;text-align:center;letter-spacing:.04em">수성 · 금성 · 지구 · 화성<br>목성 · 토성 · 천왕성 · 해왕성</p><div class="key"><span class="kt">외우기</span>"수·금·지·화·목·토·천·해" — 태양에서 가까운 순서! 행성 하나하나의 얼굴은 2장에서 만나요.</div>`},
- {t:"learn",h:"위성 — 행성의 단짝",figs:[["moon","지구의 위성 <b>달</b>"],["titan","토성의 위성 <b>타이탄</b> (두꺼운 대기)"]],b:`<p><b>위성</b>은 <em>행성 주위를 공전</em>하는 천체. 지구의 위성은 <b>달</b> 하나뿐이지만, 목성형 행성들은 수십 개씩 거느려요.</p><div class="key"><span class="kt">함정 주의</span>위성은 태양이 아니라 <b>행성</b> 주위를 돌아요. 하지만 그 행성이 태양을 돌기 때문에 — <b>위성도 당당한 태양계 구성원!</b></div>`},
- {t:"learn",h:"소행성과 혜성",figs:[["asteroid","<b>소행성</b> — 작고 울퉁불퉁한 암석 덩어리"],["comet","<b>혜성</b> 67P — 얼음·먼지에서 가스가 뿜어져 나온다"]],b:`<ul><li><b>소행성</b> — 작고 불규칙한 <em>암석</em> 천체. 주로 <b>화성과 목성 사이</b> '소행성대'에서 태양 주위를 공전</li><li><b>혜성</b> — <em>얼음과 먼지</em> 덩어리. <b>길쭉한 궤도</b>로 태양 주위를 공전</li></ul><div class="key"><span class="kt">혜성의 꼬리</span>태양에 <b>가까워지면</b> 얼음이 녹아 꼬리가 생기고, 꼬리는 항상 <em>태양 반대쪽</em>을 향해요.</div>`},
- {t:"learn",h:"왜소 행성 — 행성이 되지 못한 이유",img:"pluto",cap:"<b>명왕성</b> — 2006년 행성에서 왜소 행성으로 (뉴허라이즌스 촬영)",b:`<p>명왕성, 세레스 같은 <b>왜소 행성</b>은 태양 주위를 공전하고 모양도 둥글어요. 그런데 왜 행성이 아닐까요?</p><div class="key"><span class="kt">차이점</span>자기 <b>궤도 주변의 천체들을 흡수하지 못해</b> 궤도가 깨끗하지 않기 때문. 그래도 태양을 도니까 <b>태양계 구성원</b>이에요.</div>`},
+ {t:"learn",sky:["mercury","venus","mars","jupiter","saturn","uranus","neptune"],h:"행성 8형제",img:"solarsys2",cap:"태양에서 가까운 순서 — <b>수·금·지·화·목·토·천·해</b>",b:`<p>태양 주위를 공전하는 8개의 행성.</p><p style="font-family:var(--disp);font-size:1.4em;text-align:center;letter-spacing:.04em">수성 · 금성 · 지구 · 화성<br>목성 · 토성 · 천왕성 · 해왕성</p><div class="key"><span class="kt">외우기</span>"수·금·지·화·목·토·천·해" — 태양에서 가까운 순서! 행성 하나하나의 얼굴은 2장에서 만나요.</div>`},
+ {t:"learn",sky:["moon","jupiterMoons"],h:"위성 — 행성의 단짝",figs:[["moon","지구의 위성 <b>달</b>"],["titan","토성의 위성 <b>타이탄</b> (두꺼운 대기)"]],b:`<p><b>위성</b>은 <em>행성 주위를 공전</em>하는 천체. 지구의 위성은 <b>달</b> 하나뿐이지만, 목성형 행성들은 수십 개씩 거느려요.</p><div class="key"><span class="kt">함정 주의</span>위성은 태양이 아니라 <b>행성</b> 주위를 돌아요. 하지만 그 행성이 태양을 돌기 때문에 — <b>위성도 당당한 태양계 구성원!</b></div>`},
+ {t:"learn",sky:["ceres"],h:"소행성과 혜성",figs:[["asteroid","<b>소행성</b> — 작고 울퉁불퉁한 암석 덩어리"],["comet","<b>혜성</b> 67P — 얼음·먼지에서 가스가 뿜어져 나온다"]],b:`<ul><li><b>소행성</b> — 작고 불규칙한 <em>암석</em> 천체. 주로 <b>화성과 목성 사이</b> '소행성대'에서 태양 주위를 공전</li><li><b>혜성</b> — <em>얼음과 먼지</em> 덩어리. <b>길쭉한 궤도</b>로 태양 주위를 공전</li></ul><div class="key"><span class="kt">혜성의 꼬리</span>태양에 <b>가까워지면</b> 얼음이 녹아 꼬리가 생기고, 꼬리는 항상 <em>태양 반대쪽</em>을 향해요.</div>`},
+ {t:"learn",sky:["pluto","ceres"],h:"왜소 행성 — 행성이 되지 못한 이유",img:"pluto",cap:"<b>명왕성</b> — 2006년 행성에서 왜소 행성으로 (뉴허라이즌스 촬영)",b:`<p>명왕성, 세레스 같은 <b>왜소 행성</b>은 태양 주위를 공전하고 모양도 둥글어요. 그런데 왜 행성이 아닐까요?</p><div class="key"><span class="kt">차이점</span>자기 <b>궤도 주변의 천체들을 흡수하지 못해</b> 궤도가 깨끗하지 않기 때문. 그래도 태양을 도니까 <b>태양계 구성원</b>이에요.</div>`},
  {t:"quiz",q:"혜성의 꼬리가 생기는 때와 방향으로 옳은 것은?",o:["태양에서 멀어질 때, 태양 쪽","태양에 가까워질 때, 태양 반대쪽","언제나 꼬리가 있고 방향은 제멋대로"],a:1,ex:"태양에 가까워지면 얼음이 승화해 꼬리가 생기고, 태양풍에 밀려 꼬리는 태양 반대쪽을 향해요."},
  {t:"quiz",q:"다음 중 태양계 구성원이 <b>아닌</b> 것은?",o:["달(위성)","소행성","태양계 밖의 다른 별"],a:2,ex:"위성·소행성·혜성·왜소 행성도 모두 태양계 구성원! 태양계 밖의 별은 구성원이 아니에요."},
  {t:"write",key:"w_c1",h:"관제 일지 · 한 줄 논술",img:"comet",prompt:`우주 신문에 <b>"행성이 아닌 혜성은 태양계 구성원이 아니다"</b>라는 기사가 실렸어요. 이 기사가 잘못된 까닭을 한두 문장으로 반박해 보세요.`,frame:"혜성은 행성은 아니지만 <b>______을/를 공전</b>하기 때문에 <b>______</b>이다.",spec:{min:25,groups:[{name:"'공전'이라는 말",words:["공전","주위를 돌","주위를 도는","태양 주위"]},{name:"'태양계 구성원'이라는 판단",words:["구성원","태양계에 포함","태양계이다","태양계에 속"]}]},ai:"평가 요소: ① 혜성이 태양 주위를 공전한다는 사실을 근거로 들었는가 ② 그러므로 (행성이 아니어도) 태양계 구성원이라고 판단했는가 ③ 신문 기사가 틀렸다고 분명히 말했는가. 수준: 상=①②③ 모두, 근거→결론 연결어 사용 / 중=판단은 맞으나 공전 근거가 없거나 흐릿함 / 하=판단이 틀리거나 근거 없음. 중1 범위: 태양계=태양+태양 주위를 공전하는 천체."},
@@ -704,9 +708,9 @@ const CH=[
  {t:"hero",log:"통신 로그 · D+12 · 행성 관측 자료 수신",h:"쌍둥이가 아니야",sub:"아라호가 8개 행성의 사진과 자료를 보내왔다. 겉모습은 제각각이지만 두 팀으로 나뉜다 — 분류 기준을 마스터하라. — 센터장",art:SIZE_FIG,img:"planets4"},
  {t:"meet",h:"관제팀 분류 회의"},
  {t:"learn",h:"정체 공개 — 관제센터 공식 분류",wide:true,b:REVEAL_TABLE+`<div class="key"><span class="kt">관제센터 공식 기록</span>노란 칸 네 행성은 <b>지구형 행성</b>, 파란 칸 네 행성은 <b>목성형 행성</b>. 여러분 관제팀의 두 팀과 비교해 보세요 — 어떤 기준으로 나눠도 같은 두 무리가 나왔다면, 그 기준들이 <em>함께 움직인다</em>는 뜻이에요.</div><p class="small">질량·반지름이 큰 쪽이 밀도는 오히려 작다 — 이 반전은 몇 장 뒤에서 다시 만나요.</p>`},
- {t:"learn",h:"지구형 행성 — 수·금·지·화",wide:true,b:planetGallery("rock")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>작다</em> · 단단한 <b>암석</b> → 밀도 <em>크다</em> · 위성이 <em>없거나 적다</em> · 고리 <em>없음</em></div>`},
+ {t:"learn",sky:["mercury","venus","mars"],h:"지구형 행성 — 수·금·지·화",wide:true,b:planetGallery("rock")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>작다</em> · 단단한 <b>암석</b> → 밀도 <em>크다</em> · 위성이 <em>없거나 적다</em> · 고리 <em>없음</em></div>`},
  {t:"learn",h:"지구형 행성의 표면",wide:true,b:planetSurf("rock")+`<p style="margin-top:12px">네 행성 모두 <b>단단한 땅</b>이 있어요. 수성의 충돌구, 금성의 화산, 지구의 바다, 화성의 극관 — 모두 <em>암석 표면</em> 위에서 벌어지는 일.</p>`},
- {t:"learn",h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>크다</em> · 주로 <b>기체</b> → 밀도 <em>작다</em> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
+ {t:"learn",sky:["jupiterMoons","saturn","uranus","neptune"],h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>크다</em> · 주로 <b>기체</b> → 밀도 <em>작다</em> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
  {t:"learn",h:"목성형 행성의 표면",wide:true,b:planetSurf("gas")+`<p style="margin-top:12px">착륙할 땅이 없어요! 보이는 건 전부 <b>기체 대기의 소용돌이</b>. 목성의 대적점, 토성의 줄무늬, 천왕성의 가느다란 고리, 해왕성의 대흑점.</p>`},
  {t:"learn",h:"자료표로 두 팀 가르기",wide:true,b:DATA_TABLE+`<div class="key"><span class="kt">논술형 핵심</span>표에서 <b>반지름·질량·밀도·위성 수·고리</b> 중 두 가지 이상을 골라 "A는 B<em>보다</em> ~하다"로 비교하면 근거 완성!</div>`},
  {t:"learn",h:"반전: 클수록 밀도는 작다?",img:"saturn",cap:"<b>토성</b> — 평균 밀도 0.7 g/cm³, 물(1.0)보다 밀도가 작다",b:`<p>가장 많이 틀리는 오개념 — "크면 밀도도 크겠지?" <b>반대예요!</b></p>${METAPHOR}<div class="key"><span class="kt">오개념 교정</span>밀도는 '얼마나 꽉 찼는가'. 목성형은 덩치는 커도 기체라 <b>밀도가 작아요.</b></div>`},
@@ -746,7 +750,7 @@ const CH=[
  {t:"hero",log:"통신 로그 · 지상 관제 · 보조 임무",h:"승무원의 눈",sub:"아라호만 우주를 보는 게 아니다. 승무원도 직접 하늘을 봐야 한다 — 천체 망원경을 조립하고 달과 행성, 태양을 관측하라. — 센터장",img:"telescope_girl"},
  {t:"learn",h:"천체 망원경의 구조",figs:[["tele_parts","<b>경통</b> · <b>파인더</b>"],["tele_eyepiece","<b>접안렌즈</b> — 배율을 바꾼다"],["tele_mount","<b>가대</b> · <b>균형추</b>"],["tele_tripod","<b>삼각대</b>"]],b:`<ul><li><b>경통</b> — 빛을 모으는 몸통 (앞쪽 대물렌즈)</li><li><b>파인더</b> — 넓게 보며 천체를 먼저 찾는 작은 망원경</li><li><b>접안렌즈</b> — 눈을 대고 보는 렌즈</li><li><b>가대·균형추</b> — 경통을 받치고 균형을 맞춤</li><li><b>삼각대</b> — 전체를 떠받침</li></ul>`},
  {t:"learn",h:"설치 순서",img:"telescope_girl",cap:"어둡고 사방이 트인 곳에서, 보호자와 함께",b:`<ol class="steps"><li>평평한 곳에 <b>삼각대</b>를 세운다</li><li>삼각대 위에 <b>가대</b>를 고정하고 <b>균형추</b>를 단다</li><li>가대 위에 <b>경통</b>을 고정하고 <b>파인더</b>·<b>접안렌즈</b>를 끼운다</li><li>균형추와 경통 위치를 조절해 <b>균형</b>을 맞춘다</li><li><b>파인더</b>로 천체를 먼저 찾은 뒤 <b>접안렌즈</b>로 관측한다</li></ol>`},
- {t:"learn",h:"달과 행성 관측하기",figs:[["telescope_phone","접안렌즈에 <b>스마트 기기</b>를 대면 촬영도 OK"],["moon","망원경으로 본 <b>달</b> — 충돌구가 또렷하다"]],b:`<p>맨눈으로는 점으로 보이던 행성이 망원경에서는 <b>둥근 원반</b>으로 보여요. 토성의 고리, 목성의 줄무늬와 위성까지!</p><div class="key"><span class="kt">관측 팁</span>구름 없는 날, 천체 관측 앱으로 뜨는 시각을 확인하고, 자정 넘어서까지 관측하지 않기.</div>`},
+ {t:"learn",sky:["tonight","moon","jupiterMoons","saturn"],h:"달과 행성 관측하기",figs:[["telescope_phone","접안렌즈에 <b>스마트 기기</b>를 대면 촬영도 OK"],["moon","망원경으로 본 <b>달</b> — 충돌구가 또렷하다"]],b:`<p>맨눈으로는 점으로 보이던 행성이 망원경에서는 <b>둥근 원반</b>으로 보여요. 토성의 고리, 목성의 줄무늬와 위성까지!</p><div class="key"><span class="kt">관측 팁</span>구름 없는 날, 천체 관측 앱으로 뜨는 시각을 확인하고, 자정 넘어서까지 관측하지 않기.</div>`},
  {t:"learn",h:"태양 관측 — 절대 직접 보지 마!",figs:[["solar_proj","<b>태양 투영판</b>에 비친 태양의 흑점"],["solar_filter","경통 앞에 끼우는 <b>태양 필터</b>"]],b:`<p>망원경으로 태양을 <b>직접 보면 실명</b>할 수 있어요. 두 가지 안전한 방법:</p><ul><li><b>투영법</b> — 접안렌즈 뒤에 투영판을 두고 비친 상을 본다 (파인더 뚜껑 닫기!)</li><li><b>태양 필터</b> — 경통 앞에 전용 필터를 끼운다</li></ul><div class="key"><span class="kt">이렇게 보면</span>흑점이 며칠 동안 이동하는 것 = 태양의 <b>자전</b> 증거!</div>`},
  {t:"learn",h:"우주로 나간 눈, 우주로 간 손",figs:[["jwst","<b>제임스 웹 우주 망원경</b> (2021 발사)"],["carina","웹 망원경이 찍은 <b>용골자리 성운</b>"],["rover","화성 탐사차 <b>퍼서비어런스</b>"],["ingenuity","화성 헬리콥터 <b>인저뉴어티</b>"]],b:`<p>대기의 방해가 없는 우주에서 더 선명하게 보기 위해 <b>우주 망원경</b>을, 직접 만지고 분석하기 위해 <b>탐사선</b>을 보내요. 아라호도 그 후배!</p>`},
  {t:"quiz",q:"천체 망원경으로 천체를 찾을 때 가장 먼저 쓰는 부품은?",o:["접안렌즈","파인더","균형추"],a:1,ex:"시야가 넓은 파인더로 먼저 찾고, 접안렌즈로 자세히 봐요."},
@@ -940,6 +944,17 @@ function renderLearn(){
 }
 
 /* ═══════ 슬라이드 ═══════ */
+/* 🔭 Stellarium Web 바로가기 — 오늘 밤 9시, 군포 하늘 기준으로 그 천체를 가운데에 확대해 연다 */
+const SKY={
+ mercury:["수성","Mercury",0.01], venus:["금성","Venus",0.03], mars:["화성","Mars",0.01],
+ jupiter:["목성","Jupiter",0.03], jupiterMoons:["목성과 위성 4개","Jupiter",0.3], saturn:["토성 고리","Saturn",0.03],
+ uranus:["천왕성","Uranus",0.01], neptune:["해왕성","Neptune",0.01], moon:["달","Moon",1],
+ pluto:["명왕성","Pluto",0.5], ceres:["세레스(소행성·왜소 행성)","Ceres",1], tonight:["오늘 밤 남쪽 하늘",null,90]};
+function skyURL(k){const v=SKY[k], d=new Date(), p=n=>String(n).padStart(2,"0");
+ const date=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T21:00:00+09:00`;
+ const q=`?fov=${v[2]}&lat=37.36&lng=126.93&date=${encodeURIComponent(date)}`+(v[1]?"":"&az=180&alt=25");
+ return "https://stellarium-web.org/"+(v[1]?"skysource/"+v[1]:"")+q;}
+const skyBar=(keys)=>`<div class="skybar"><span class="skyh">🔭 하늘에서 직접 보기</span>${keys.map(k=>`<a class="skybtn" href="${skyURL(k)}" target="_blank" rel="noopener">${SKY[k][0]} ↗</a>`).join("")}<span class="small skyn" title="땅에 가려 안 보이면 Stellarium 화면 아래의 땅(지면) 버튼을 끄세요">오늘 밤 9시 군포 하늘 · 안 보이면 ‘땅’ 끄기</span></div>`;
 function renderSlide(){
  const c=CH[deck.ch], i=deck.i, sl=c.slides[i], k=c.id+"_"+i;
  S.slide[c.id]=i; try{history.replaceState(null,"",location.pathname+"#"+c.id+"s"+(i+1));}catch(e){}
@@ -953,7 +968,7 @@ function renderSlide(){
    <div style="text-align:left;max-width:860px;margin:14px auto 0">${commsComposeHTML(c.no,"출발 전",{compact:true})}</div></div>`;}
  if(sl.t==="learn"){ seen();
    const media=sl.figs?`<div class="figs ${sl.figs.length>=4?'c2':sl.figs.length===3?'c3':'c2'}">${sl.figs.map(f=>IMG(f[0],f[1],sl.figs.length>=3?'sq':'tall')).join("")}</div>`:sl.img?IMG(sl.img,sl.cap,'tall'):"";
-   body=`<div class="s-kicker">${c.no} · ${c.title}</div><div class="s-title">${sl.h}</div>${sl.wide?`<div class="s-body">${sl.b}</div>`:`<div class="s-grid"><div class="s-body">${sl.b}</div>${media}</div>`}`;}
+   body=`<div class="s-kicker">${c.no} · ${c.title}</div><div class="s-title">${sl.h}</div>${sl.sky?skyBar(sl.sky):""}${sl.wide?`<div class="s-body">${sl.b}</div>`:`<div class="s-grid"><div class="s-body">${sl.b}</div>${media}</div>`}`;}
  if(sl.t==="clear"){ if(!S.seen[k]){S.seen[k]=1;S.pts+=2;save();}
    body=`<div class="s-hero"><span class="stamp" style="font-size:1.4rem">MISSION CLEAR</span><div class="s-title" style="margin-top:14px">${c.title} 완료!</div>
    <div class="s-grid" style="text-align:left"><div class="figure"><b style="color:var(--sun);font-family:var(--disp)">오늘의 핵심 다시 보기</b><ul class="cklist">${sl.pts.map(p=>`<li class="y">${p}</li>`).join("")}</ul><p class="small">자꾸 보면 저절로 외워져요. 내일 한 번만 더 넘겨 보기!</p>${(()=>{const d=DOCS.find(x=>x.no===c.no);return d?`<a href="docs/${d.f}.pdf" target="_blank" rel="noopener" class="btn-s" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--fg);padding:10px 16px;border-radius:14px;margin-top:6px">📂 복습 자료 열기 — ${d.t.split(":")[0]}</a>`:"";})()}</div>
