@@ -381,6 +381,8 @@ body.deckmode .toast{bottom:110px}
 .bteam .grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:3px 0}
 .bteam .grp i{font-style:normal;font-weight:900;border-radius:8px;padding:0 8px}
 .bteam .g1 i{background:#ffb13b33;color:var(--sun)} .bteam .g2 i{background:#5fe3ff26;color:var(--cyan)}
+.peers{margin-top:18px;padding-top:14px;border-top:1.5px dashed var(--line2)}
+.peers h3{margin:0 0 6px}
 .tally{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
 .tally span{background:var(--panel2);border-radius:99px;padding:2px 14px} .tally b{color:var(--sun)}
 .revtab td.a{background:#6b4208;color:#ffe2a8} .revtab td.b{background:#0d3a73;color:#d4ebff}
@@ -1300,6 +1302,31 @@ function mountSunsort(root,k){
    Z.chk=true;Z.ok=SUNSORT.every(([,,a],i)=>Z.v[i]===a);if(Z.ok&&!S.quiz[k]){S.quiz[k]=1;addPts(3);}else save();draw();
    if(!Z.ok)root.querySelector("#ssfb").innerHTML='<div class="fb no"><b>❌ 표시를 다시 생각해 봐요.</b> 힌트: 표면(광구)에서 <b>관측되는 무늬</b>는 두 가지뿐! 나머지는 광구 위 대기(채층·코로나)에서 보여요.</div>';};}
  draw();}
+/* 다른 관제팀의 분류 보고 보기 — 우리 반 보고만, 모둠별 마지막 보고 */
+async function loadMeetPeers(box,myG){
+ if(!box)return; box.innerHTML='<p class="small">다른 관제팀 보고를 불러오는 중…</p>';
+ try{
+  const all=await commsList({cls:isT()?"":(me?me.cls:""),mission:"MISSION 02"});
+  const latest={}; all.filter(r=>r.phase==="분류회의").forEach(r=>{const m=String(r.text).match(/^모둠(\d+) \| (.*)$/);if(!m)return;const key=r.cls+"|"+m[1];if(!latest[key])latest[key]={cls:r.cls,g:m[1],line:m[2]};});
+  const rows=Object.values(latest).sort((a,b)=>String(a.cls).localeCompare(String(b.cls),'ko',{numeric:true})||(+a.g)-(+b.g));
+  const P=t=>{const o={};String(t).split(" / ").forEach(seg=>{const i=seg.indexOf(": ");if(i>0)o[seg.slice(0,i)]=seg.slice(i+2);});return o;};
+  const key=o=>{const a=String(o["1팀"]||"").split(",").filter(Boolean).sort().join(""),b=String(o["2팀"]||"").split(",").filter(Boolean).sort().join("");return [a,b].sort().join("|");};
+  if(!rows.length){box.innerHTML=`<h3>📡 다른 관제팀의 보고</h3><p class="small">아직 보고한 관제팀이 없어요. 잠시 뒤 <button class="btn-g" id="mpRe" style="min-height:36px;padding:2px 12px">새로고침</button></p>`;box.querySelector("#mpRe").onclick=()=>loadMeetPeers(box,myG);return;}
+  const parts={};rows.forEach(x=>{x.o=P(x.line);x.k=key(x.o);parts[x.k]=(parts[x.k]||0)+1;});
+  const mine=rows.find(x=>String(x.g)===String(myG)&&(isT()||String(x.cls)===String(me&&me.cls)));
+  const top=Object.entries(parts).sort((a,b)=>b[1]-a[1])[0];
+  const cnt={};rows.forEach(x=>String(x.o["기준"]||"").split(",").filter(Boolean).forEach(c=>cnt[c]=(cnt[c]||0)+1));
+  const multi=new Set(rows.map(x=>x.cls)).size>1;
+  const chips=s=>String(s||"").split(",").filter(Boolean).map(c=>`<i>${esc(c)}</i>`).join("");
+  box.innerHTML=`<h3>📡 다른 관제팀의 보고 <span class="small">— ${multi?"모든 반":esc(me.cls)+"반"} ${rows.length}개 팀</span> <button class="btn-g" id="mpRe" style="min-height:36px;padding:2px 12px;margin-left:6px">새로고침</button></h3>
+   <div class="tally">🧭 고른 기준: ${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<span>${esc(c)} <b>${n}</b></span>`).join("")}</div>
+   <div class="key" style="margin:6px 0 12px"><span class="kt">비교해 보기</span>${rows.length>1?`기준은 제각각인데, <b>${top[1]}개 팀</b>이 행성을 <em>똑같은 두 무리</em>로 나눴어요${mine?(mine.k===top[0]?" — 우리 팀도 그중 하나예요":" — 우리 팀은 조금 달라요. 어디가 다른지 찾아보세요"):""}. 서로 다른 기준으로 나눴는데 같은 결과가 나온다면, 무엇을 뜻할까요?`:"아직 보고가 하나뿐이에요. 다른 팀 보고가 오면 새로고침해 보세요."}</div>
+   <div class="board">${rows.map(x=>{const me_=mine&&x===mine, same=mine&&x.k===mine.k&&!me_;return `<div class="bteam" style="${me_?'border-color:var(--sun);box-shadow:0 0 0 2px #ffb13b55':''}"><h4>${multi?esc(x.cls)+'반 ':''}모둠 ${esc(x.g)} ${me_?'<span class="pill w">우리 팀</span>':same?'<span class="pill g">우리와 같은 두 무리</span>':''}</h4>
+    <div class="grp g1">1팀 ${chips(x.o["1팀"])}</div><div class="grp g2">2팀 ${chips(x.o["2팀"])}</div>
+    <div class="small" style="margin-top:6px">기준: ${esc(x.o["기준"]||"")}</div><div style="margin-top:4px;font-size:.98rem">${esc(x.o["설명"]||"")}</div></div>`;}).join("")}</div>`;
+  box.querySelector("#mpRe").onclick=()=>loadMeetPeers(box,myG);
+ }catch(e){box.innerHTML=`<p class="small">다른 관제팀 보고를 불러오지 못했어요 (${esc(e)}).</p>`;}
+}
 function mountMeet(root,k,c,onDone){
  /* 관제팀 분류 회의: 정답을 알려주기 전에, 모둠이 원자료만 보고 스스로 기준을 세워 두 팀으로 나눈다 */
  const M=S.meet=S.meet||{}; M.as=M.as||{}; M.cr=M.cr||[]; M.tx=M.tx||""; M.g=M.g||"";
@@ -1314,7 +1341,8 @@ function mountMeet(root,k,c,onDone){
    <div class="chips">${CR.map(x=>`<button data-cr="${x}" class="${M.cr.includes(x)?'on':''}">${x}</button>`).join("")}</div></div>
    <div><div class="frame">💬 문장 틀 — 1팀은 ___이/가 ___고, 2팀은 ___이/가 ___다. 그래서 ___을/를 기준으로 나눴다.</div>
    <textarea id="mt" style="min-height:84px" placeholder="모둠이 합의한 기준을 한두 문장으로">${esc(M.tx)}</textarea>
-   <button class="btn-p" id="mgo" style="width:100%;margin-top:8px">📡 관제센터에 분류 보고</button><div id="mfb">${S.quiz[k]?'<div class="fb ok"><b>✅ 보고 접수 완료.</b> 기준을 고치면 다시 보고해도 돼요.</div>':''}</div></div></div>`;
+   <button class="btn-p" id="mgo" style="width:100%;margin-top:8px">📡 관제센터에 분류 보고</button><div id="mfb">${S.quiz[k]?'<div class="fb ok"><b>✅ 보고 접수 완료.</b> 기준을 고치면 다시 보고해도 돼요.</div>':''}</div></div></div>
+  <div id="mpeers" class="peers" ${S.quiz[k]||isT()||isG()?'':'hidden'}></div>`;
   root.querySelectorAll(".rawcard").forEach(b=>b.onclick=()=>{const cc=b.dataset.c;M.as[cc]=((M.as[cc]||0)+1)%3;save();const t=M.as[cc];b.className="rawcard"+(t?" t"+t:"");b.querySelector(".tm").textContent=tag(t);});
   root.querySelectorAll("[data-cr]").forEach(b=>b.onclick=()=>{const x=b.dataset.cr;M.cr=M.cr.includes(x)?M.cr.filter(y=>y!==x):[...M.cr,x];b.classList.toggle("on");save();});
   root.querySelector("#mg").onchange=e=>{M.g=e.target.value;save();};
@@ -1333,9 +1361,12 @@ function mountMeet(root,k,c,onDone){
    const match=(same(t1,off.a)&&same(t2,off.b))||(same(t1,off.b)&&same(t2,off.a));
    const line=`1팀: ${t1.join(",")} / 2팀: ${t2.join(",")} / 기준: ${M.cr.join(",")} / 설명: ${M.tx}`;
    logSrv('분류회의',`c2 모둠${M.g}`,line,match?'공식분류와 같음':'다른 분류','');
+   commsAdd({mission:"MISSION 02",phase:"분류회의",text:`모둠${M.g} | `+line,anon:'1'}).then(()=>loadMeetPeers(root.querySelector("#mpeers"),M.g)).catch(()=>{});
    const first=!S.quiz[k]; S.quiz[k]=1; if(first)addPts(5); else save();
    fb.innerHTML=`<div class="fb ok"><b>📡 보고 접수!</b> 센터장 화면에 모든 관제팀의 분류가 모입니다. <br>발표 준비: <em>왜 그 기준을 골랐는지</em>, 그리고 다른 기준으로 나눠도 같은 두 팀이 나오는지 생각해 두세요. <span class="small">다음 장(정체 공개)은 센터장 신호가 있을 때 넘기세요.</span></div>`;
+   root.querySelector("#mpeers").hidden=false;
    if(onDone)onDone();};
+  const pr=root.querySelector("#mpeers"); if(!pr.hidden)loadMeetPeers(pr,M.g);
  } draw();
 }
 function mountG2(root,k,onDone){
@@ -1634,7 +1665,7 @@ function cmCard(r){
 async function loadComms(){
   const L=document.getElementById("cmList"), ST=document.getElementById("cmStat"); if(!L)return;
   const RO=(!isT()&&CM.other)||isG(); /* 다른 반 구경·참관: 이름 가림 · 읽기 전용 */
-  try{let every=await commsList({cls:(isT()||(RO&&!isG()))?"":(me?me.cls:""),mission:CM.mission});
+  try{let every=(await commsList({cls:(isT()||(RO&&!isG()))?"":(me?me.cls:""),mission:CM.mission})).filter(r=>r.phase!=="분류회의");
     if(isG())every=every.filter(r=>String(r.cls)===String(me.cls)).map(r=>({...r,mine:false,ro:true}));
     else if(RO)every=every.filter(r=>me&&String(r.cls)!==String(me.cls)).map(r=>({...r,mine:false,ro:true}));
     const cc=document.getElementById("cmCls"); if(cc){const cls=[...new Set(every.map(r=>String(r.cls)).filter(x=>x&&x!=="T"))].sort((a,b)=>(+a||0)-(+b||0)||a.localeCompare(b));
