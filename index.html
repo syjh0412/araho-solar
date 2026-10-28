@@ -200,6 +200,15 @@ svg text{font-family:var(--body)}
 table.sumtab td.ga,table.sumtab th.ga{background:#6b4208;color:#ffe2a8} table.sumtab td.gb,table.sumtab th.gb{background:#0d3a73;color:#d4ebff}
 table.sumtab td:nth-child(2){font-weight:900;color:var(--sun)}
 table.sumtab .tb{display:inline-block;min-width:5.5em;font-weight:700}
+.tlink{display:block;margin:14px auto 0;background:none;border:0;color:var(--cyan);font-size:1rem;text-decoration:underline;text-underline-offset:4px;min-height:40px}
+.guestbox{margin-top:10px;padding:14px 16px;border:1.5px solid var(--violet);border-radius:16px;background:#a497ff12}
+.guestbox h3{margin:0 0 4px;color:var(--violet)}
+.gcls{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.gcls button{min-height:44px;background:var(--panel2);border:1.5px solid var(--line2);border-radius:12px}
+.gcls button:disabled{opacity:.35}
+.gcls button.gon{grid-column:1/-1;border-color:var(--violet);color:var(--fg);font-weight:900;font-size:1.1rem;min-height:56px;background:#a497ff22}
+.greet{position:fixed;left:50%;top:18px;z-index:80;transform:translate(-50%,-20px);opacity:0;transition:all .4s;display:flex;gap:14px;align-items:center;max-width:min(680px,92vw);background:#121a46f2;border:1.5px solid var(--violet);border-radius:18px;padding:14px 20px;box-shadow:0 18px 50px #000a;cursor:pointer;line-height:1.55}
+.greet.on{transform:translate(-50%,0);opacity:1}.greet.out{opacity:0;transform:translate(-50%,-20px)}
 .volmeta{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;background:#080c24;border:1.5px solid var(--line);border-radius:14px;padding:8px 16px;margin:0 0 12px}
 .volmeta .vm{display:flex;align-items:center;gap:8px;font-size:1.02rem;line-height:1.35}
 .volopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -439,11 +448,14 @@ const LOCAL_TEACHER_CODE = '0726';   // 서버가 없을 때만 쓰는 임시 �
 const SCHOOL = '고천';                 // 예: '고천' → '고천 관제센터'
 const SCHOOL_FULL = '고천중학교';
 const SCHOOL_EN = 'GOCHEON';            // 첫 화면 영문 표기 (예: 'GOCHEON')
+/* ③ 참관(공개수업) — 참관 선생님이 둘러볼 수 있는 반. 쓰기·저장은 안 되고 보기만. 끄려면 [] */
+const GUEST_CLS = ['1'];
 const SCHOOL_STORY = '고천(古川), 오래된 냇물은 흘러 바다에 닿는다 — 그리고 별들의 바다, 우주로. ';  // 첫 화면 이야기(학교 이름 풀이). 비워 둬도 된다.
 
 /* ───────── 서버 통신 (힘탐정과 같은 방식: 읽기 JSONP, 쓰기 POST) ───────── */
 let seq=0;
 function call(params){ return new Promise((done,fail)=>{
+  if(me&&me.guest&&params.action!=="qlist") return fail(GUEST_MSG);
   if(!API) return fail('서버 미설정');
   const cb='cb_'+(++seq)+'_'+Date.now(); let s;
   const timer=setTimeout(()=>{clean();fail('시간 초과');},20000);
@@ -452,7 +464,7 @@ function call(params){ return new Promise((done,fail)=>{
   const q=['callback='+cb]; for(const k in params){ if(params[k]==null)continue; q.push(encodeURIComponent(k)+'='+encodeURIComponent(params[k])); }
   s=document.createElement('script'); s.src=API+'?'+q.join('&'); s.onerror=()=>{clean();fail('연결 실패');}; document.head.appendChild(s);
 });}
-function post(params){ if(!API) return Promise.reject('서버 미설정');
+function post(params){ if(me&&me.guest) return Promise.reject(GUEST_MSG); if(!API) return Promise.reject('서버 미설정');
   return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(params)})
    .then(r=>r.json()).then(res=>{ if(res&&res.ok)return res; throw (res&&res.error)||'오류'; }); }
 
@@ -465,7 +477,7 @@ function freshState(){return {pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},
 function loadLocal(){try{const j=localStorage.getItem(LS+'_'+(me?me.cls+'_'+me.num:'x')); if(j)S={...freshState(),...JSON.parse(j)};}catch(e){}}
 let saveTimer=null, syncState='off';
 function save(){
-  if(isT()){drawHud();return;} // 센터장 체험 기록은 저장하지 않음 — 다시 들어오면 처음부터
+  if(isT()||isG()){drawHud();return;} // 센터장·참관 체험 기록은 저장하지 않음 — 다시 들어오면 처음부터
   try{localStorage.setItem(LS+'_'+(me?me.cls+'_'+me.num:'x'),JSON.stringify(S));}catch(e){}
   drawHud();
   if(API&&me){ clearTimeout(saveTimer); setSync('pending'); saveTimer=setTimeout(()=>{
@@ -502,6 +514,7 @@ const CPN_OLD={m1:"첫 임무 완수 보급 (폐지)",wd:"명추리 보급 (폐�
 let COUP={};
 function cpnState(c){const st=COUP[c.id]; if(st==="Y")return "y"; if(st==="W")return "w"; return c.t()?"ready":"lock";}
 function cpnHTML(){
+  if(isG())return `<h3>🍬 센터장 보급</h3><p class="small">학생은 미션 완주·논술 시험 제출·커맨더 승급 때 보급(간식) 쿠폰을 신청하고, 센터장이 결재해요. 참관 모드에서는 보기만 할 수 있어요.</p>`;
   const got=CPNS.filter(c=>COUP[c.id]==="Y").length;
   return `<h3>🍬 센터장 보급 <span class="small">받음 ${got}/${CPNS.length}</span></h3>
   <p class="small">조건을 채우면 <b>보급 신청</b> → 센터장 콘솔에 올라가고, 간식은 수업 시간에 받습니다. 쿠폰은 하나씩 한 번만!</p>
@@ -573,6 +586,8 @@ function astronautSVG(pts,suit,size,o){
   </svg>`;
 }
 const isT=()=>!!(me&&me.cls==="T");
+const isG=()=>!!(me&&me.guest);  /* 참관 모드: 둘러보기 전용 */
+const GUEST_MSG="참관 모드에서는 둘러보기만 할 수 있어요";
 /* 센터장(플라이트 디렉터) 캐릭터 — 관제복·헤드셋·태블릿 */
 function directorSVG(size){
   const sz=size||200, uid="d"+Math.floor(Math.random()*1e6);
@@ -879,10 +894,18 @@ const EXAM=[
 const app=document.getElementById("app"), stage=document.getElementById("stage"), gate=document.getElementById("gate");
 let view="home", deck=null, examPage=0;
 function drawHud(){const h=document.getElementById("hud");if(!h)return;
+ if(isG()){h.innerHTML=`<span style="font-size:1.6rem">🎩</span><span class="rk">참관 · ${esc(me.cls)}반 둘러보기</span><span class="pt">⭐ ${S.pts}</span><span class="small">둘러보기 전용 — 해 본 활동은 저장되지 않아요</span><span style="flex:1"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`;const ho=h.querySelector("#hudOut");if(ho)ho.onclick=logout;return;}
  if(isT()){h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${directorSVG(34)}</span><span class="rk">센터장</span><span class="small">${esc(SCHOOL)} 관제센터 · 플라이트 디렉터</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`;setSync(syncState);const ho=h.querySelector("#hudOut");if(ho)ho.onclick=logout;return;}
  const{r,next}=rank();const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
  h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${astronautSVG(null,null,34)}</span><span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`; setSync(syncState);
  const ho=h.querySelector("#hudOut"); if(ho)ho.onclick=logout;}
+function greetGuest(){
+ const old=document.getElementById("greetBox"); if(old)old.remove();
+ const g=document.createElement("div"); g.id="greetBox"; g.className="greet";
+ g.innerHTML=`<span style="font-size:2rem">🎩</span><span><b>참관 오신 선생님, 반갑습니다.</b><br>${esc(SCHOOL)} 관제센터 ${esc(me.cls)}반 관제실입니다. 오늘 승무원들의 태양계 탐사 임무를 함께 지켜봐 주세요.<br><span class="small">미션 학습·수배 파일·논술 시험·교신 채널을 자유롭게 둘러보실 수 있어요. (누르면 닫혀요)</span></span>`;
+ g.onclick=()=>{g.classList.add("out");setTimeout(()=>g.remove(),400);};
+ document.body.appendChild(g); setTimeout(()=>g.classList.add("on"),60);
+ setTimeout(()=>{if(g.parentNode){g.classList.add("out");setTimeout(()=>g.remove(),400);}},9000);}
 function logout(){me=null;deck=null;TPIN="";try{localStorage.removeItem(LS_ME);}catch(e){}S=freshState();view="home";render();}
 const hudBlock=()=>`<div id="hud" class="hud"></div>`;
 function slideDone(c,sl,idx){const k=c.id+"_"+idx;
@@ -895,7 +918,8 @@ function render(){ grMigrate(S);
  if(!me){document.body.classList.add("gate");gate.hidden=false;renderGate();return;}
  document.body.classList.remove("gate");gate.hidden=true;
  document.body.classList.toggle("deckmode",!!deck); stage.hidden=!deck;
- document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+ document.querySelectorAll("#tabs button").forEach(b=>{b.classList.toggle("on",b.dataset.v===view);if(b.dataset.v==="teacher")b.hidden=isG();});
+ if(isG()&&view==="teacher")view="home";
  if(deck){renderSlide();return;}
  ({home:renderHome,crew:renderCrew,learn:renderLearn,wanted:renderWanted,exam:renderExam,comms:renderComms,docs:renderDocs,teacher:renderTeacher})[view]();
  showAI();
@@ -914,7 +938,10 @@ function renderGate(){
    <label>이름</label><input type="text" id="gNameIn" placeholder="이름">`}
   <button class="btn-p" id="gGo" style="width:100%;margin-top:16px">관제센터 입장</button>
   <div id="gMsg" class="small" style="margin-top:10px">${API?(ROSTER_TRIED&&!hasR?"명단이 아직 없어 이름을 직접 입력합니다.":"기록은 센터장의 구글 시트에 자동 저장됩니다."):"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
-  <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장으로 입장</button></div>`;
+  <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장으로 입장</button>
+  ${GUEST_CLS.length?`<button class="tlink" id="gGuestOpen">🎩 참관 오셨나요? 둘러보기</button>
+  <div id="gGuest" hidden class="guestbox"><h3>참관 둘러보기</h3><p class="small">쓰기는 되지 않는 <b>둘러보기 전용</b> 입장입니다. 미션 학습 슬라이드, 수배 파일, 논술 시험, 승무원실, 교신 채널을 자유롭게 둘러보실 수 있어요. 해 보신 활동은 저장되지 않습니다.</p>
+   <div class="gcls">${[1,2,3,4,5,6,7,8].filter(c=>c<=Math.max(4,...GUEST_CLS.map(Number).filter(Boolean))).map(c=>GUEST_CLS.includes(String(c))?`<button class="gon" data-gc="${c}">${c}반 참관${GUEST_CLS.length===1?" — 오늘 공개수업":""}</button>`:`<button disabled title="오늘은 ${GUEST_CLS.join(", ")}반만 둘러볼 수 있어요">${c}반</button>`).join("")}</div></div>`:""}</div>`;
  if(hasR){
    const cs=gate.querySelector("#gCls"),ns=gate.querySelector("#gNum"),nm=gate.querySelector("#gName");
    cs.onchange=()=>{const list=(ROSTER[cs.value]||[]).slice().sort((x,y)=>Number(x.num)-Number(y.num));
@@ -943,6 +970,9 @@ function renderGate(){
  const eye=gate.querySelector("#gEye"); if(eye){eye.onclick=()=>{const i=gate.querySelector("#gCode");const on=i.style.webkitTextSecurity==="disc";i.style.webkitTextSecurity=on?"none":"disc";eye.textContent=on?"숨김":"보기";};}
  gate.querySelector("#gGo").onclick=go;
  gate.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter")go();});
+ const go_=gate.querySelector("#gGuestOpen"); if(go_)go_.onclick=()=>{const g=gate.querySelector("#gGuest");g.hidden=!g.hidden;};
+ gate.querySelectorAll("[data-gc]").forEach(b=>b.onclick=()=>{const c=b.dataset.gc; if(!GUEST_CLS.includes(String(c)))return;
+   me={cls:String(c),num:"참관",name:"참관 선생님",guest:true}; S=freshState(); deck=null; view="home"; CM.other=false; render(); greetGuest();});
  gate.querySelector("#gT").onclick=()=>{me={cls:"T",num:"0",name:"센터장"};S=freshState();try{localStorage.removeItem(LS+'_T_0');}catch(e){}view="teacher";render();};
  if(API&&!ROSTER_TRIED){ROSTER_TRIED=true; call({action:'names'}).then(r=>{ROSTER=r.roster||null; if(!me)renderGate();}).catch(()=>{if(!me)renderGate();});}
 }
@@ -957,7 +987,7 @@ function renderHome(){
  <div class="row2">
   <div class="card"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
     <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${isT()?directorSVG(150):astronautSVG(null,null,150)}</div>
-    <div style="flex:1;min-width:220px"><div class="comms">${isT()?"FLIGHT DIRECTOR":"CREW ID"}</div><div style="font-family:var(--disp);font-size:1.6rem">${isT()?"센터장":esc(me.name)}</div><div class="small">${isT()?esc(SCHOOL)+" 관제센터 총괄 · 임무 지시와 승인":esc(me.cls)+"반 "+esc(me.num)+"번 · "+esc(SCHOOL)+" 관제센터"}</div>
+    <div style="flex:1;min-width:220px"><div class="comms">${isT()?"FLIGHT DIRECTOR":"CREW ID"}</div><div style="font-family:var(--disp);font-size:1.6rem">${isT()?"센터장":esc(me.name)}</div><div class="small">${isT()?esc(SCHOOL)+" 관제센터 총괄 · 임무 지시와 승인":(isG()?esc(me.cls)+"반 참관":esc(me.cls)+"반 "+esc(me.num)+"번")+" · "+esc(SCHOOL)+" 관제센터"}</div>
      ${isT()?`<button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">📋 센터장 콘솔로</button>`:`<div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
      <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">🧑‍🚀 승무원실 — 모습·장비·꾸미기·보급</button>`}</div></div>
    <h3 style="margin-top:18px">훈장</h3>
@@ -1084,7 +1114,7 @@ function renderSlide(){
  /* ── 단계 잠금: 빈칸을 모두 열고(학습), 퀴즈를 맞히고, 게임을 끝내고, 논술을 점검받아야 다음으로 ── */
  S.done=S.done||{}; let locked=false, lockWhy="";
  const unlock=()=>{locked=false;S.done[k]=1;save();const n=stage.querySelector("#next");if(n){n.disabled=false;}const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey";lm.textContent="← → 키 · 스페이스 · 밀어서 넘기기";}};
- const setLock=(why)=>{if(isT())return; /* 센터장은 잠금 없이 자유롭게 넘김 (빈칸·게임은 그대로 시연 가능) */ locked=true;lockWhy=why;const n=stage.querySelector("#next");if(n)n.disabled=true;const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey lockmsg";lm.textContent=why;}};
+ const setLock=(why)=>{if(isT()||isG())return; /* 센터장은 잠금 없이 자유롭게 넘김 (빈칸·게임은 그대로 시연 가능) */ locked=true;lockWhy=why;const n=stage.querySelector("#next");if(n)n.disabled=true;const lm=stage.querySelector(".hintkey");if(lm){lm.className="hintkey lockmsg";lm.textContent=why;}};
  if(!S.done[k]){
    if(sl.t==="learn"){
      const els=[...stage.querySelectorAll(".s-body b, .s-body em")].filter(e=>e.classList.contains("tb")||!e.closest(".pcard,.cap,.figcap,.chain,.cklist,.frame,table"));
@@ -1528,6 +1558,7 @@ async function commsAnswer(qid,text){
 const PHASES=["출발 전","귀환 후","귀환 보고"];
 function commsComposeHTML(mission,phase,opts){
   opts=opts||{};
+  if(isG())return `<div class="frame" style="margin:${opts.compact?'10px 0 0':'0 0 16px'}">🎩 <b>참관 모드</b> — 학생들은 여기서 ${phase==="귀환 후"?"새로 생긴 질문과 알게 된 점을":"이 주제에서 가장 궁금한 질문을"} <b>교신</b>으로 보내요. 보낸 교신은 <b>교신</b> 탭에서 둘러보실 수 있어요.</div>`;
   const pick=opts.pick?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px"><select id="cmM" style="width:auto;padding:8px 12px">${CH.map(c=>`<option value="${c.no}" ${mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select><select id="cmP" style="width:auto;padding:8px 12px">${PHASES.map(x=>`<option ${phase===x?'selected':''}>${x}</option>`).join("")}</select></div>`:"";
   if(phase==="귀환 후"&&!opts.pick){
     const k1="q_"+mission+"_귀환 후", k2="q_"+mission+"_귀환 보고"; const d1=S.comms&&S.comms[k1], d2=S.comms&&S.comms[k2];
@@ -1566,15 +1597,15 @@ function bindCompose(root,mission,phase,after){
 let CM={mission:"",mine:false,noans:false,compose:false,open:{},cls:"",other:false};
 function renderComms(){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">📡 교신 채널</h2>
-  <p class="small" style="margin:0 4px 10px">${isT()?'센터장은 모든 반의 교신을 볼 수 있어요. 반을 골라 보세요.':(CM.other?`<b style="color:var(--violet)">🔭 다른 반 교신 구경 중</b> — 이름은 가려지고, 읽기만 할 수 있어요.`:`<b style="color:var(--cyan)">${esc(me?me.cls:"")}반 교신</b>이에요. 다른 반 교신은 <b>구경하기</b>로 볼 수 있어요.`)} 왼쪽 칸은 ❓ 질문, 오른쪽 칸은 💡 알게 된 점 — 칸 안에서 미션별로 나뉩니다. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — 응답 1건에 +2점.</p>
+  <p class="small" style="margin:0 4px 10px">${isG()?`🎩 <b style="color:var(--violet)">참관 — ${esc(me.cls)}반 승무원들의 교신</b>이에요. 학생 이름은 가리고 보여 드려요.`:isT()?'센터장은 모든 반의 교신을 볼 수 있어요. 반을 골라 보세요.':(CM.other?`<b style="color:var(--violet)">🔭 다른 반 교신 구경 중</b> — 이름은 가려지고, 읽기만 할 수 있어요.`:`<b style="color:var(--cyan)">${esc(me?me.cls:"")}반 교신</b>이에요. 다른 반 교신은 <b>구경하기</b>로 볼 수 있어요.`)} 왼쪽 칸은 ❓ 질문, 오른쪽 칸은 💡 알게 된 점 — 칸 안에서 미션별로 나뉩니다. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — 응답 1건에 +2점.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
    ${isT()?`<select id="cmCls" style="width:auto;padding:8px 12px"><option value="">모든 반</option>${CM.cls?`<option value="${esc(CM.cls)}" selected>${esc(CM.cls)}반</option>`:''}</select>`:''}
    <select id="cmMission" style="width:auto;padding:8px 12px"><option value="">모든 미션</option>${CH.map(c=>`<option value="${c.no}" ${CM.mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select>
-   ${isT()?'':`<button class="${CM.other?'btn-s':'btn-g'}" id="cmOther" style="min-height:44px;${CM.other?'border-color:var(--violet);color:var(--violet)':''}">${CM.other?'← 우리 반 교신으로':'🔭 다른 반 교신 구경하기'}</button>`}
-   <button class="btn-g" id="cmMine" ${CM.other?'hidden':''} style="min-height:44px;${CM.mine?'border-color:var(--sun);color:var(--sun)':''}">${CM.mine?'✓ ':''}내 교신만</button>
-   <button class="btn-g" id="cmNoans" ${CM.other?'hidden':''} style="min-height:44px;${CM.noans?'border-color:var(--sun);color:var(--sun)':''}">${CM.noans?'✓ ':''}응답 없는 질문</button>
+   ${isT()||isG()?'':`<button class="${CM.other?'btn-s':'btn-g'}" id="cmOther" style="min-height:44px;${CM.other?'border-color:var(--violet);color:var(--violet)':''}">${CM.other?'← 우리 반 교신으로':'🔭 다른 반 교신 구경하기'}</button>`}
+   <button class="btn-g" id="cmMine" ${CM.other||isG()?'hidden':''} style="min-height:44px;${CM.mine?'border-color:var(--sun);color:var(--sun)':''}">${CM.mine?'✓ ':''}내 교신만</button>
+   <button class="btn-g" id="cmNoans" ${CM.other||isG()?'hidden':''} style="min-height:44px;${CM.noans?'border-color:var(--sun);color:var(--sun)':''}">${CM.noans?'✓ ':''}응답 없는 질문</button>
    <button class="btn-s" id="cmReload" style="min-height:44px">새로고침</button>
-   <button class="btn-p" id="cmNew" ${CM.other?'hidden':''} style="min-height:44px;margin-left:auto;font-size:1rem">${CM.compose?'✕ 닫기':'✏️ 새 교신 보내기'}</button></div>
+   <button class="btn-p" id="cmNew" ${CM.other||isG()?'hidden':''} style="min-height:44px;margin-left:auto;font-size:1rem">${CM.compose?'✕ 닫기':'✏️ 새 교신 보내기'}</button></div>
   <div id="cmCompose" ${CM.compose?'':'hidden'}>${commsComposeHTML(CM.mission||CH[0].no,"출발 전",{pick:true})}
    ${API?"":'<div class="fb no">서버 미연결: 교신이 이 기기에만 저장됩니다. 센터장이 시트를 연결하면 학급 전체가 함께 봅니다.</div>'}</div>
   <div id="cmStat"></div><div id="cmList"><p class="small">불러오는 중…</p></div>`;
@@ -1602,9 +1633,10 @@ function cmCard(r){
 }
 async function loadComms(){
   const L=document.getElementById("cmList"), ST=document.getElementById("cmStat"); if(!L)return;
-  const RO=!isT()&&CM.other; /* 다른 반 구경: 이름 가림 · 읽기 전용 */
-  try{let every=await commsList({cls:(isT()||RO)?"":(me?me.cls:""),mission:CM.mission});
-    if(RO)every=every.filter(r=>me&&String(r.cls)!==String(me.cls)).map(r=>({...r,mine:false,ro:true}));
+  const RO=(!isT()&&CM.other)||isG(); /* 다른 반 구경·참관: 이름 가림 · 읽기 전용 */
+  try{let every=await commsList({cls:(isT()||(RO&&!isG()))?"":(me?me.cls:""),mission:CM.mission});
+    if(isG())every=every.filter(r=>String(r.cls)===String(me.cls)).map(r=>({...r,mine:false,ro:true}));
+    else if(RO)every=every.filter(r=>me&&String(r.cls)!==String(me.cls)).map(r=>({...r,mine:false,ro:true}));
     const cc=document.getElementById("cmCls"); if(cc){const cls=[...new Set(every.map(r=>String(r.cls)).filter(x=>x&&x!=="T"))].sort((a,b)=>(+a||0)-(+b||0)||a.localeCompare(b));
       cc.innerHTML=`<option value="">모든 반</option>`+cls.map(x=>`<option value="${esc(x)}" ${CM.cls===x?'selected':''}>${esc(x)}반</option>`).join("");}
     const all=isT()&&CM.cls?every.filter(r=>String(r.cls)===CM.cls):every; let rows=all;
