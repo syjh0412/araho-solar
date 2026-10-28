@@ -424,6 +424,7 @@ function freshState(){return {pts:0,seen:{},quiz:{},writes:{},wanted:{},exam:{},
 function loadLocal(){try{const j=localStorage.getItem(LS+'_'+(me?me.cls+'_'+me.num:'x')); if(j)S={...freshState(),...JSON.parse(j)};}catch(e){}}
 let saveTimer=null, syncState='off';
 function save(){
+  if(isT()){drawHud();return;} // 센터장 체험 기록은 저장하지 않음 — 다시 들어오면 처음부터
   try{localStorage.setItem(LS+'_'+(me?me.cls+'_'+me.num:'x'),JSON.stringify(S));}catch(e){}
   drawHud();
   if(API&&me){ clearTimeout(saveTimer); setSync('pending'); saveTimer=setTimeout(()=>{
@@ -878,7 +879,7 @@ function renderGate(){
  const eye=gate.querySelector("#gEye"); if(eye){eye.onclick=()=>{const i=gate.querySelector("#gCode");const on=i.style.webkitTextSecurity==="disc";i.style.webkitTextSecurity=on?"none":"disc";eye.textContent=on?"숨김":"보기";};}
  gate.querySelector("#gGo").onclick=go;
  gate.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter")go();});
- gate.querySelector("#gT").onclick=()=>{me={cls:"T",num:"0",name:"센터장"};loadLocal();view="teacher";render();};
+ gate.querySelector("#gT").onclick=()=>{me={cls:"T",num:"0",name:"센터장"};S=freshState();try{localStorage.removeItem(LS+'_T_0');}catch(e){}view="teacher";render();};
  if(API&&!ROSTER_TRIED){ROSTER_TRIED=true; call({action:'names'}).then(r=>{ROSTER=r.roster||null; if(!me)renderGate();}).catch(()=>{if(!me)renderGate();});}
 }
 
@@ -1197,7 +1198,7 @@ function renderTeacher(){
     if(API){try{const r=await call({action:'tlogin',pin:v});TPIN=v;AI_ON=!!r.ai;render();}catch(e){document.getElementById("terr").innerHTML='<div class="fb no">'+esc(e)+'</div>';}}
     else{if(v===LOCAL_TEACHER_CODE){TPIN=v;render();}else document.getElementById("terr").innerHTML='<div class="fb no">코드가 달라요.</div>';}};
   document.getElementById("tc").onkeydown=e=>{if(e.key==="Enter")document.getElementById("tgo").click();};
-  document.getElementById("tback").onclick=()=>{if(me&&me.cls==="T"){me=null;}view="home";render();};
+  document.getElementById("tback").onclick=()=>{if(me&&me.cls==="T"){me=null;S=freshState();}view="home";render();};
   return;
  }
  const setup=`<div class="sec"><button data-sec>▶ ⚙️ 처음 설정 안내 (구글 시트 + Apps Script, 5분)</button><div hidden>
