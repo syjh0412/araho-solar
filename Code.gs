@@ -119,12 +119,17 @@ function findRoster(){
   }
   return null;
 }
+/* 공개 응답에서는 학생 이름 가운데 글자를 가린다 (김민준 → 김○준, 이준 → 이○). 센터장 코드가 맞을 때만 전체 이름. */
+function maskName(n){ n=String(n||'').trim(); if(!n || n==='익명 승무원' || n==='센터장') return n;
+  var c=n.split(''); if(c.length<=1) return n; if(c.length===2) return c[0]+'○';
+  return c[0]+new Array(c.length-1).join('○')+c[c.length-1]; }
+function pinOk(p){ var pin=conf('PIN'); return !!(pin && String(p.pin||'')===pin); }
 function rosterPublic(p){
   var R = findRoster(); if(!R) return {ok:true, roster:null};
   var v = R.sh.getRange(R.head+1,1,Math.max(0,R.sh.getLastRow()-R.head),Math.max(R.ki+1,R.sh.getLastColumn())).getValues();
   var out = {};
   for(var i=0;i<v.length;i++){ var c=String(v[i][R.ci]).trim(), n=String(v[i][R.ni]).trim(), m=String(v[i][R.mi]).trim();
-    if(!c||!n||!m) continue; (out[c]=out[c]||[]).push({num:n,name:m,set:!!String(v[i][R.ki]||'').trim()}); }
+    if(!c||!n||!m) continue; (out[c]=out[c]||[]).push({num:n,name:maskName(m),set:!!String(v[i][R.ki]||'').trim()}); }
   return {ok:true, roster:out};
 }
 function rosterRow(R, cls, num){
@@ -238,14 +243,16 @@ function qlist(p){
   var q = sheet(SHEET_Q, ['id','시각','반','번호','이름','미션','단계','내용','익명','응답수']);
   var a = sheet(SHEET_A, ['id','qid','시각','반','번호','이름','내용','센터장']);
   var qv = q.getDataRange().getValues(), av = a.getDataRange().getValues();
+  var full = pinOk(p), nm = function(x){ return full ? String(x) : maskName(x); };
   var ans = {};
   for(var j=1;j<av.length;j++){ var r=av[j]; (ans[String(r[1])]=ans[String(r[1])]||[]).push({t:r[2]?new Date(r[2]).toISOString():'',cls:r[3],num:r[4],name:r[5],text:r[6],teacher:String(r[7])==='1'}); }
+  for(var aq in ans){ ans[aq].forEach(function(a){ if(!a.teacher) a.name = nm(a.name); }); }
   var rows=[];
   for(var i=qv.length-1;i>=1 && rows.length<300;i--){ var x=qv[i];
     if(p.cls && String(x[2])!==String(p.cls)) continue;
     if(p.mission && String(x[5])!==String(p.mission)) continue;
     var anon = String(x[8])==='1';
-    rows.push({id:x[0], t:x[1]?new Date(x[1]).toISOString():'', cls:x[2], num:anon?'':x[3], name:anon?'익명 승무원':x[4], mine:(String(x[2])===String(p.cls)&&String(x[3])===String(p.num)), mission:x[5], phase:x[6], text:x[7], answers:ans[String(x[0])]||[]});
+    rows.push({id:x[0], t:x[1]?new Date(x[1]).toISOString():'', cls:x[2], num:anon?'':x[3], name:anon?'익명 승무원':nm(x[4]), mine:(String(x[2])===String(p.cls)&&String(x[3])===String(p.num)), mission:x[5], phase:x[6], text:x[7], answers:ans[String(x[0])]||[]});
   }
   return {ok:true, rows:rows};
 }

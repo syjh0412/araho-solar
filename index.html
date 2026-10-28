@@ -632,6 +632,8 @@ function directorSVG(size){
 }
 function checkUnlock(before,after){ITEMS.forEach(it=>{if(before<it.at&&after>=it.at)setTimeout(()=>toast(`${it.e} 장비 획득: ${it.n}!`),600);});
   const rb=RANKS.filter(r=>before>=r[0]).length,ra=RANKS.filter(r=>after>=r[0]).length; if(ra>rb)setTimeout(()=>toast(`🎖️ 승급! ${RANKS[ra-1][1]}`),1400);}
+/* 화면 보호용: 학생 이름 가운데 글자 가리기 (서버도 같은 규칙으로 가려서 보낸다) */
+function maskName(n){n=String(n||"").trim();const c=[...n];if(c.length<=1||n.includes("○"))return n;if(c.length===2)return c[0]+"○";return c[0]+"○".repeat(c.length-2)+c[c.length-1];}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 const IMG=(n,cap,cls)=>`<div class="fig ${cls||'tall'}"><img src="img/${n}.jpg" alt="${esc(cap||n)}" loading="lazy">${cap?`<div class="cap">${cap}</div>`:""}</div>`;
 
@@ -949,7 +951,7 @@ function renderGate(){
    cs.onchange=()=>{const list=(ROSTER[cs.value]||[]).slice().sort((x,y)=>Number(x.num)-Number(y.num));
      ns.disabled=!list.length; ns.innerHTML='<option value="">선택</option>'+list.map(x=>`<option value="${esc(x.num)}">${esc(x.num)}번</option>`).join(""); nm.innerHTML='<div class="av">🧑‍🚀</div><div class="small">번호를 고르세요</div>';};
    ns.onchange=()=>{const st=(ROSTER[cs.value]||[]).find(x=>x.num===ns.value); if(!st)return;
-     nm.innerHTML=`<div class="av">🧑‍🚀</div><div><div class="nm">${esc(st.name)}</div><div class="small">${esc(cs.value)}반 ${esc(st.num)}번 · ${st.set?"콜사인을 입력하세요":"<b style='color:var(--sun)'>첫 입장!</b> 콜사인을 새로 정하세요"}</div></div>`;
+     nm.innerHTML=`<div class="av">🧑‍🚀</div><div><div class="nm">${esc(maskName(st.name))} <span class="small" style="font-family:var(--body)">— 내 이름 맞나요?</span></div><div class="small">${esc(cs.value)}반 ${esc(st.num)}번 · ${st.set?"콜사인을 입력하세요":"<b style='color:var(--sun)'>첫 입장!</b> 콜사인을 새로 정하세요"}</div></div>`;
      gate.querySelector("#gCode").placeholder=st.set?"콜사인":"새 콜사인 (2~8자)";};
  }
  const go=async()=>{
@@ -1572,7 +1574,7 @@ const LSC="araho_comms_local";
 function localComms(){try{return JSON.parse(localStorage.getItem(LSC)||"[]");}catch(e){return [];}}
 function saveLocalComms(a){try{localStorage.setItem(LSC,JSON.stringify(a.slice(0,300)));}catch(e){}}
 async function commsList(f){
-  if(API){const r=await call({action:'qlist',cls:f.cls||'',num:me?me.num:'',mission:f.mission||''});
+  if(API){const r=await call({action:'qlist',cls:f.cls||'',num:me?me.num:'',mission:f.mission||'',pin:isT()?TPIN:''});
     const my=new Set((S.myq||[]).map(String));
     return (r.rows||[]).map(x=>({...x,mine:!!(x.mine||my.has(String(x.id))||(me&&x.num!==''&&String(x.cls)===String(me.cls)&&String(x.num)===String(me.num)))}));}
   let rows=localComms(); if(f.cls)rows=rows.filter(x=>String(x.cls)===String(f.cls)); if(f.mission)rows=rows.filter(x=>x.mission===f.mission); return rows.map(x=>({...x,mine:me&&x.cls===me.cls&&x.num===me.num}));
