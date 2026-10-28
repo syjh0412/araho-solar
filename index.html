@@ -1089,7 +1089,8 @@ function grMigrate(st){ /* 예전 기록(c2 슬라이드 번호)을 새 순서�
 function mountGraph(root,k){
  const G=S.graph=S.graph||{}; G.v=G.v||[0,0,1,0,0,0,0,0]; G.v[2]=1; let cur=G.cur??0, drag=false;
  const L=56,T=16,CW=60,UH=30,W=CW*8,H=UH*12; const y=v=>T+H-v*UH;
- const ok=i=>Math.abs(G.v[i]-GR[i][2])<=(GR[i][2]<2?0.15:0.3);
+ const tol=i=>GR[i][2]<2?0.15:0.4; /* 이 범위 안에 놓으면 정확한 값에 자석처럼 붙는다 */
+ const ok=i=>Math.abs(G.v[i]-GR[i][2])<=tol(i)+1e-9;
  const allOk=()=>GR.every((_,i)=>ok(i));
  function svg(){
   let g=`<svg id="grsvg" viewBox="0 0 ${L+W+14} ${T+H+106}" style="width:100%;display:block;touch-action:none;user-select:none">`;
@@ -1103,7 +1104,8 @@ function mountGraph(root,k){
   GR.forEach((p,i)=>{const cx=L+i*CW+CW/2,v=G.v[i],sel=i===cur;
    if(sel)g+=`<rect x="${L+i*CW}" y="${T}" width="${CW}" height="${H}" fill="#ffb13b22"/>`;
    if(G.show)g+=`<line x1="${cx-24}" x2="${cx+24}" y1="${y(p[2])}" y2="${y(p[2])}" stroke="#ff4d6d" stroke-width="2.5" stroke-dasharray="5 3"/>`;
-   if(v>0)g+=`<rect x="${cx-17}" y="${y(v)}" width="34" height="${v*UH}" fill="${i===2?'#b8b0e8':'#ffb13b'}" stroke="${i===2?'#8f86cf':'#d98a12'}" stroke-width="1.5"/><text x="${cx}" y="${y(v)-6}" text-anchor="middle" font-size="13" font-weight="700" fill="#2a3050" paint-order="stroke" stroke="#f7f8fc" stroke-width="3">${v.toFixed(v<2?2:1).replace(/0$/,'').replace(/\.$/,'')}</text>`;
+   const snap=i!==2&&v===p[2];
+   if(v>0)g+=`<rect x="${cx-17}" y="${y(v)}" width="34" height="${v*UH}" fill="${i===2?'#b8b0e8':'#ffb13b'}" stroke="${i===2?'#8f86cf':snap?'#14b87a':'#d98a12'}" stroke-width="${snap?3:1.5}"/><text x="${cx}" y="${y(v)-6}" text-anchor="middle" font-size="13" font-weight="700" fill="${snap?'#0f8a5c':'#2a3050'}" paint-order="stroke" stroke="#f7f8fc" stroke-width="3">${snap?p[2]+' ✓':v.toFixed(v<2?2:1).replace(/0$/,'').replace(/\.$/,'')}</text>`;
    if(G.chk&&i!==2)g+=`<text x="${cx}" y="${T+H+94}" text-anchor="middle" font-size="16">${ok(i)?'✅':'❌'}</text>`;
    g+=`<clipPath id="grc${i}"><circle cx="${cx}" cy="${T+H+20}" r="13"/></clipPath><image href="img/${p[1]}.jpg" x="${cx-13}" y="${T+H+7}" width="26" height="26" preserveAspectRatio="xMidYMid slice" clip-path="url(#grc${i})"/>
    <text x="${cx}" y="${T+H+52}" text-anchor="middle" font-size="${p[0].length>2?13:15}" font-weight="${sel?900:500}" fill="${sel?'#ffb13b':'#e9ecff'}">${p[0]}</text>
@@ -1116,7 +1118,7 @@ function mountGraph(root,k){
     <li><b>세로축 눈금 읽기</b> — 0부터 12까지, <em>한 칸 = 1</em>. 이미 그려진 <b>지구 막대가 딱 한 칸</b>이에요. 이게 기준!</li>
     <li><b>표에서 값 찾기</b> — 아래 행성을 하나 고르면 그 행성의 반지름과 그릴 위치가 나와요.</li>
     <li><b>눈금 사이 어림하기</b> — 값이 눈금 사이에 있으면 어느 쪽에 더 가까운지 봐요. 0.5는 한 칸의 <em>절반</em>(점선).</li>
-    <li><b>막대 그리기</b> — 0에서 그 높이까지 같은 폭으로 칠하기. 그래프 칸을 <em>누르거나 끌어서</em> 높이를 맞춰요.</li>
+    <li><b>막대 그리기</b> — 0에서 그 높이까지 같은 폭으로 칠하기. 그래프 칸을 <em>누르거나 끌어서</em> 높이를 맞춰요. 거의 맞는 자리에 가면 정확한 값에 <em>착 붙고</em> 초록 테두리 + ✓가 떠요.</li>
     <li><b>두 집단 나누기</b> — 키가 비슷한 막대끼리 묶어요. 막대 사이에 <em>큰 틈</em>이 생기는 곳이 경계!</li>
    </ol>
    <div class="grpick">${GR.map((p,i)=>`<button data-i="${i}" class="${i===cur?'on':''} ${G.chk&&i!==2?(ok(i)?'y':'n'):''}">${p[0]}</button>`).join("")}</div>
@@ -1132,7 +1134,9 @@ function mountGraph(root,k){
  function setFrom(e){const sv=root.querySelector("#grsvg"),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(sv.getScreenCTM().inverse());
   const i=Math.floor((q.x-L)/CW); if(i<0||i>7)return; if(i!==cur){cur=G.cur=i;}
   if(i===2){redraw();return;}
-  let v=(T+H-q.y)/UH; v=Math.max(0,Math.min(12,v)); v=v<2?Math.round(v*20)/20:Math.round(v*10)/10; G.v[i]=v; G.chk=false; redraw();}
+  let v=(T+H-q.y)/UH; v=Math.max(0,Math.min(12,v)); v=v<2?Math.round(v*20)/20:Math.round(v*10)/10;
+  if(Math.abs(v-GR[i][2])<=tol(i)){ if(G.v[i]!==GR[i][2]){try{navigator.vibrate&&navigator.vibrate(12);}catch(_){}} v=GR[i][2]; }
+  G.v[i]=v; G.chk=false; redraw();}
  function redraw(){const f=root.querySelector(".figure");f.innerHTML=f.innerHTML.replace(/<svg[\s\S]*<\/svg>/,svg());root.querySelector("#grinfo").innerHTML=info();
   root.querySelectorAll(".grpick button").forEach(b=>{b.classList.toggle("on",+b.dataset.i===cur);if(!G.chk)b.classList.remove("y","n");});bindSvg();}
  function bindSvg(){const h=root.querySelector("#grhit");
