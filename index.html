@@ -382,7 +382,7 @@ body.deckmode .toast{bottom:110px}
 <div id="stage" hidden></div>
 <nav id="tabs">
   <button data-v="home"><span class="ic">🛰️</span>관제센터</button>
-  <button data-v="crew"><span class="ic">👨‍🚀</span>승무원실</button>
+  <button data-v="crew"><span class="ic">🧑‍🚀</span>승무원실</button>
   <button data-v="learn"><span class="ic">📚</span>미션 학습</button>
   <button data-v="wanted"><span class="ic">🔭</span>수배 파일</button>
   <button data-v="exam"><span class="ic">✍️</span>논술 시험</button>
@@ -440,7 +440,7 @@ function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length
 /* 장비: 점수를 모으면 우주복이 한 점씩 갖춰진다 */
 const ITEMS=[
  {k:"gloves",at:15,n:"장갑·부츠",e:"🧤",d:"선외 활동용 두꺼운 장갑과 부츠. 색을 고를 수 있다."},
- {k:"suit",at:30,n:"우주복",e:"👨‍🚀",d:"고천 관제센터 지급품. 색은 네가 고른다."},
+ {k:"suit",at:30,n:"우주복",e:"🧑‍🚀",d:"고천 관제센터 지급품. 색은 네가 고른다."},
  {k:"helmet",at:50,n:"헬멧",e:"🪖",d:"이제 선외 활동(EVA) 자격이 생겼다. 바이저를 고를 수 있다."},
  {k:"pack",at:75,n:"생명유지 배낭",e:"🎒",d:"산소·물·냉각수. 8시간 버틸 수 있다."},
  {k:"jet",at:100,n:"제트팩",e:"🚀",d:"우주 공간에서 방향을 바꾸는 추진 장치."},
@@ -472,10 +472,12 @@ function cpnBind(root){root.querySelectorAll(".cpn").forEach(bt=>bt.onclick=asyn
 const SUITS={white:["#f2f4fa","#c3c9dc","흰색"],orange:["#ff9a3c","#c9641a","주황"],blue:["#6fb6ff","#2f6fc9","파랑"],mint:["#8df0d2","#3fae8e","민트"],black:["#3a4160","#1b2038","검정"]};
 const GLOVES={white:["#eef0f6","#b9c0d6","흰색"],black:["#2a3050","#141830","검정"],orange:["#ff9a3c","#c9641a","주황"],red:["#ff6b6b","#b83a3a","빨강"]};
 const VISORS={clear:["#bfe8ff","#e9f7ff",.28,"투명"],blue:["#4f8fe8","#bfe0ff",.55,"파랑 미러"],gold:["#ffd166","#fff3c4",.62,"황금(✨ 황금 바이저 필요)"]};
-function sty(){S.sty=S.sty||{};return {suit:S.sty.suit||S.suit||"white",glove:S.sty.glove||"white",visor:(S.sty.visor==="gold"&&!have("visor"))?"clear":(S.sty.visor||"clear")};}
-function astronautSVG(pts,suit,size){
+const HAIRS={dbrown:["#2b1d16","#4a3328","흑갈색"],black:["#16131a","#3a3540","검정"],brown:["#6b4226","#94603a","갈색"],blond:["#d9a441","#f3d27a","금발"]};
+const LOOKS={m:"남자 승무원",f:"여자 승무원"};
+function sty(){S.sty=S.sty||{};return {look:S.sty.look==="f"?"f":"m",hair:HAIRS[S.sty.hair]?S.sty.hair:"dbrown",suit:S.sty.suit||S.suit||"white",glove:S.sty.glove||"white",visor:(S.sty.visor==="gold"&&!have("visor"))?"clear":(S.sty.visor||"clear")};}
+function astronautSVG(pts,suit,size,o){
   const p=pts==null?S.pts:pts; const H=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&p>=it.at;};
-  const st=sty(); const [c1,c2]=SUITS[suit||st.suit]||SUITS.white; const [g1,g2]=GLOVES[st.glove]||GLOVES.white; const [v1,v2,vo]=VISORS[st.visor]||VISORS.clear;
+  const st=Object.assign(sty(),o||{}); const [h1,h2]=HAIRS[st.hair]||HAIRS.dbrown; const F=st.look==="f"; const [c1,c2]=SUITS[suit||st.suit]||SUITS.white; const [g1,g2]=GLOVES[st.glove]||GLOVES.white; const [v1,v2,vo]=VISORS[st.visor]||VISORS.clear;
   const sz=size||200, uid="a"+Math.floor(Math.random()*1e6);
   const suitOn=H("suit"), body=suitOn?c1:"#6b7390", bodyD=suitOn?c2:"#454c6b";
   return `<svg viewBox="0 0 240 320" width="${sz}" height="${sz*1.33}" style="display:block;max-width:100%;height:auto">
@@ -510,11 +512,20 @@ function astronautSVG(pts,suit,size){
   <!-- 목 고리 -->
   <ellipse cx="120" cy="108" rx="30" ry="9" fill="${suitOn?"#9aa3bd":"#5a6180"}" stroke="${bodyD}" stroke-width="2"/>
   <!-- 머리 -->
+  ${F?(H("helmet")?`<path d="M84 58 q-4 26 -4 42 q2 8 10 8 q10 0 16 -6 q-6 -16 -4 -44z M156 58 q4 26 4 42 q-2 8 -10 8 q-10 0 -16 -6 q6 -16 4 -44z" fill="${h1}"/>`
+   :`<path d="M84 58 q-4 30 -6 52 q0 10 10 12 q12 2 18 -6 q-6 -20 -4 -50z M156 58 q4 30 6 52 q0 10 -10 12 q-12 2 -18 -6 q6 -20 4 -50z" fill="${h1}"/><path d="M84 70 q-2 22 -2 40 M156 70 q2 22 2 40" stroke="${h2}" stroke-width="2.5" fill="none" opacity=".55" stroke-linecap="round"/>`):""}
   <ellipse cx="120" cy="66" rx="34" ry="38" fill="url(#${uid}f)"/>
-  <path d="M86 62 q2 -36 34 -38 q34 2 36 38 q-8 -16 -36 -16 q-28 0 -34 16z" fill="#2b1d16"/><path d="M90 48 q10 -14 30 -12" stroke="#4a3328" stroke-width="3" fill="none" opacity=".6"/>
+  ${F?`<path d="M85 66 q-2 -42 36 -42 q36 2 35 42 q-4 -14 -14 -22 q-10 14 -40 16 q-10 0 -17 6z" fill="${h1}"/><path d="M96 42 q14 -12 34 -8" stroke="${h2}" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/>
+  <g transform="translate(146 40) rotate(15)"><path d="M0 -8 l2.4 5 5.4 .6 -4 3.7 1.1 5.4 -4.9 -2.7 -4.9 2.7 1.1 -5.4 -4 -3.7 5.4 -.6z" fill="#ffd166" stroke="#e09a2a" stroke-width="1"/></g>
+  <ellipse cx="106" cy="69" rx="4.3" ry="5" fill="#1a120e"/><ellipse cx="134" cy="69" rx="4.3" ry="5" fill="#1a120e"/><circle cx="107.6" cy="67.2" r="1.5" fill="#fff"/><circle cx="135.6" cy="67.2" r="1.5" fill="#fff"/>
+  <path d="M101.5 65.5 l-3.5 -2.5 M102.5 64 l-2 -3.5 M138.5 65.5 l3.5 -2.5 M137.5 64 l2 -3.5" stroke="#1a120e" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M100 58 q6 -4 13 -1 M127 57 q7 -3 13 1" stroke="${h1}" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="97" cy="80" rx="6" ry="3.5" fill="#ff8fa3" opacity=".45"/><ellipse cx="143" cy="80" rx="6" ry="3.5" fill="#ff8fa3" opacity=".45"/>
+  <path d="M112 86 q8 7 16 0" stroke="#c4536b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M119 77 q1.5 2.5 0 4" stroke="#c98f72" stroke-width="1.4" fill="none"/>`
+  :`<path d="M86 62 q2 -36 34 -38 q34 2 36 38 q-8 -16 -36 -16 q-28 0 -34 16z" fill="${h1}"/><path d="M90 48 q10 -14 30 -12" stroke="${h2}" stroke-width="3" fill="none" opacity=".6"/>
   <ellipse cx="106" cy="68" rx="4" ry="4.5" fill="#1a120e"/><ellipse cx="134" cy="68" rx="4" ry="4.5" fill="#1a120e"/><circle cx="107.5" cy="66.5" r="1.3" fill="#fff"/><circle cx="135.5" cy="66.5" r="1.3" fill="#fff"/>
-  <path d="M99 58 q7 -4 14 0 M127 58 q7 -4 14 0" stroke="#2b1d16" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M110 86 q10 8 20 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M118 76 q2 3 0 5" stroke="#c98f72" stroke-width="1.5" fill="none"/>
+  <path d="M99 58 q7 -4 14 0 M127 58 q7 -4 14 0" stroke="${h1}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M110 86 q10 8 20 0" stroke="#b05a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M118 76 q2 3 0 5" stroke="#c98f72" stroke-width="1.5" fill="none"/>`}
   ${H("helmet")?`<circle cx="120" cy="66" r="50" fill="url(#${uid}v)" stroke="#e6ecff" stroke-width="5"/><path d="M80 52 q20 -34 60 -22" stroke="#fff" stroke-width="4" fill="none" opacity=".55" stroke-linecap="round"/><path d="M158 86 q-6 18 -24 26" stroke="#fff" stroke-width="2" fill="none" opacity=".35" stroke-linecap="round"/><rect x="100" y="110" width="40" height="8" rx="3" fill="#9aa3bd" stroke="${bodyD}"/>`:""}
   ${H("robot")?`<g><rect x="6" y="196" width="34" height="40" rx="9" fill="url(#${uid}m)" stroke="#5fe3ff" stroke-width="2"/><rect x="12" y="206" width="22" height="12" rx="4" fill="#0a0f2c"/><circle cx="18" cy="212" r="2.5" fill="#5fe3ff"/><circle cx="28" cy="212" r="2.5" fill="#5fe3ff"/><rect x="14" y="224" width="18" height="3" rx="1.5" fill="#3b4a9a"/><line x1="23" y1="196" x2="23" y2="184" stroke="#5fe3ff" stroke-width="2"/><circle cx="23" cy="181" r="3.5" fill="#ffb13b"><animate attributeName="opacity" values="1;.3;1" dur="1.2s" repeatCount="indefinite"/></circle><rect x="2" y="238" width="42" height="6" rx="3" fill="#3b4a9a"/></g>`:""}
   </svg>`;
@@ -832,7 +843,7 @@ function renderGate(){
  const classes=hasR?Object.keys(ROSTER).sort((x,y)=>x.localeCompare(y,'ko',{numeric:true})):[];
  gate.innerHTML=`<div class="gatebox"><div class="comms">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1><p class="sub">승무원 신분을 확인합니다.</p>
   ${hasR?`<div class="row2"><div><label>반</label><select id="gCls"><option value="">선택</option>${classes.map(c=>`<option>${esc(c)}</option>`).join("")}</select></div><div><label>번호</label><select id="gNum" disabled><option value="">반 먼저</option></select></div></div>
-   <div id="gName" class="idcard" style="margin-top:12px;min-height:72px"><div class="av">👩‍🚀</div><div class="small">반과 번호를 고르면 이름이 나와요</div></div>
+   <div id="gName" class="idcard" style="margin-top:12px;min-height:72px"><div class="av">🧑‍🚀</div><div class="small">반과 번호를 고르면 이름이 나와요</div></div>
    <label>콜사인 <span class="small">— 나만의 호출 부호(비밀번호). 처음이면 지금 정하세요 (2~8자)</span></label><div style="position:relative"><input type="text" id="gCode" placeholder="예) 독수리, 블루문" autocomplete="off" autocapitalize="off" spellcheck="false" lang="ko" style="-webkit-text-security:disc;padding-right:64px"><button type="button" id="gEye" class="btn-g" style="position:absolute;right:6px;top:6px;bottom:6px;min-height:0;padding:0 12px;font-size:.9rem">보기</button></div>`
   :`<div class="row2"><div><label>반</label><input type="text" id="gCls" inputmode="numeric" placeholder="예) 3"></div><div><label>번호</label><input type="text" id="gNum" inputmode="numeric" placeholder="예) 12"></div></div>
    <label>이름</label><input type="text" id="gNameIn" placeholder="이름">`}
@@ -842,9 +853,9 @@ function renderGate(){
  if(hasR){
    const cs=gate.querySelector("#gCls"),ns=gate.querySelector("#gNum"),nm=gate.querySelector("#gName");
    cs.onchange=()=>{const list=(ROSTER[cs.value]||[]).slice().sort((x,y)=>Number(x.num)-Number(y.num));
-     ns.disabled=!list.length; ns.innerHTML='<option value="">선택</option>'+list.map(x=>`<option value="${esc(x.num)}">${esc(x.num)}번</option>`).join(""); nm.innerHTML='<div class="av">👩‍🚀</div><div class="small">번호를 고르세요</div>';};
+     ns.disabled=!list.length; ns.innerHTML='<option value="">선택</option>'+list.map(x=>`<option value="${esc(x.num)}">${esc(x.num)}번</option>`).join(""); nm.innerHTML='<div class="av">🧑‍🚀</div><div class="small">번호를 고르세요</div>';};
    ns.onchange=()=>{const st=(ROSTER[cs.value]||[]).find(x=>x.num===ns.value); if(!st)return;
-     nm.innerHTML=`<div class="av">👩‍🚀</div><div><div class="nm">${esc(st.name)}</div><div class="small">${esc(cs.value)}반 ${esc(st.num)}번 · ${st.set?"콜사인을 입력하세요":"<b style='color:var(--sun)'>첫 입장!</b> 콜사인을 새로 정하세요"}</div></div>`;
+     nm.innerHTML=`<div class="av">🧑‍🚀</div><div><div class="nm">${esc(st.name)}</div><div class="small">${esc(cs.value)}반 ${esc(st.num)}번 · ${st.set?"콜사인을 입력하세요":"<b style='color:var(--sun)'>첫 입장!</b> 콜사인을 새로 정하세요"}</div></div>`;
      gate.querySelector("#gCode").placeholder=st.set?"콜사인":"새 콜사인 (2~8자)";};
  }
  const go=async()=>{
@@ -883,7 +894,7 @@ function renderHome(){
     <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${isT()?directorSVG(150):astronautSVG(null,null,150)}</div>
     <div style="flex:1;min-width:220px"><div class="comms">${isT()?"FLIGHT DIRECTOR":"CREW ID"}</div><div style="font-family:var(--disp);font-size:1.6rem">${isT()?"센터장":esc(me.name)}</div><div class="small">${isT()?"고천 관제센터 총괄 · 임무 지시와 승인":esc(me.cls)+"반 "+esc(me.num)+"번 · 고천 관제센터"}</div>
      ${isT()?`<button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">📋 센터장 콘솔로</button>`:`<div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
-     <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">👨‍🚀 승무원실 — 장비·꾸미기·보급</button>`}</div></div>
+     <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">🧑‍🚀 승무원실 — 모습·장비·꾸미기·보급</button>`}</div></div>
    <h3 style="margin-top:18px">훈장</h3>
    <div class="badgerow">${CH.map(c=>{const p=chapProg(c);return `<span class="badge ${p.d>=p.total?'on':''}">${c.no} ${p.d}/${p.total}</span>`;}).join("")}
    <span class="badge ${Object.keys(S.wanted).length>=WANTED.length?'on':''}">🔭 수배 ${Object.keys(S.wanted).length}/${WANTED.length}</span>
@@ -899,7 +910,7 @@ function renderHome(){
 const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (최대 15건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
 function renderCrew(){
  if(isT()){
-  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실 <span class="small">— 센터장 참고용</span></h2>
+  app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">🧑‍🚀 승무원실 <span class="small">— 센터장 참고용</span></h2>
   <p class="small" style="margin:0 4px 12px">학생이 보는 승급·장비·점수 기준입니다. 센터장은 점수가 쌓이지 않습니다.</p>
   <div class="crew3">
    <div class="card" style="text-align:center;margin:0"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${directorSVG(220)}</div><div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">센터장</div><div class="small">고천 관제센터 · 플라이트 디렉터</div>
@@ -914,14 +925,17 @@ function renderCrew(){
  }
  const {r,next}=rank(); const nextItem=ITEMS.find(i=>S.pts<i.at); const ri=RANKS.filter(x=>S.pts>=x[0]).length-1;
  const sw=(t,obj,cur,shape,lockFn)=>`<div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">${Object.entries(obj).map(([k,v])=>{const lock=lockFn&&lockFn(k);return `<button class="stybtn" data-t="${t}" data-v="${k}" title="${v[v.length-1]}" ${lock?'disabled':''} style="min-height:0;width:44px;height:44px;padding:0;border-radius:${shape};background:${t==='visor'?`radial-gradient(circle at 35% 30%,${v[1]},${v[0]})`:v[0]};border:3px solid ${cur===k?'var(--sun)':'#0000'};${lock?'opacity:.35':''}"></button>`;}).join("")}</div>`;
- app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">👨‍🚀 승무원실</h2>
- <p class="small" style="margin:0 4px 12px">점수를 모으면 장비가 지급되고, 지급된 장비는 색과 모양을 고를 수 있어요.</p>
+ app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">🧑‍🚀 승무원실</h2>
+ <p class="small" style="margin:0 4px 12px">승무원 모습과 머리 색은 처음부터 고를 수 있고, 장비는 점수를 모으면 지급돼요.</p>
  <div class="crew3">
   <div class="card" style="text-align:center;margin:0"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${astronautSVG(null,null,220)}</div>
    <div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">${esc(me.name)}</div><div style="font-family:var(--disp);color:var(--sun);font-size:1.2rem">${r}</div>
    <div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
    <div style="text-align:left;margin-top:16px">
-    <div class="small">우주복 ${have("suit")?"":"<span class='pill'>30점에 지급</span>"}</div>${have("suit")?sw("suit",SUITS,sty().suit,"50%"):""}
+    <div class="small">내 승무원 모습 ${S.sty&&S.sty.look?"":"<b style='color:var(--sun)'>· 먼저 골라 보세요!</b>"}</div>
+    <div style="display:flex;gap:10px;margin-top:6px">${Object.entries(LOOKS).map(([k,v])=>`<button class="stybtn" data-t="look" data-v="${k}" title="${v}" style="min-height:0;flex:1;padding:6px 4px 4px;border-radius:14px;background:#ffffff0d;border:3px solid ${S.sty&&S.sty.look&&sty().look===k?'var(--sun)':'#ffffff22'};color:var(--fg)"><span style="display:block;height:64px;overflow:hidden"><span style="display:inline-block;width:56px">${astronautSVG(null,null,56,{look:k})}</span></span><span class="small" style="display:block;color:var(--fg)">${v}</span></button>`).join("")}</div>
+    <div class="small" style="margin-top:12px">머리 색</div>${sw("hair",HAIRS,sty().hair,"50%")}
+    <div class="small" style="margin-top:12px">우주복 ${have("suit")?"":"<span class='pill'>30점에 지급</span>"}</div>${have("suit")?sw("suit",SUITS,sty().suit,"50%"):""}
     <div class="small" style="margin-top:12px">장갑·부츠 ${have("gloves")?"":"<span class='pill'>15점에 지급</span>"}</div>${have("gloves")?sw("glove",GLOVES,sty().glove,"10px"):""}
     <div class="small" style="margin-top:12px">헬멧 바이저 ${have("helmet")?"":"<span class='pill'>50점에 지급</span>"}</div>${have("helmet")?sw("visor",VISORS,sty().visor,"50%",k=>k==="gold"&&!have("visor")):""}
    </div></div>
@@ -1259,7 +1273,7 @@ function chapProgFrom(c,st){let d=0;c.slides.forEach((sl,i)=>{const k=c.id+"_"+i
 async function showDetail(x){
  const D=document.getElementById("tdetail"); let st={};try{st=JSON.parse(x.state||'{}');}catch(e){}
  const writes=Object.entries(st.writes||{}); const exam=Object.entries(st.exam||{});
- D.innerHTML=`<div class="card"><h3>👩‍🚀 ${esc(x.name)} <span class="small">(${esc(x.cls)}반 ${esc(x.num)}번 · ⭐${esc(x.pts)} · ${esc(x.rank)})</span></h3>
+ D.innerHTML=`<div class="card"><h3>🧑‍🚀 ${esc(x.name)} <span class="small">(${esc(x.cls)}반 ${esc(x.num)}번 · ⭐${esc(x.pts)} · ${esc(x.rank)})</span></h3>
   <div class="row2"><div><h4 style="margin:10px 0 4px;color:var(--cyan)">한 줄 논술 ${writes.length}건</h4>${writes.length?writes.map(([k,w])=>`<div class="frame" style="color:var(--fg)"><b style="color:var(--sun)">${esc(k)}</b> <span class="pill ${w.ok?'g':'w'}">${w.ok?'통과':'연습 중'} ${esc(w.g||'')}</span><br>${esc(w.t)}</div>`).join(""):'<p class="small">없음</p>'}</div>
   <div><h4 style="margin:10px 0 4px;color:var(--cyan)">논술 시험 답안 ${exam.length}/3</h4>${exam.length?exam.map(([n,v])=>`<div class="frame" style="color:var(--fg)"><b style="color:var(--sun)">문항 ${esc(n)}</b> <span class="pill">자동점검 ${esc(v.g||'-')}</span><br>${esc(v.t)}</div>`).join(""):'<p class="small">없음</p>'}
   <h4 style="margin:14px 0 4px;color:var(--cyan)">수배 파일 ${Object.keys(st.wanted||{}).length}/${WANTED.length}</h4>${Object.entries(st.wanted||{}).map(([id,v])=>{const w=WANTED.find(z=>z.id===id);return `<span class="pill g">${w?w.a:id}</span> <span class="small">${esc(v.memo||'')}</span><br>`;}).join("")}</div></div>
