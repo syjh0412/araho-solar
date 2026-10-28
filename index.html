@@ -435,6 +435,10 @@ body.deckmode .toast{bottom:110px}
    ═══════════════════════════════════════════════════════════ */
 const API = 'https://script.google.com/macros/s/AKfycbxO1J0sjikl0jaeyOE69k4smdRIjDSTgEiPbJzWzwPWFVCiiegVXFVlBqDVRUuiV9gJfg/exec';
 const LOCAL_TEACHER_CODE = '0726';   // 서버가 없을 때만 쓰는 임시 센터장 코드
+/* ② 학교 이름 — 화면 곳곳(관제센터 이름, 미션 패치)에 쓰인다. SCHOOL은 두 글자 정도가 패치에 예쁘게 들어간다. */
+const SCHOOL = '고천';                 // 예: '고천' → '고천 관제센터'
+const SCHOOL_FULL = '고천중학교';
+const SCHOOL_STORY = '고천(古川), 오래된 냇물은 흘러 바다에 닿는다 — 그리고 별들의 바다, 우주로. ';  // 첫 화면 이야기(학교 이름 풀이). 비워 둬도 된다.
 
 /* ───────── 서버 통신 (힘탐정과 같은 방식: 읽기 JSONP, 쓰기 POST) ───────── */
 let seq=0;
@@ -477,11 +481,11 @@ function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length
 /* 장비: 점수를 모으면 우주복이 한 점씩 갖춰진다 */
 const ITEMS=[
  {k:"gloves",at:15,n:"장갑·부츠",e:"🧤",d:"선외 활동용 두꺼운 장갑과 부츠. 색을 고를 수 있다."},
- {k:"suit",at:30,n:"우주복",e:"🧑‍🚀",d:"고천 관제센터 지급품. 색은 네가 고른다."},
+ {k:"suit",at:30,n:"우주복",e:"🧑‍🚀",d:SCHOOL+" 관제센터 지급품. 색은 네가 고른다."},
  {k:"helmet",at:50,n:"헬멧",e:"🪖",d:"이제 선외 활동(EVA) 자격이 생겼다. 바이저를 고를 수 있다."},
  {k:"pack",at:75,n:"생명유지 배낭",e:"🎒",d:"산소·물·냉각수. 8시간 버틸 수 있다."},
  {k:"jet",at:100,n:"제트팩",e:"🚀",d:"우주 공간에서 방향을 바꾸는 추진 장치."},
- {k:"patch",at:125,n:"고천 미션 패치",e:"🏷️",d:"고천중 관제센터 공식 패치. 가슴에 단다."},
+ {k:"patch",at:125,n:SCHOOL+" 미션 패치",e:"🏷️",d:SCHOOL_FULL+" 관제센터 공식 패치. 가슴에 단다."},
  {k:"robot",at:150,n:"반려 로봇 '아라'",e:"🤖",d:"아라호가 보내준 작은 친구. 계산이 빠르다."},
  {k:"visor",at:170,n:"황금 바이저",e:"✨",d:"태양빛을 막는 금 코팅. 베테랑의 상징."},
  {k:"cmd",at:190,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
@@ -538,7 +542,7 @@ function astronautSVG(pts,suit,size,o){
   <path d="M120 112 v100" stroke="${bodyD}" stroke-width="2" opacity=".5"/><path d="M84 160 h72" stroke="${bodyD}" stroke-width="1.5" opacity=".4"/>
   ${suitOn?`<rect x="92" y="138" width="56" height="36" rx="8" fill="#0d1335" stroke="${bodyD}" stroke-width="2"/><circle cx="104" cy="150" r="4" fill="#3fe6a6"/><circle cx="120" cy="150" r="4" fill="#ffb13b"/><circle cx="136" cy="150" r="4" fill="#5fe3ff"/><rect x="100" y="160" width="40" height="6" rx="3" fill="#3b4a9a"/><rect x="82" y="188" width="18" height="10" rx="3" fill="${bodyD}" opacity=".7"/><rect x="140" y="188" width="18" height="10" rx="3" fill="${bodyD}" opacity=".7"/>`
    :`<path d="M100 110 l20 22 l20 -22" fill="none" stroke="#454c6b" stroke-width="3"/><rect x="110" y="140" width="20" height="26" rx="4" fill="#454c6b" opacity=".6"/>`}
-  ${H("patch")?`<circle cx="150" cy="128" r="12" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><circle cx="150" cy="128" r="6" fill="none" stroke="#5fe3ff" stroke-width="1.5"/><text x="150" y="131.5" text-anchor="middle" font-size="8" fill="#ffb13b" font-weight="900">고천</text>`:""}
+  ${H("patch")?`<circle cx="150" cy="128" r="12" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><circle cx="150" cy="128" r="6" fill="none" stroke="#5fe3ff" stroke-width="1.5"/><text x="150" y="131.5" text-anchor="middle" font-size="8" fill="#ffb13b" font-weight="900">${esc(SCHOOL)}</text>`:""}
   <!-- 팔 -->
   <path d="M80 118 q-26 10 -34 60 q-2 14 8 18 l14 2 q10 -2 10 -14 q0 -30 10 -50z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2.5"/>
   <path d="M160 118 q26 10 34 60 q2 14 -8 18 l-14 2 q-10 -2 -10 -14 q0 -30 -10 -50z" fill="url(#${uid}s)" stroke="${bodyD}" stroke-width="2.5"/>
@@ -586,7 +590,7 @@ function directorSVG(size){
   <rect x="74" y="108" width="30" height="10" rx="3" fill="#ffd166" stroke="#b8860b"/><rect x="136" y="108" width="30" height="10" rx="3" fill="#ffd166" stroke="#b8860b"/>
   <g stroke="#b8860b" stroke-width="1.5"><path d="M80 113 h18 M142 113 h18"/><path d="M84 110 v6 M90 110 v6 M96 110 v6 M146 110 v6 M152 110 v6 M158 110 v6"/></g>
   <rect x="134" y="140" width="30" height="12" rx="2" fill="#f3f5ff"/><text x="149" y="149" text-anchor="middle" font-size="7.5" fill="#0e1640" font-weight="900">센터장</text>
-  <circle cx="92" cy="146" r="11" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><circle cx="92" cy="146" r="5.5" fill="none" stroke="#5fe3ff" stroke-width="1.5"/><text x="92" y="149.5" text-anchor="middle" font-size="7.5" fill="#ffb13b" font-weight="900">고천</text>
+  <circle cx="92" cy="146" r="11" fill="#0a0f2c" stroke="#ffb13b" stroke-width="2.5"/><circle cx="92" cy="146" r="5.5" fill="none" stroke="#5fe3ff" stroke-width="1.5"/><text x="92" y="149.5" text-anchor="middle" font-size="7.5" fill="#ffb13b" font-weight="900">${esc(SCHOOL)}</text>
   <!-- 팔 -->
   <path d="M80 118 q-26 10 -34 60 q-2 14 8 18 l14 2 q10 -2 10 -14 q0 -30 10 -50z" fill="url(#${uid}c)" stroke="#3b4a9a" stroke-width="2.5"/>
   <path d="M160 118 q26 10 34 60 q2 14 -8 18 l-14 2 q-10 -2 -10 -14 q0 -30 -10 -50z" fill="url(#${uid}c)" stroke="#3b4a9a" stroke-width="2.5"/>
@@ -874,7 +878,7 @@ const EXAM=[
 const app=document.getElementById("app"), stage=document.getElementById("stage"), gate=document.getElementById("gate");
 let view="home", deck=null, examPage=0;
 function drawHud(){const h=document.getElementById("hud");if(!h)return;
- if(isT()){h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${directorSVG(34)}</span><span class="rk">센터장</span><span class="small">고천 관제센터 · 플라이트 디렉터</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`;setSync(syncState);const ho=h.querySelector("#hudOut");if(ho)ho.onclick=logout;return;}
+ if(isT()){h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${directorSVG(34)}</span><span class="rk">센터장</span><span class="small">${esc(SCHOOL)} 관제센터 · 플라이트 디렉터</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`;setSync(syncState);const ho=h.querySelector("#hudOut");if(ho)ho.onclick=logout;return;}
  const{r,next}=rank();const pct=next?Math.min(100,Math.round(S.pts/next[0]*100)):100;
  h.innerHTML=`<span style="display:inline-block;width:34px;height:40px;overflow:hidden">${astronautSVG(null,null,34)}</span><span class="rk">${esc(me?me.name:"")} · ${r}</span><span class="pt">⭐ ${S.pts}</span><span class="bar"><i style="width:${pct}%"></i></span><span class="small">${next?`다음 등급까지 ${next[0]-S.pts}점`:"최고 등급 달성!"}</span><span class="sync"></span><button class="btn-g" id="hudOut" style="min-height:34px;padding:2px 12px;font-size:.88rem">나가기</button>`; setSync(syncState);
  const ho=h.querySelector("#hudOut"); if(ho)ho.onclick=logout;}
@@ -947,12 +951,12 @@ function renderHome(){
  const {r,next}=rank();
  app.innerHTML=`${hudBlock()}
  <div class="hero" style="margin-top:14px"><div><div class="log">GOCHEON MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1>
-  <p class="lead"><b style="color:var(--sun)">아라</b>는 '바다'를 뜻하는 옛 우리말. 고천(古川), 오래된 냇물은 흘러 바다에 닿는다 — 그리고 별들의 바다, 우주로. 고천중학교 관제센터가 쏘아 올린 태양계 탐사선 <b style="color:var(--sun)">아라호</b>가 발사대에 섰다. 너는 신입 훈련생. 탐사선이 보내오는 자료를 읽고, 판단하고, 글로 보고하라. 임무를 완수할수록 장비가 갖춰지고, 마지막엔 <b style="color:var(--cyan)">커맨더</b>가 된다.</p>
+  <p class="lead"><b style="color:var(--sun)">아라</b>는 '바다'를 뜻하는 옛 우리말. ${SCHOOL_STORY}${esc(SCHOOL_FULL)} 관제센터가 쏘아 올린 태양계 탐사선 <b style="color:var(--sun)">아라호</b>가 발사대에 섰다. 너는 신입 훈련생. 탐사선이 보내오는 자료를 읽고, 판단하고, 글로 보고하라. 임무를 완수할수록 장비가 갖춰지고, 마지막엔 <b style="color:var(--cyan)">커맨더</b>가 된다.</p>
   <div class="flow"><span>📚 <b>미션 학습</b> 5개 장</span><span>🔭 <b>수배 파일</b> 추리</span><span>✍️ <b>자격 논술 시험</b></span></div></div><div></div></div>
  <div class="row2">
   <div class="card"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
     <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${isT()?directorSVG(150):astronautSVG(null,null,150)}</div>
-    <div style="flex:1;min-width:220px"><div class="comms">${isT()?"FLIGHT DIRECTOR":"CREW ID"}</div><div style="font-family:var(--disp);font-size:1.6rem">${isT()?"센터장":esc(me.name)}</div><div class="small">${isT()?"고천 관제센터 총괄 · 임무 지시와 승인":esc(me.cls)+"반 "+esc(me.num)+"번 · 고천 관제센터"}</div>
+    <div style="flex:1;min-width:220px"><div class="comms">${isT()?"FLIGHT DIRECTOR":"CREW ID"}</div><div style="font-family:var(--disp);font-size:1.6rem">${isT()?"센터장":esc(me.name)}</div><div class="small">${isT()?esc(SCHOOL)+" 관제센터 총괄 · 임무 지시와 승인":esc(me.cls)+"반 "+esc(me.num)+"번 · "+esc(SCHOOL)+" 관제센터"}</div>
      ${isT()?`<button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">📋 센터장 콘솔로</button>`:`<div style="font-family:var(--disp);color:var(--sun);font-size:1.25rem;margin-top:6px">${r}</div><div class="small">⭐ ${S.pts}점 ${next?`· ${next[1]}까지 ${next[0]-S.pts}점`:"· 최고 등급"}</div>
      <button class="btn-s" id="goCrew" style="margin-top:12px;min-height:44px">🧑‍🚀 승무원실 — 모습·장비·꾸미기·보급</button>`}</div></div>
    <h3 style="margin-top:18px">훈장</h3>
@@ -973,7 +977,7 @@ function renderCrew(){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">🧑‍🚀 승무원실 <span class="small">— 센터장 참고용</span></h2>
   <p class="small" style="margin:0 4px 12px">학생이 보는 승급·장비·점수 기준입니다. 센터장은 점수가 쌓이지 않습니다.</p>
   <div class="crew3">
-   <div class="card" style="text-align:center;margin:0"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${directorSVG(220)}</div><div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">센터장</div><div class="small">고천 관제센터 · 플라이트 디렉터</div>
+   <div class="card" style="text-align:center;margin:0"><div style="display:inline-block;filter:drop-shadow(0 14px 30px #000a)">${directorSVG(220)}</div><div style="font-family:var(--disp);font-size:1.5rem;margin-top:6px">센터장</div><div class="small">${esc(SCHOOL)} 관제센터 · 플라이트 디렉터</div>
     <div style="text-align:left;margin-top:16px"><div class="small">학생 캐릭터는 장비를 얻을 때마다 이렇게 변합니다</div><div style="display:flex;gap:6px;justify-content:space-between;margin-top:6px">${[0,30,80,150,190].map(pt=>`<div style="text-align:center"><div style="filter:drop-shadow(0 6px 12px #0008)">${astronautSVG(pt,"white",52)}</div><div class="small">${pt}</div></div>`).join("")}</div></div></div>
    <div class="card" style="margin:0"><h3>장비 지급 기준</h3><div style="display:grid;gap:8px;margin-top:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);margin:0"><span style="font-size:1.5rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill w">${it.at}점</span></div>`).join("")}</div></div>
    <div class="card" style="margin:0"><h3>🍬 보급 쿠폰 조건</h3><div style="display:grid;gap:8px;margin-top:8px">${CPNS.map(c=>`<div class="frame" style="display:flex;gap:10px;align-items:center;color:var(--fg);margin:0"><span style="font-size:1.4rem">🍬</span><div style="flex:1"><b>${c.n}</b><div class="small">${c.c}</div></div></div>`).join("")}</div><p class="small" style="margin-top:8px">학생이 신청하면 센터장 콘솔 '보급 신청 결재'에 올라옵니다.</p></div>
