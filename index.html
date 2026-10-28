@@ -644,14 +644,26 @@ function bindOrbit(root){
   box.querySelectorAll(".planet").forEach(pl=>{pl.onclick=()=>pl.classList.toggle("show");});
   place(); window.addEventListener("resize",place,{passive:true});
 }
+function granules(cx,cy,R){ /* 쌀알무늬 확대: 밝은 알갱이 + 어두운 틈 (고정 배치) */
+ let g="",seed=7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+ for(let row=-5;row<=5;row++)for(let col=-5;col<=5;col++){const x=cx+col*15+(row%2?7.5:0)+(rnd()-.5)*5,y=cy+row*13+(rnd()-.5)*4;
+  if(Math.hypot(x-cx,y-cy)>R+8)continue;const rx=6+rnd()*2.4,ry=5+rnd()*2,a=(rnd()*60-30).toFixed(0);
+  g+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" transform="rotate(${a} ${x.toFixed(1)} ${y.toFixed(1)})" fill="url(#gran)"/>`;}
+ return g;}
 function sceneSun(){
  return `<div class="sunstage"><svg viewBox="0 0 460 330" style="width:100%;display:block">
   <defs><radialGradient id="sg2" cx="42%" cy="38%"><stop offset="0%" stop-color="#fff6cf"/><stop offset="55%" stop-color="#ffb13b"/><stop offset="100%" stop-color="#ff7a1a"/></radialGradient>
+  <radialGradient id="gran" cx="45%" cy="40%"><stop offset="0%" stop-color="#ffe9a8"/><stop offset="70%" stop-color="#ffb347"/><stop offset="100%" stop-color="#e8801f"/></radialGradient>
+  <clipPath id="granclip"><circle cx="392" cy="232" r="46"/></clipPath>
   <radialGradient id="cor" cx="50%" cy="50%"><stop offset="55%" stop-color="#ffd16600"/><stop offset="80%" stop-color="#ffd16633"/><stop offset="100%" stop-color="#ffd16600"/></radialGradient></defs>
   <circle class="corona" cx="210" cy="170" r="150" fill="url(#cor)"/><circle cx="210" cy="170" r="104" fill="none" stroke="#ff9c5a66" stroke-width="10"/><circle cx="210" cy="170" r="96" fill="url(#sg2)"/>
   <ellipse cx="182" cy="142" rx="12" ry="8" fill="#5a2d00"/><ellipse cx="238" cy="196" rx="8" ry="5" fill="#5a2d00"/><ellipse cx="206" cy="210" rx="5" ry="4" fill="#5a2d00"/>
   <path class="flareA" d="M292 92 q40 -34 20 -70 q-6 34 -40 48 z" fill="#ffd166"/><path d="M118 236 q-26 24 2 44 q26 16 40 -8" fill="none" stroke="#ff8f4d" stroke-width="9" stroke-linecap="round"/>
-  <line x1="182" y1="142" x2="356" y2="76" stroke="#a3adda" stroke-width="1"/><text x="300" y="68" class="pin">흑점</text>
+  <line x1="172" y1="146" x2="62" y2="176" stroke="#a3adda" stroke-width="1"/><text x="18" y="192" class="pin">흑점</text>
+  <circle cx="252" cy="158" r="12" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 2"/>
+  <line x1="262" y1="165" x2="352" y2="212" stroke="#ffffffaa" stroke-width="1" stroke-dasharray="3 3"/><line x1="256" y1="170" x2="370" y2="273" stroke="#ffffffaa" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="392" cy="232" r="46" fill="#9a4208"/><g clip-path="url(#granclip)">${granules(392,232,46)}</g><circle cx="392" cy="232" r="46" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="392" y="300" text-anchor="middle" class="pin">쌀알무늬(확대)</text>
   <line x1="300" y1="56" x2="356" y2="112" stroke="#a3adda" stroke-width="1"/><text x="360" y="118" class="pin">플레어</text>
   <line x1="138" y1="258" x2="110" y2="296" stroke="#a3adda" stroke-width="1"/><text x="76" y="314" class="pin">홍염</text>
   <line x1="210" y1="66" x2="258" y2="30" stroke="#a3adda" stroke-width="1"/><text x="262" y="26" class="pin">코로나(대기)</text>
