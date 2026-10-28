@@ -188,6 +188,15 @@ svg text{font-family:var(--body)}
 .cklist li{padding:4px 0}
 .cklist .y::before{content:"✔ ";color:var(--green)} .cklist .n::before{content:"✦ ";color:var(--sun)}
 @media (max-width:900px){.grwrap>.figure{order:-1}}
+.volopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.volopts .opt{justify-content:center;font-weight:700}
+.volcalc{display:grid;gap:8px;margin-top:12px}
+.volcalc>div{background:#080c24;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font-size:clamp(1rem,1.25vw,1.15rem);line-height:1.55}
+.volcalc em{color:var(--sun);font-style:normal;font-weight:900}
+.volcalc .vn{color:var(--sun);font-weight:900;margin-right:6px}
+.volmini{display:flex;justify-content:center;gap:18px;margin-bottom:6px}
+.volmini>div{width:90px;text-align:center}
+.volcount{font-size:1.3rem;margin-top:6px}.volcount b{color:var(--sun);font-size:1.8rem}
 .grsteps{margin:0;padding:0;list-style:none;counter-reset:g;display:grid;gap:7px}
 .grsteps li{counter-increment:g;position:relative;padding:8px 12px 8px 46px;background:#080c24;border:1.5px solid var(--line);border-radius:12px;font-size:clamp(.98rem,1.2vw,1.1rem);line-height:1.5}
 .grsteps li::before{content:counter(g);position:absolute;left:10px;top:8px;width:26px;height:26px;border-radius:50%;background:var(--sun);color:#2a1500;font-weight:900;display:grid;place-items:center;font-size:.95rem}
@@ -748,6 +757,7 @@ const CH=[
  {t:"learn",h:"자료표로 두 팀 가르기",wide:true,b:DATA_TABLE+`<div class="key"><span class="kt">논술형 핵심</span>표에서 <b>반지름·질량·밀도·위성 수·고리</b> 중 두 가지 이상을 골라 "A는 B<em>보다</em> ~하다"로 비교하면 근거 완성!</div>`},
  {t:"graph",h:"교과서 활동 · 반지름 막대그래프 그리기"},
  {t:"learn",h:"반전: 클수록 밀도는 작다?",img:"saturn",cap:"<b>토성</b> — 평균 밀도 0.7 g/cm³, 물(1.0)보다 밀도가 작다",b:`<p>가장 많이 틀리는 오개념 — "크면 밀도도 크겠지?" <b>반대예요!</b></p>${METAPHOR}<div class="key"><span class="kt">오개념 교정</span>밀도는 '얼마나 꽉 찼는가'. 목성형은 덩치는 커도 기체라 <b>밀도가 작아요.</b></div>`},
+ {t:"vol",h:"솜사탕인데 왜 이렇게 무거울까?"},
  {t:"game2",h:"격납고 분류 작전"},
  {t:"learn",h:"서술 공식",img:"planets4",cap:"수성 · 금성 · 지구 · 화성 — 실제 비율",b:`<div class="key"><span class="kt">서술 공식</span>"A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>."</div><p>⚠️ 근거는 반드시 <b>두 가지 이상</b> — 한 가지만 쓰면 감점!</p><div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>크기·질량</td><td>작다</td><td>크다</td></tr><tr><td>평균 밀도</td><td>크다</td><td>작다</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div>`},
  {t:"quiz",q:"평균 밀도가 크고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"밀도가 크다 = 암석 행성 = 지구형! 지구형은 위성이 없거나 적어요."},
@@ -836,7 +846,7 @@ function drawHud(){const h=document.getElementById("hud");if(!h)return;
 function logout(){me=null;deck=null;TPIN="";try{localStorage.removeItem(LS_ME);}catch(e){}S=freshState();view="home";render();}
 const hudBlock=()=>`<div id="hud" class="hud"></div>`;
 function slideDone(c,sl,idx){const k=c.id+"_"+idx;
- if(sl.t==="learn"||sl.t==="hero"||sl.t==="clear"||sl.t==="graph")return !!S.seen[k];
+ if(sl.t==="learn"||sl.t==="hero"||sl.t==="clear"||sl.t==="graph"||sl.t==="vol")return !!S.seen[k];
  if(sl.t==="quiz"||sl.t==="game2"||sl.t==="meet")return !!S.quiz[k];
  if(sl.t==="write")return !!(S.writes[sl.key]&&S.writes[sl.key].ok); return false;}
 function chapProg(c){let d=0;c.slides.forEach((sl,i)=>{if(slideDone(c,sl,i))d++;});return{d,total:c.slides.length};}
@@ -922,7 +932,7 @@ function renderHome(){
 }
 
 /* ═══════ 승무원실 — 캐릭터·장비·보급 ═══════ */
-const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["반지름 그래프 완성",4],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (최대 15건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
+const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["반지름 그래프 완성",4],["목성 속 지구 개수 예측 정답",2],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (최대 15건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
 function renderCrew(){
  if(isT()){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">🧑‍🚀 승무원실 <span class="small">— 센터장 참고용</span></h2>
@@ -1017,6 +1027,7 @@ function renderSlide(){
    <div id="qfb">${S.quiz[k]?`<div class="fb ok"><b>✅ 해결한 퀴즈!</b> ${esc(sl.ex)}</div>`:""}</div></div>${IMG(c.cover,"",'tall')}</div>`;}
  if(sl.t==="game2"){
    body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div><p class="s-body">아라호에서 행성 <b>관측 자료</b>만 도착했다 — 이름도 사진도 없이. 자료만 보고 어느 격납고(지구형/목성형)로 보낼지 판단하고, <em>근거</em>를 함께 보고하라.</p><div id="g2"></div>`;}
+ if(sl.t==="vol"){ seen(); body=`<div class="s-kicker">${c.no} · 🍭 반전의 반전</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">솜사탕인데 왜 이렇게 무거울까? — 목성 안에 지구 몇 개?</div><div id="vol"></div>`;}
  if(sl.t==="graph"){ seen(); body=`<div class="s-kicker">${c.no} · 📊 교과서 활동</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">반지름 막대그래프 그리기 — 표를 그림으로 바꾸면 두 집단이 보인다</div><div id="graph"></div>`;}
  if(sl.t==="meet"){ body=`<div class="s-kicker">🧑‍🚀 모둠 탐구 · ${sl.h}</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">이름이 지워진 8개 행성 — 두 팀으로 나눠라</div><div id="meet"></div>`;}
  if(sl.t==="write"){const w=S.writes[sl.key]||{};
@@ -1063,6 +1074,7 @@ function renderSlide(){
  if(sl.t==="game2")mountG2(stage.querySelector("#g2"),k,unlock);
  if(sl.t==="meet")mountMeet(stage.querySelector("#meet"),k,c,unlock);
  if(sl.t==="graph")mountGraph(stage.querySelector("#graph"),k);
+ if(sl.t==="vol")mountVol(stage.querySelector("#vol"),k);
  if(sl.t==="write"){const out=stage.querySelector("#wout");
    stage.querySelector("#wchk").onclick=()=>{const t=stage.querySelector("#wt").value;const r=checkWrite(t,sl.spec);out.innerHTML=fbHTML(r);
      const first=!(S.writes[sl.key]&&S.writes[sl.key].ok); S.writes[sl.key]={t,ok:r.pass||((S.writes[sl.key]||{}).ok),g:r.got+"/"+r.need,ts:Date.now()};
@@ -1075,17 +1087,19 @@ function renderSlide(){
 /* ═══════ 교과서 활동: 반지름 막대그래프 그리기 도우미 ═══════ */
 /* 값은 교과서 표(미국항공우주국, 2023) 그대로 */
 const GR=[["수성","mercury",0.38],["금성","venus",0.95],["지구","earth",1],["화성","mars",0.53],["목성","jupiter",11.21],["토성","saturn",9.45],["천왕성","uranus",4.01],["해왕성","neptune",3.88]];
-const GR_INS=8; /* 이 슬라이드가 들어간 위치 — 예전 진도 기록을 한 칸씩 밀어 맞춘다 */
 function grTip(v){
  if(v<1){const t=Math.round(v*10);return `1보다 작아요 → <b>맨 아래 첫 칸 안</b>에 그려요. 한 칸을 10조각으로 나누면 약 <b>${t}조각</b> 높이${t<5?' (절반보다 낮게)':t===5?' (딱 절반)':' (절반보다 높게)'}.`;}
  if(v===1)return `지구는 기준! <b>딱 한 칸</b> (이미 그려져 있어요).`;
  const n=Math.floor(v),f=v-n;return `<b>${n}</b>과 <b>${n+1}</b> 사이 → ${f<0.25?`<b>${n}</b> 눈금 바로 위`:f<0.5?`<b>${n}</b>쪽에 조금 더 가깝게`:f<0.75?`<b>${n+1}</b>쪽에 조금 더 가깝게`:`<b>${n+1}</b> 눈금 바로 아래`}.`;}
-function grMigrate(st){ /* 예전 기록(c2 슬라이드 번호)을 새 순서에 맞춘다 — 한 번만 */
- if(!st||st.mvG)return st;
- ["seen","quiz","done","tries"].forEach(f=>{const o=st[f];if(!o)return;const ks=Object.keys(o).filter(x=>/^c2_\d+$/.test(x)).map(x=>+x.slice(3)).filter(i=>i>=GR_INS).sort((a,b)=>b-a);
-  ks.forEach(i=>{o["c2_"+(i+1)]=o["c2_"+i];delete o["c2_"+i];});});
- if(st.slide&&typeof st.slide.c2==="number"&&st.slide.c2>=GR_INS)st.slide.c2++;
- st.mvG=1;return st;}
+const C2_INS=[["mvG",8],["mvJ",10]]; /* 슬라이드가 끼어든 위치 — 예전 진도 기록 번호를 차례로 한 칸씩 민다 */
+function grMigrate(st){
+ if(!st)return st;
+ C2_INS.forEach(([flag,at])=>{ if(st[flag])return;
+  ["seen","quiz","done","tries"].forEach(f=>{const o=st[f];if(!o)return;const ks=Object.keys(o).filter(x=>/^c2_\d+$/.test(x)).map(x=>+x.slice(3)).filter(i=>i>=at).sort((a,b)=>b-a);
+   ks.forEach(i=>{o["c2_"+(i+1)]=o["c2_"+i];delete o["c2_"+i];});});
+  if(st.slide&&typeof st.slide.c2==="number"&&st.slide.c2>=at)st.slide.c2++;
+  st[flag]=1;});
+ return st;}
 function mountGraph(root,k){
  const G=S.graph=S.graph||{}; G.v=G.v||[0,0,1,0,0,0,0,0]; G.v[2]=1; let cur=G.cur??0, drag=false;
  const L=56,T=16,CW=60,UH=30,W=CW*8,H=UH*12; const y=v=>T+H-v*UH;
@@ -1150,6 +1164,56 @@ function mountGraph(root,k){
   root.querySelector("#grchk").onclick=()=>{G.chk=true; if(allOk()){G.done=true; if(!S.quiz[k]){S.quiz[k]=1;addPts(4);}else save();}
    else{G.done=false;G.tries=(G.tries||0)+1;const bad=GR.findIndex((_,i)=>!ok(i));if(bad>=0)cur=G.cur=bad;save();}
    draw();};}
+ draw();}
+/* ═══════ 솜사탕인데 왜 무거울까: 부피(세제곱) × 밀도 ═══════ */
+const VOLP={jup:{n:"목성",img:"jupiter",r:"11.21",k:11,d:"1.33",den:4,m:"317.83"},sat:{n:"토성",img:"saturn",r:"9.45",k:9,d:"0.69",den:8,m:"95.16"}};
+function isoCube(n,h,sz,hl){ /* n×n 바닥, h층까지 쌓인 쌓기나무 (등각 투영) */
+ const s=sz/(n*1.9), c=Math.cos(Math.PI/6)*s, q=0.5*s, ox=n*c+4, oy=n*s+4;
+ const P=(x,y,z)=>`${(ox+(x-y)*c).toFixed(1)},${(oy+(x+y)*q-z*s).toFixed(1)}`;
+ const W=2*n*c+8, H=n*s+n*s+8; let g=`<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" style="width:100%;max-width:${sz}px;display:block;margin:auto">`;
+ /* 빈 자리 윤곽 */
+ g+=`<polygon points="${P(0,0,n)} ${P(n,0,n)} ${P(n,n,n)} ${P(0,n,n)}" fill="none" stroke="#5fe3ff44" stroke-dasharray="3 3"/><path d="M${P(n,n,0)} L${P(n,n,n)} M${P(0,n,0)} L${P(0,n,n)} M${P(n,0,0)} L${P(n,0,n)}" stroke="#5fe3ff44" stroke-dasharray="3 3"/>`;
+ g+=`<polygon points="${P(0,0,0)} ${P(n,0,0)} ${P(n,n,0)} ${P(0,n,0)}" fill="#ffffff10" stroke="#5fe3ff66"/>`;
+ if(h>0){
+  g+=`<polygon points="${P(0,n,0)} ${P(n,n,0)} ${P(n,n,h)} ${P(0,n,h)}" fill="#2f6fc9"/><polygon points="${P(n,0,0)} ${P(n,n,0)} ${P(n,n,h)} ${P(n,0,h)}" fill="#1f4d94"/><polygon points="${P(0,0,h)} ${P(n,0,h)} ${P(n,n,h)} ${P(0,n,h)}" fill="${hl?'#ffd166':'#6fb6ff'}"/>`;
+  let L="";for(let i=0;i<=n;i++){L+=`M${P(i,0,h)} L${P(i,n,h)} M${P(0,i,h)} L${P(n,i,h)} M${P(i,n,0)} L${P(i,n,h)} M${P(n,i,0)} L${P(n,i,h)} `;}
+  for(let z=0;z<=h;z++){L+=`M${P(0,n,z)} L${P(n,n,z)} L${P(n,0,z)} `;}
+  g+=`<path d="${L}" stroke="#0a0f2c" stroke-width="${n>5?0.7:1.4}" fill="none" opacity=".75"/>`;}
+ return g+`</svg>`;}
+function mountVol(root,k){
+ const V=S.vol=S.vol||{}; let pl=V.pl||"jup", h=0, timer=null;
+ const fmt=x=>x.toLocaleString("ko-KR");
+ function calc(){const p=VOLP[pl],n=p.k,vol=n*n*n,m=Math.round(vol/p.den);
+  return `<div class="volcalc"><div><span class="vn">①</span><b>부피</b> — 반지름 약 ${n}배 → <b>${n} × ${n} × ${n} = ${fmt(vol)}</b> → ${p.n} 안에 지구가 <em>약 ${fmt(Math.round(vol/100)*100)}개</em></div>
+   <div><span class="vn">②</span><b>밀도</b> — ${p.n} ${p.d} ÷ 지구 5.51 ≈ <em>1/${p.den}</em> → 같은 크기면 지구 무게의 1/${p.den}뿐 (솜사탕!)</div>
+   <div><span class="vn">③</span><b>질량</b> — ${fmt(vol)} ÷ ${p.den} ≈ <em>약 ${m}배</em> → 교과서 값 <b style="color:var(--cyan)">${p.m}배</b>와 거의 같다!</div></div>`;}
+ function draw(){const p=VOLP[pl],n=p.k;
+  root.innerHTML=`<div class="s-grid" style="align-items:start;gap:26px"><div>
+   <div class="key" style="margin-top:0"><span class="kt">예측</span>${p.n}의 반지름은 지구의 약 <b>${n}배</b>(${p.r}). 그럼 ${p.n} 안에 지구가 <b>몇 개</b> 들어갈까?</div>
+   <div class="volopts">${[[n,"약 "+n+"개"],[n*n,"약 "+fmt(n*n)+"개"],[n*n*n,"약 "+fmt(Math.round(n*n*n/100)*100)+"개"]].map(([v,t])=>`<button class="opt" data-v="${v}" style="margin:0"><span>${t}</span></button>`).join("")}</div>
+   <div id="vfb"></div>
+   <div id="vcalc">${V[pl]?calc():""}</div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${Object.entries(VOLP).map(([kk,x])=>`<button class="${kk===pl?'btn-s':'btn-g'}" data-pl="${kk}" style="min-height:42px">${x.n}으로 해 보기</button>`).join("")}<button class="btn-g" id="vplay" style="min-height:42px">▶ 다시 쌓기</button></div>
+  </div><div class="figure" style="margin:0;text-align:center">
+   <div class="small" style="margin-bottom:4px">한 칸 = 지구 하나가 들어가는 상자</div>
+   <div class="volmini"><div>${isoCube(2,2,90)}<span class="small">2배 → <b>8</b>개</span></div><div>${isoCube(3,3,90)}<span class="small">3배 → <b>27</b>개</span></div><div style="opacity:.5;font-size:1.6rem;align-self:center">…</div></div>
+   <div id="vcube">${isoCube(n,V[pl]?n:0,300,false)}</div>
+   <div id="vcount" class="volcount">${V[pl]?`<b>${fmt(n*n*n)}</b>개 = ${n}×${n} 한 층 ${fmt(n*n)}개 × ${n}층`:`예측을 고르면 쌓기 시작!`}</div>
+   <p class="figcap">반지름이 ${n}배면 가로·세로·높이가 모두 ${n}배 → 부피는 ${n}×${n}×${n}배</p></div></div>
+   <div class="key"><span class="kt">핵심</span>목성형 행성은 <b>하나하나는 가볍지만</b>(밀도 작다) <b>엄청나게 커서</b>(부피 크다) 질량이 크다. 반지름이 조금만 커져도 부피는 <em>세 번 곱한 만큼</em> 커진다!</div>`;
+  root.querySelectorAll(".volopts .opt").forEach(b=>b.onclick=()=>{const v=+b.dataset.v,good=v===n*n*n;
+   root.querySelectorAll(".volopts .opt").forEach(x=>x.classList.remove("ok","no"));b.classList.add(good?"ok":"no");
+   root.querySelector("#vfb").innerHTML=good?`<div class="fb ok"><b>🎯 정답!</b> 반지름 ${n}배 → 가로 ${n} × 세로 ${n} × 높이 ${n}.</div>`
+    :`<div class="fb no"><b>🛰️ 많이 하는 생각!</b> ${v===n?`${n}개는 지구를 <b>한 줄</b>로 세운 것뿐이에요.`:`${fmt(n*n)}개는 <b>한 층</b>(가로×세로)만 센 거예요. 높이도 ${n}층!`} 쌓이는 걸 보세요 →</div>`;
+   if(good&&pl==="jup"&&!S.quiz[k]){S.quiz[k]=1;addPts(2);}
+   play();});
+  root.querySelectorAll("[data-pl]").forEach(b=>b.onclick=()=>{clearInterval(timer);pl=V.pl=b.dataset.pl;save();draw();});
+  root.querySelector("#vplay").onclick=play;}
+ function play(){const p=VOLP[pl],n=p.k;clearInterval(timer);h=0;
+  const cube=root.querySelector("#vcube"),cnt=root.querySelector("#vcount");
+  timer=setInterval(()=>{if(!root.isConnected){clearInterval(timer);return;}h++;cube.innerHTML=isoCube(n,h,300,h===n);
+   cnt.innerHTML=`<b>${fmt(n*n*h)}</b>개 <span class="small">(한 층 ${fmt(n*n)}개 × ${h}층)</span>`;
+   if(h>=n){clearInterval(timer);cnt.innerHTML=`<b>${fmt(n*n*n)}</b>개 = ${n}×${n} 한 층 ${fmt(n*n)}개 × ${n}층`;V[pl]=1;save();root.querySelector("#vcalc").innerHTML=calc();}},260);}
  draw();}
 function mountMeet(root,k,c,onDone){
  /* 관제팀 분류 회의: 정답을 알려주기 전에, 모둠이 원자료만 보고 스스로 기준을 세워 두 팀으로 나눈다 */
@@ -1363,7 +1427,7 @@ async function loadRoster(){
  }catch(e){tb.innerHTML=tb.rows[0].outerHTML+`<tr><td colspan="9"><div class="fb no">불러오기 실패: ${esc(e)}</div></td></tr>`;}
 }
 function chapProgFrom(c,st){st=grMigrate(JSON.parse(JSON.stringify(st||{})));let d=0;c.slides.forEach((sl,i)=>{const k=c.id+"_"+i;
- if((sl.t==="learn"||sl.t==="hero"||sl.t==="clear"||sl.t==="graph")&&st.seen&&st.seen[k])d++;
+ if((sl.t==="learn"||sl.t==="hero"||sl.t==="clear"||sl.t==="graph"||sl.t==="vol")&&st.seen&&st.seen[k])d++;
  else if((sl.t==="quiz"||sl.t==="game2"||sl.t==="meet")&&st.quiz&&st.quiz[k])d++;
  else if(sl.t==="write"&&st.writes&&st.writes[sl.key]&&st.writes[sl.key].ok)d++;});return{d,total:c.slides.length};}
 async function showDetail(x){
