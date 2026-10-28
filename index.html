@@ -197,6 +197,8 @@ svg text{font-family:var(--body)}
 .sortcard.s{border-color:var(--sun)}.sortcard.s .tg{color:var(--sun);font-weight:700}
 .sortcard.a{border-color:var(--violet)}.sortcard.a .tg{color:var(--violet);font-weight:700}
 .sortcard.n{box-shadow:0 0 0 3px var(--red)}
+table.sumtab td.ga,table.sumtab th.ga{background:#6b4208;color:#ffe2a8} table.sumtab td.gb,table.sumtab th.gb{background:#0d3a73;color:#d4ebff}
+table.sumtab td:nth-child(2){font-weight:900;color:var(--sun)}
 .volopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .volopts .opt{justify-content:center;font-weight:700}
 .volcalc{display:grid;gap:8px;margin-top:12px}
@@ -729,7 +731,7 @@ const PL=[
  {n:"지구",img:"earth",surf:"earth2",t:"rock",m:1.00,r:1.00,d:5.5,sat:1,ring:"없음",f:"<b>질소와 산소</b> 등으로 이루어진 대기와 <b>액체 상태의 물</b>이 있다. 식물이 자랄 수 있는 <b>토양</b>이 있고 다양한 <b>생명체</b>가 있다. 위성은 달 하나."},
  {n:"화성",img:"mars",surf:"mars_polar",t:"rock",m:0.11,r:0.53,d:3.9,sat:2,ring:"없음",f:"표면에 암석과 <b>붉은색 토양</b>이 있다. <b>거대한 화산</b>이 있으며 <b>물이 흘렀던 흔적</b>이 있다. 극지방에는 드라이아이스와 얼음으로 된 흰색의 <b>극관</b>이 있다."},
  {n:"목성",img:"jupiter",surf:"jupiter_spot",t:"gas",m:317.83,r:11.21,d:1.3,sat:95,ring:"있음",f:"태양계 행성 중 <b>가장 크다</b>. 주로 <b>수소와 헬륨</b>으로 이루어져 있다. 표면에 <b>가로줄 무늬</b>와 거대한 대기의 소용돌이인 <b>대적점</b>이 있다. <b>희미한 고리</b>와 수많은 위성이 있다."},
- {n:"토성",img:"saturn",surf:"saturn2",t:"gas",m:95.16,r:9.45,d:0.7,sat:146,ring:"있음",f:"태양계에서 <b>두 번째로 큰</b> 행성. 대기에 줄무늬가 있고, <b>얼음과 암석</b>으로 이루어진 <b>뚜렷한 고리</b>가 있다. 평균 밀도 0.7 g/cm³로 물보다 작다."},
+ {n:"토성",img:"saturn",surf:"saturn2",t:"gas",m:95.16,r:9.45,d:0.7,sat:146,ring:"있음",f:"태양계에서 <b>두 번째로 큰</b> 행성. 대기에 줄무늬가 있고, <b>얼음과 암석</b>으로 이루어진 <b>뚜렷한 고리</b>가 있다."},
  {n:"천왕성",img:"uranus",surf:"uranus_ring",t:"gas",m:14.54,r:4.01,d:1.3,sat:27,ring:"있음",f:"<b>청록색</b>으로 보인다. 다른 행성과 달리 <b>자전축과 공전 궤도면이 거의 나란</b>하다(자전축이 누워 있다)."},
  {n:"해왕성",img:"neptune",surf:"neptune_surf",t:"gas",m:17.15,r:3.88,d:1.6,sat:14,ring:"있음",f:"태양계에서 <b>가장 바깥쪽</b>에 있는 푸른 행성. 표면에 대기의 소용돌이인 <b>대흑점</b>이 나타난다."}];
 /* 관제팀 분류 회의용: 이름을 가린 행성 코드 (모든 모둠이 같은 글자를 보도록 고정) */
@@ -738,15 +740,15 @@ const RAW_OFFICIAL=()=>{const a=RAW.filter(x=>x.p.t==="rock").map(x=>x.c),b=RAW.
 const REVEAL_TABLE=`<div class="twrap"><table class="t revtab"><tr><th>코드</th>${RAW.map(x=>`<th class="${x.p.t==='rock'?'a':'b'}">${x.c}</th>`).join("")}</tr>
 <tr><td>정체</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}" style="font-weight:700">${x.p.n}</td>`).join("")}</tr>
 <tr><td>반지름</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.r}</td>`).join("")}</tr>
-<tr><td>평균 밀도</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.d}</td>`).join("")}</tr>
+<tr><td>질량</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.m}</td>`).join("")}</tr>
 <tr><td>위성 수</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.sat}</td>`).join("")}</tr>
-<tr><td>고리</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.ring}</td>`).join("")}</tr></table></div>`;
+<tr><td>고리</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.ring}</td>`).join("")}</tr>
+<tr><td>표면 상태</td>${RAW.map(x=>`<td class="${x.p.t==='rock'?'a':'b'}">${x.p.t==='rock'?'고체':'기체'}</td>`).join("")}</tr></table></div>`;
 const planetGallery=(type)=>`<div class="pgal">${PL.filter(p=>p.t===type).map(p=>`<button class="pcard" data-p="${p.n}"><div class="ph" style="background-image:url(img/${p.img}.jpg)"></div><div class="nm">${p.n}</div><div class="ft">${p.f}</div></button>`).join("")}</div>`;
 const planetSurf=(type)=>`<div class="figs c4">${PL.filter(p=>p.t===type).map(p=>IMG(p.surf,`<b>${p.n}의 표면</b>`,'sq')).join("")}</div>`;
 const DATA_TABLE=`<div class="twrap"><table class="t"><tr><th>행성</th>${PL.map(p=>`<th class="${p.t==='rock'?'grpA':'grpB'}">${p.n}</th>`).join("")}</tr>
 <tr><td>반지름(지구=1)</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.r}</td>`).join("")}</tr>
 <tr><td>질량(지구=1)</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.m}</td>`).join("")}</tr>
-<tr><td>평균 밀도(g/cm³)</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.d}</td>`).join("")}</tr>
 <tr><td>위성 수</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.sat}</td>`).join("")}</tr>
 <tr><td>고리</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.ring}</td>`).join("")}</tr>
 <tr><td>표면 상태</td>${PL.map(p=>`<td class="${p.t==='rock'?'grpA':'grpB'}">${p.t==='rock'?'고체(암석)':'기체'}</td>`).join("")}</tr></table></div><p class="figcap">질량·반지름·위성 수는 교과서 값(미국항공우주국, 2023) · 노란 칸 = 지구형, 파란 칸 = 목성형</p>`;
@@ -778,21 +780,21 @@ const CH=[
 {id:"c2",cover:"jupiter",title:"쌍둥이가 아니야",no:"MISSION 02",sub:"행성의 특징과 분류 · 모둠 탐구 포함 25분",slides:[
  {t:"hero",log:"통신 로그 · D+12 · 행성 관측 자료 수신",h:"쌍둥이가 아니야",sub:"아라호가 8개 행성의 사진과 자료를 보내왔다. 겉모습은 제각각이지만 두 팀으로 나뉜다 — 분류 기준을 마스터하라. — 센터장",art:SIZE_FIG,img:"planets4"},
  {t:"meet",h:"관제팀 분류 회의"},
- {t:"learn",h:"정체 공개 — 관제센터 공식 분류",wide:true,b:REVEAL_TABLE+`<div class="key"><span class="kt">관제센터 공식 기록</span>노란 칸 네 행성은 <b>지구형 행성</b>, 파란 칸 네 행성은 <b>목성형 행성</b>. 여러분 관제팀의 두 팀과 비교해 보세요 — 어떤 기준으로 나눠도 같은 두 무리가 나왔다면, 그 기준들이 <em>함께 움직인다</em>는 뜻이에요.</div><p class="small">질량·반지름이 큰 쪽이 밀도는 오히려 작다 — 이 반전은 몇 장 뒤에서 다시 만나요.</p>`},
- {t:"learn",sky:["mercury","venus","mars"],h:"지구형 행성 — 수·금·지·화",wide:true,b:planetGallery("rock")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>작다</em> · 단단한 <b>암석</b> → 밀도 <em>크다</em> · 위성이 <em>없거나 적다</em> · 고리 <em>없음</em></div>`},
+ {t:"learn",h:"정체 공개 — 관제센터 공식 분류",wide:true,b:REVEAL_TABLE+`<div class="key"><span class="kt">관제센터 공식 기록</span>노란 칸 네 행성은 <b>지구형 행성</b>, 파란 칸 네 행성은 <b>목성형 행성</b>. 여러분 관제팀의 두 팀과 비교해 보세요 — 어떤 기준으로 나눠도 같은 두 무리가 나왔다면, 그 기준들이 <em>함께 움직인다</em>는 뜻이에요.</div>`},
+ {t:"learn",sky:["mercury","venus","mars"],h:"지구형 행성 — 수·금·지·화",wide:true,b:planetGallery("rock")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>질량과 반지름이 <em>작다</em> · 표면이 단단한 <b>암석</b> · 위성이 <em>없거나 적다</em> · 고리 <em>없음</em></div>`},
  {t:"learn",h:"지구형 행성의 표면",wide:true,b:planetSurf("rock")+`<p style="margin-top:12px">네 행성 모두 <b>단단한 땅</b>이 있어요. 수성의 충돌구, 금성의 화산, 지구의 바다, 화성의 극관 — 모두 <em>암석 표면</em> 위에서 벌어지는 일.</p>`},
- {t:"learn",sky:["jupiterMoons","saturn","uranus","neptune"],h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>크기·질량이 <em>크다</em> · 주로 <b>기체</b> → 밀도 <em>작다</em> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
+ {t:"learn",sky:["jupiterMoons","saturn","uranus","neptune"],h:"목성형 행성 — 목·토·천·해",wide:true,b:planetGallery("gas")+`<div class="key" style="margin-top:14px"><span class="kt">공통점</span>질량과 반지름이 <em>크다</em> · 표면이 <b>기체</b> · 위성이 <em>많다</em> · 고리 <em>있음</em></div>`},
  {t:"learn",h:"목성형 행성의 표면",wide:true,b:planetSurf("gas")+`<p style="margin-top:12px">착륙할 땅이 없어요! 보이는 건 전부 <b>기체 대기의 소용돌이</b>. 목성의 대적점, 토성의 줄무늬, 천왕성의 가느다란 고리, 해왕성의 대흑점.</p>`},
- {t:"learn",h:"자료표로 두 팀 가르기",wide:true,b:DATA_TABLE+DIST_FIG+`<div class="key"><span class="kt">논술형 핵심</span>표에서 <b>반지름·질량·밀도·위성 수·고리</b> 중 두 가지 이상을 골라 "A는 B<em>보다</em> ~하다"로 비교하면 근거 완성!</div>`},
+ {t:"learn",h:"자료표로 두 팀 가르기",wide:true,b:DATA_TABLE+DIST_FIG+`<div class="key"><span class="kt">논술형 핵심</span>표에서 <b>질량·반지름·위성 수·고리·표면 상태</b> 중 두 가지 이상을 골라 "A는 B<em>보다</em> ~하다"로 비교하면 근거 완성!</div>`},
  {t:"graph",h:"교과서 활동 · 반지름 막대그래프 그리기"},
- {t:"learn",h:"반전: 클수록 밀도는 작다?",img:"saturn",cap:"<b>토성</b> — 평균 밀도 0.7 g/cm³, 물(1.0)보다 밀도가 작다",b:`<p>가장 많이 틀리는 오개념 — "크면 밀도도 크겠지?" <b>반대예요!</b></p>${METAPHOR}<div class="key"><span class="kt">오개념 교정</span>밀도는 '얼마나 꽉 찼는가'. 목성형은 덩치는 커도 기체라 <b>밀도가 작아요.</b></div>`},
- {t:"vol",h:"솜사탕인데 왜 이렇게 무거울까?"},
+ {t:"learn",h:"교과서 정리 — 지구형 행성과 목성형 행성",wide:true,b:`<p>수성, 금성, 지구, 화성은 질량과 반지름이 작고 표면이 단단한 암석으로 이루어진 행성으로, <b>지구형 행성</b>이라고 해요. 목성, 토성, 천왕성, 해왕성은 질량과 반지름이 크고 표면이 기체로 이루어진 행성으로, <b>목성형 행성</b>이라고 해요. 목성형 행성은 <em>고리</em>가 있고 <em>위성 수가 많아요</em>.</p><div class="twrap" style="max-width:760px;margin:14px auto"><table class="t sumtab"><tr><th class="ga">지구형 행성</th><th>특징</th><th class="gb">목성형 행성</th></tr><tr><td class="ga">작다</td><td>질량</td><td class="gb">크다</td></tr><tr><td class="ga">작다</td><td>반지름</td><td class="gb">크다</td></tr><tr><td class="ga">없거나 적다</td><td>위성 수</td><td class="gb">많다</td></tr><tr><td class="ga">없다</td><td>고리</td><td class="gb">있다</td></tr><tr><td class="ga">암석</td><td>표면 상태</td><td class="gb">기체</td></tr></table></div><div class="key"><span class="kt">교과서 Q</span>지구형 행성과 목성형 행성의 반지름을 비교하면? — 앞 장에서 그린 막대그래프를 떠올려 보세요. 지구형은 모두 1 이하, 목성형은 4~11!</div>`},
+ {t:"vol",h:"더 알아보기 · 목성 안에 지구 몇 개?"},
  {t:"game2",h:"격납고 분류 작전"},
- {t:"learn",h:"서술 공식",img:"planets4",cap:"수성 · 금성 · 지구 · 화성 — 실제 비율",b:`<div class="key"><span class="kt">서술 공식</span>"A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>."</div><p>⚠️ 근거는 반드시 <b>두 가지 이상</b> — 한 가지만 쓰면 감점!</p><div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>크기·질량</td><td>작다</td><td>크다</td></tr><tr><td>평균 밀도</td><td>크다</td><td>작다</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div>`},
- {t:"quiz",q:"평균 밀도가 크고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"밀도가 크다 = 암석 행성 = 지구형! 지구형은 위성이 없거나 적어요."},
+ {t:"learn",h:"서술 공식",img:"planets4",cap:"수성 · 금성 · 지구 · 화성 — 실제 비율",b:`<div class="key"><span class="kt">서술 공식</span>"A는 ○○형 행성이다. A는 B<b>보다</b> ~하고 ~하기 <b>때문이다</b>."</div><p>⚠️ 근거는 반드시 <b>두 가지 이상</b> — 한 가지만 쓰면 감점!</p><div class="twrap"><table class="t"><tr><th>구분</th><th>지구형</th><th>목성형</th></tr><tr><td>질량·반지름</td><td>작다</td><td>크다</td></tr><tr><td>표면 상태</td><td>암석</td><td>기체</td></tr><tr><td>위성 수</td><td>없거나 적다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div>`},
+ {t:"quiz",q:"표면이 단단한 암석으로 이루어져 있고 위성이 없는 행성은 어느 팀?",o:["지구형 행성","목성형 행성","둘 다 아님"],a:0,ex:"표면이 암석 = 지구형! 지구형은 위성이 없거나 적고, 목성형은 표면이 기체예요."},
  {t:"quiz",q:"자전축이 거의 누워 있어 굴러가듯 공전하는 청록색 행성은?",o:["해왕성","천왕성","토성"],a:1,ex:"천왕성! 메테인 때문에 청록색이고 자전축이 공전 궤도면과 거의 나란해요."},
- {t:"write",key:"w_c2",h:"관제 일지 · 한 줄 논술",img:"uranus",prompt:`아라호가 관측한 <b>천체 P</b> — 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음.<br>P를 지구형/목성형으로 <b>분류</b>하고, 자료에서 <b>근거 두 가지 이상</b>을 들어 까닭을 쓰세요.`,frame:"P는 <b>___형 행성</b>이다. 왜냐하면 지구형 행성보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:40,groups:[{name:"'목성형'이라는 분류",words:["목성형"]},{name:"밀도 근거",words:["밀도"]},{name:"위성 또는 고리 근거",words:["위성","고리"]}],compare:true},ai:"자료: 천체 P 상대 지름 4.0, 평균 밀도 1.2 g/cm³, 위성 27개, 고리 있음. 평가 요소: ① P를 목성형 행성으로 분류 ② 자료의 특징 두 가지 이상(지름 큼, 밀도 작음, 위성 많음, 고리 있음)을 지구형과 비교(…보다)하여 근거로 제시 ③ 분류와 근거를 ‘때문이다’로 연결. 수준: 상=①②③ / 중=분류는 맞으나 근거 1개이거나 비교 표현 없음 / 하=분류 틀림. 오개념 주의: ‘크니까 밀도도 크다’."},
- {t:"clear",vids:[1],pts:["지구형(수금지화): 작다·밀도 크다·위성 적다·고리 없다","목성형(목토천해): 크다·밀도 작다·위성 많다·고리 있다","클수록 밀도는 작다 (솜사탕!)","행성마다 얼굴이 있다: 대적점·고리·극관·누운 자전축…","서술은 '…보다 ~하기 때문이다' + 근거 2가지"]}
+ {t:"write",key:"w_c2",h:"관제 일지 · 한 줄 논술",img:"uranus",prompt:`아라호가 관측한 <b>천체 P</b> — 반지름(지구=1) 4.0, 위성 27개, 고리 있음, 표면 상태: 기체.<br>P를 지구형/목성형으로 <b>분류</b>하고, 자료에서 <b>근거 두 가지 이상</b>을 들어 까닭을 쓰세요.`,frame:"P는 <b>___형 행성</b>이다. 왜냐하면 지구형 행성보다 ___이/가 ___고, ___이/가 ___기 때문이다.",spec:{min:40,groups:[{name:"'목성형'이라는 분류",words:["목성형"]},{name:"크기 또는 표면 근거",words:["반지름","지름","크기","크고","크다","기체","표면"]},{name:"위성 또는 고리 근거",words:["위성","고리"]}],compare:true},ai:"자료: 천체 P 반지름(지구=1) 4.0, 위성 27개, 고리 있음, 표면 상태 기체. 평가 요소: ① P를 목성형 행성으로 분류 ② 자료의 특징 두 가지 이상(반지름 큼, 위성 많음, 고리 있음, 표면이 기체)을 지구형과 비교(…보다)하여 근거로 제시 ③ 분류와 근거를 ‘때문이다’로 연결. 수준: 상=①②③ / 중=분류는 맞으나 근거 1개이거나 비교 표현 없음 / 하=분류 틀림. 밀도는 교과서 범위가 아니므로 요구하지 말 것(학생이 맞게 쓰면 감점하지 않음)."},
+ {t:"clear",vids:[1],pts:["지구형(수금지화): 질량·반지름 작다·표면 암석·위성 없거나 적다·고리 없다","목성형(목토천해): 질량·반지름 크다·표면 기체·위성 많다·고리 있다","반지름 11배 → 부피는 약 1,300배 (더 알아보기)","행성마다 얼굴이 있다: 대적점·고리·극관·누운 자전축…","서술은 '…보다 ~하기 때문이다' + 근거 2가지"]}
 ]},
 {id:"c3",cover:"prominence",title:"태양의 얼굴",no:"MISSION 03",sub:"태양의 표면·대기와 태양 활동 · 8분",slides:[
  {t:"hero",log:"통신 로그 · D+40 · 태양 카메라 가동",h:"태양의 얼굴",sub:"아라호가 태양 전용 필터를 열었다. 표면과 대기에서 벌어지는 거대한 쇼 — 하나도 놓치지 말고 기록하라. — 센터장",scene:"sun",img:"sun_full"},
@@ -838,24 +840,24 @@ const WANTED=[
  {id:"wd1",img:"asteroid",clue:"태양 주위를 공전한다. 주로 화성과 목성 사이에서 관측된다. 크기가 작고 모양이 불규칙한 암석 천체다.",a:"소행성"},
  {id:"wd2",img:"comet",clue:"얼음과 먼지로 이루어져 있다. 길쭉한 궤도로 태양 주위를 돈다. 태양에 가까워지자 꼬리가 나타났다!",a:"혜성"},
  {id:"wd3",img:"moon",clue:"태양이 아니라 어느 행성 주위를 빙글빙글 공전하고 있다. 지구에도 이런 단짝이 하나 있다.",a:"위성"},
- {id:"wd4",img:"saturn",clue:"지름이 매우 크고 평균 밀도는 작다. 고리가 있고 위성을 수십 개 거느린다.",a:"목성형 행성"},
+ {id:"wd4",img:"saturn",clue:"지름이 매우 크고 표면이 기체로 이루어져 있다. 고리가 있고 위성을 수십 개 거느린다.",a:"목성형 행성"},
  {id:"wd5",img:"sun_full",clue:"태양계에서 유일하게 스스로 빛을 낸다. 표면 온도 약 6000℃.",a:"태양"},
- {id:"wd6",img:"mars",clue:"지름이 작고 평균 밀도가 크다. 단단한 암석 표면을 가졌고 위성이 없거나 적다.",a:"지구형 행성"},
- {id:"wd7",img:"pluto",clue:"태양 주위를 공전하고 둥글다. 그런데 자기 궤도 주변을 깨끗이 치우지 못해 행성 자격을 잃었다.",a:"왜소 행성"},
+ {id:"wd6",img:"mars",clue:"지름과 질량이 작다. 표면이 단단한 암석으로 이루어져 있고 위성이 없거나 적다.",a:"지구형 행성"},
+ {id:"wd7",img:"pluto",clue:"태양 주위를 공전한다. 행성과 비슷하지만 크기와 질량이 행성보다 작다. 2006년에 행성 자격을 잃었다.",a:"왜소 행성"},
  {id:"wd8",img:"uranus",clue:"청록색이다. 자전축이 거의 누워 있어 굴러가듯 태양을 돈다. 가느다란 고리가 있다.",a:"천왕성"}];
 const WOPTS=["태양","지구형 행성","목성형 행성","위성","소행성","혜성","왜소 행성","천왕성"];
 
 /* ═══════ 논술형 평가 (제시문·자료를 문항별 페이지로 분리) ═══════ */
 const DOC_INTRO=`<div class="doc"><h4>【제시문】 탐사선 아라호의 새 임무</h4><p>국제 공동 탐사선 <b>아라호</b>는 지구를 출발해 천체 <b>다</b>의 근처를 지난 뒤 천체 <b>가</b>와 <b>나</b>를 관측할 예정이다. 이후 화성과 목성 사이에서 태양 주위를 도는 천체 <b>라</b>를 근접 촬영하고, 긴 궤도를 따라 돌다가 태양에 가까워지면 꼬리가 나타나는 천체 <b>마</b>를 관측한다.</p>
 <div class="news">“태양계는 태양과 8개의 행성으로 이루어져 있다. 따라서 행성이 아닌 다, 라, 마는 태양계 구성원이 아니다.”<div class="src">— 과학신문 기사 중</div></div></div>`;
-const DOC_T1=`<div class="doc"><h4>【자료 1-가】 천체 가·나 관측 결과</h4><div class="twrap"><table class="t"><tr><th>구분</th><th>천체 가</th><th>천체 나</th></tr><tr><td>상대 지름</td><td>0.9</td><td>11.2</td></tr><tr><td>평균 밀도(g/cm³)</td><td>5.2</td><td>1.3</td></tr><tr><td>위성</td><td>없다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr></table></div><p class="src">※ 상대 지름은 지구의 지름을 1.0으로 한 값</p></div>`;
+const DOC_T1=`<div class="doc"><h4>【자료 1-가】 천체 가·나 관측 결과</h4><div class="twrap"><table class="t"><tr><th>구분</th><th>천체 가</th><th>천체 나</th></tr><tr><td>반지름(지구=1)</td><td>0.9</td><td>11.2</td></tr><tr><td>질량(지구=1)</td><td>0.8</td><td>318</td></tr><tr><td>위성</td><td>없다</td><td>많다</td></tr><tr><td>고리</td><td>없다</td><td>있다</td></tr><tr><td>표면 상태</td><td>단단한 암석</td><td>기체</td></tr></table></div><p class="src">※ 반지름과 질량은 지구의 값을 1로 하여 나타낸 값</p></div>`;
 const DOC_T2=`<div class="doc"><h4>【자료 1-나】 천체 다·라·마 관측 결과</h4><div class="twrap"><table class="t"><tr><th>천체</th><th>관측 결과</th></tr><tr><td>다</td><td style="text-align:left">어느 행성 주위를 공전한다.</td></tr><tr><td>라</td><td style="text-align:left">태양 주위를 공전하며 화성과 목성 사이에서 주로 관측된다. 작고 불규칙한 암석 천체이다.</td></tr><tr><td>마</td><td style="text-align:left">얼음과 먼지로 이루어져 있고 긴 궤도로 태양 주위를 공전한다. 태양에 가까워지면 꼬리가 나타난다.</td></tr></table></div></div>`;
 const DOC_T3=`<div class="doc"><h4>【자료 2】 우주기상센터의 관측 기록</h4><div class="twrap"><table class="t"><tr><th>항목</th><th>A 시기</th><th>B 시기</th></tr><tr><td>태양의 흑점 수</td><td>많음</td><td>적음</td></tr><tr><td>홍염과 플레어</td><td>자주 발생</td><td>드물게 발생</td></tr><tr><td>태양풍</td><td>강함</td><td>비교적 약함</td></tr><tr><td>오로라</td><td>평소보다 낮은 위도에서도 관측</td><td>극지방에서 드물게 관측</td></tr><tr><td>GPS 수신 오류 신고</td><td>크게 증가</td><td>거의 없음</td></tr></table></div><p>우주기상센터는 기록을 검토한 뒤, 태양 활동을 지속적으로 관측하면서 <b>인공위성·송전 설비 등 중요 설비 보호 조치</b>를 하고 <b>우주기상 예보를 강화</b>하기로 하였다.</p></div>`;
 const EXAM=[
- {no:1,pts:2,title:"행성의 특징 비교하기",docs:DOC_T1,imgs:["earth","jupiter"],scale:[34,300],labels:["천체 가 (상대 지름 0.9)","천체 나 (상대 지름 11.2)"],
+ {no:1,pts:2,title:"행성의 특징 비교하기",docs:DOC_T1,imgs:["earth","jupiter"],scale:[34,300],labels:["천체 가 (반지름 0.9)","천체 나 (반지름 11.2)"],
   q:`【자료 1-가】를 근거로 천체 <b>가</b>와 <b>나</b>를 각각 지구형 행성과 목성형 행성으로 분류하고, 두 천체의 특징을 <b>두 가지 이상 비교</b>하여 분류한 까닭을 서술하시오.`,
-  spec:{min:60,groups:[{name:"지구형 분류",words:["지구형"]},{name:"목성형 분류",words:["목성형"]},{name:"비교 근거 ① 지름 또는 밀도",words:["지름","밀도","크기"]},{name:"비교 근거 ② 위성 또는 고리",words:["위성","고리"]}],compare:true},
-  ai:"[문항 1 · 2점] 자료: 가(상대 지름 0.9, 밀도 5.2, 위성 없음, 고리 없음) / 나(상대 지름 11.2, 밀도 1.3, 위성 많음, 고리 있음). 채점 기준: 상(2점)=가를 지구형, 나를 목성형으로 정확히 분류하고, 자료에 제시된 특징 두 가지 이상을 비교하여 분류 근거를 구체적으로 설명 / 중(1점)=두 천체의 유형은 정확히 분류했으나 비교한 특징이 한 가지이거나 자료와 분류 근거의 연결이 부족 / 하(0점)=유형을 정확히 분류하지 못하거나 근거 없음. 근거는 반드시 표의 숫자·내용에서 나와야 함."},
+  spec:{min:60,groups:[{name:"지구형 분류",words:["지구형"]},{name:"목성형 분류",words:["목성형"]},{name:"비교 근거 ① 반지름·질량(크기)",words:["반지름","지름","질량","크기"]},{name:"비교 근거 ② 위성·고리·표면 상태",words:["위성","고리","표면","암석","기체"]}],compare:true},
+  ai:"[문항 1 · 2점] 자료: 가(반지름 0.9, 질량 0.8, 위성 없음, 고리 없음, 표면 단단한 암석) / 나(반지름 11.2, 질량 318, 위성 많음, 고리 있음, 표면 기체). 밀도는 교과서 범위가 아니므로 요구하지 말 것. 채점 기준: 상(2점)=가를 지구형, 나를 목성형으로 정확히 분류하고, 자료에 제시된 특징 두 가지 이상을 비교하여 분류 근거를 구체적으로 설명 / 중(1점)=두 천체의 유형은 정확히 분류했으나 비교한 특징이 한 가지이거나 자료와 분류 근거의 연결이 부족 / 하(0점)=유형을 정확히 분류하지 못하거나 근거 없음. 근거는 반드시 표의 숫자·내용에서 나와야 함."},
  {no:2,pts:2,title:"태양계 구성원 판단하기",docs:DOC_INTRO+DOC_T2,imgs:["moon","asteroid","comet"],
   q:`【제시문】과 【자료 1-나】를 근거로 천체 <b>다, 라, 마</b>가 각각 어떤 종류의 천체인지 밝히고, "행성이 아닌 다·라·마는 태양계 구성원이 아니다"라는 과학신문 설명이 <b>잘못된 까닭</b>을 <b>공전 관계</b>와 관련지어 서술하시오.`,
   spec:{min:60,groups:[{name:"다=위성",words:["위성"]},{name:"라=소행성",words:["소행성"]},{name:"마=혜성",words:["혜성"]},{name:"공전 관계로 설명",words:["공전","주위를 돌","주위를 도"]},{name:"신문 설명이 잘못됨을 지적",words:["잘못","오류","틀렸","구성원이다","구성원이므로"]}]},
@@ -1058,7 +1060,7 @@ function renderSlide(){
  if(sl.t==="game2"){
    body=`<div class="s-kicker">🎮 미니 게임</div><div class="s-title">격납고 분류 작전</div><p class="s-body">아라호에서 행성 <b>관측 자료</b>만 도착했다 — 이름도 사진도 없이. 자료만 보고 어느 격납고(지구형/목성형)로 보낼지 판단하고, <em>근거</em>를 함께 보고하라.</p><div id="g2"></div>`;}
  if(sl.t==="sunsort"){ seen(); body=`<div class="s-kicker">${c.no} · 📖 교과서 활동</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">${sl.h}</div><div id="sunsort"></div>`;}
- if(sl.t==="vol"){ seen(); body=`<div class="s-kicker">${c.no} · 🍭 반전의 반전</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">솜사탕인데 왜 이렇게 무거울까? — 목성 안에 지구 몇 개?</div><div id="vol"></div>`;}
+ if(sl.t==="vol"){ seen(); body=`<div class="s-kicker">${c.no} · 🔍 더 알아보기 <span class="pill" style="margin-left:6px">평가 범위 밖</span></div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">목성형은 기체인데 왜 이렇게 무거울까? — 목성 안에 지구 몇 개?</div><div id="vol"></div>`;}
  if(sl.t==="graph"){ seen(); body=`<div class="s-kicker">${c.no} · 📊 교과서 활동</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">반지름 막대그래프 그리기 — 표를 그림으로 바꾸면 두 집단이 보인다</div><div id="graph"></div>`;}
  if(sl.t==="meet"){ body=`<div class="s-kicker">🧑‍🚀 모둠 탐구 · ${sl.h}</div><div class="s-title" style="font-size:clamp(1.4rem,2.6vw,2.2rem)">이름이 지워진 8개 행성 — 두 팀으로 나눠라</div><div id="meet"></div>`;}
  if(sl.t==="write"){const w=S.writes[sl.key]||{};
@@ -1174,7 +1176,7 @@ function mountGraph(root,k){
     <button class="btn-g" id="grhalf" style="min-height:44px">${G.half===false?'0.5 점선 켜기':'0.5 점선 끄기'}</button>
     <button class="btn-g" id="grrst" style="min-height:44px">다시 그리기</button>
     ${G.tries>=1&&!G.show?'<button class="btn-g" id="grshow" style="min-height:44px">🔴 정답 높이 보기</button>':''}</div>
-   <div id="grfb">${G.done?`<div class="fb ok"><b>✅ 그래프 완성!</b> 교과서 빈칸에 이렇게 적어 보세요.<br>· <b>집단 A</b>(반지름이 작다): 수성, 금성, 지구, 화성<br>· <b>집단 B</b>(반지름이 크다): 목성, 토성, 천왕성, 해왕성<div class="small" style="margin-top:6px">가장 큰 틈은 <b>화성(0.53)</b>과 <b>해왕성(3.88)</b> 사이. 다음 활동 — <b>질량</b>으로 나눠도 같은 두 집단일까? <b>밀도</b>로 나누면 큰 쪽·작은 쪽이 <em>거꾸로</em> 된다는 것도 표에서 확인해 보기!</div></div>`:G.chk?`<div class="fb no"><b>❌ 표시 막대를 다시 맞춰 보세요.</b> 행성 이름을 누르면 어디쯤 그려야 하는지 알려 줘요.${G.tries>=1?' 그래도 어려우면 <b>정답 높이 보기</b>를 눌러 빨간 점선에 맞춰 그려도 돼요.':''}</div>`:''}</div>
+   <div id="grfb">${G.done?`<div class="fb ok"><b>✅ 그래프 완성!</b> 교과서 빈칸에 이렇게 적어 보세요.<br>· <b>집단 A</b>(반지름이 작다): 수성, 금성, 지구, 화성<br>· <b>집단 B</b>(반지름이 크다): 목성, 토성, 천왕성, 해왕성<div class="small" style="margin-top:6px">가장 큰 틈은 <b>화성(0.53)</b>과 <b>해왕성(3.88)</b> 사이. 다음 활동 — <b>질량</b>, <b>위성 수</b>, <b>표면 상태</b>로 나눠도 같은 두 집단일까? 표에서 확인해 보기!</div></div>`:G.chk?`<div class="fb no"><b>❌ 표시 막대를 다시 맞춰 보세요.</b> 행성 이름을 누르면 어디쯤 그려야 하는지 알려 줘요.${G.tries>=1?' 그래도 어려우면 <b>정답 높이 보기</b>를 눌러 빨간 점선에 맞춰 그려도 돼요.':''}</div>`:''}</div>
   </div><div class="figure" style="margin:0;padding:12px 10px 6px">${svg()}<p class="figcap">교과서 228~229쪽 표 · 그래프와 같은 값 (출처: 미국항공우주국, 2023)</p></div></div>`;
   bind();}
  function setFrom(e){const sv=root.querySelector("#grsvg"),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(sv.getScreenCTM().inverse());
@@ -1217,10 +1219,10 @@ function mountVol(root,k){
  const fmt=x=>x.toLocaleString("ko-KR");
  function calc(){const p=VOLP[pl],n=p.k,vol=n*n*n,m=Math.round(vol/p.den);
   return `<div class="volcalc"><div><span class="vn">①</span><b>부피</b> — 반지름 약 ${n}배 → <b>${n} × ${n} × ${n} = ${fmt(vol)}</b> → ${p.n} 안에 지구가 <em>약 ${fmt(Math.round(vol/100)*100)}개</em></div>
-   <div><span class="vn">②</span><b>밀도</b> — ${p.n} ${p.d} ÷ 지구 5.51 ≈ <em>1/${p.den}</em> → 같은 크기면 지구 무게의 1/${p.den}뿐 (솜사탕!)</div>
+   <div><span class="vn">②</span><b>꽉 찬 정도(밀도)</b> — ${p.n} ${p.d} ÷ 지구 5.51 ≈ <em>1/${p.den}</em> → 같은 크기면 지구 무게의 1/${p.den}뿐 (솜사탕!)</div>
    <div><span class="vn">③</span><b>질량</b> — ${fmt(vol)} ÷ ${p.den} ≈ <em>약 ${m}배</em> → 교과서 값 <b style="color:var(--cyan)">${p.m}배</b>와 거의 같다!</div></div>`;}
  function draw(){const p=VOLP[pl],n=p.k;
-  root.innerHTML=`<div class="s-grid" style="align-items:start;gap:26px"><div>
+  root.innerHTML=`<p class="small" style="margin:0 0 10px">🍭 목성형 행성은 기체로 이루어져 <b>솜사탕</b>처럼 푹신하고, 지구형 행성은 <b>쇠구슬</b>처럼 꽉 찬 암석이에요. 같은 크기 안에 얼마나 꽉 찼는지를 <b>밀도</b>라고 하는데, 뒤에 나올 「물질의 특성」 단원에서 제대로 배워요. 그런데 솜사탕 같은 목성이 지구보다 318배나 무겁다니?</p><div class="s-grid" style="align-items:start;gap:26px"><div>
    <div class="key" style="margin-top:0"><span class="kt">예측</span>${p.n}의 반지름은 지구의 약 <b>${n}배</b>(${p.r}). 그럼 ${p.n} 안에 지구가 <b>몇 개</b> 들어갈까?</div>
    <div class="volopts">${[[n,"약 "+n+"개"],[n*n,"약 "+fmt(n*n)+"개"],[n*n*n,"약 "+fmt(Math.round(n*n*n/100)*100)+"개"]].map(([v,t])=>`<button class="opt" data-v="${v}" style="margin:0"><span>${t}</span></button>`).join("")}</div>
    <div id="vfb"></div>
@@ -1232,7 +1234,7 @@ function mountVol(root,k){
    <div id="vcube">${isoCube(n,V[pl]?n:0,300,false)}</div>
    <div id="vcount" class="volcount">${V[pl]?`<b>${fmt(n*n*n)}</b>개 = ${n}×${n} 한 층 ${fmt(n*n)}개 × ${n}층`:`예측을 고르면 쌓기 시작!`}</div>
    <p class="figcap">반지름이 ${n}배면 가로·세로·높이가 모두 ${n}배 → 부피는 ${n}×${n}×${n}배</p></div></div>
-   <div class="key"><span class="kt">핵심</span>목성형 행성은 <b>하나하나는 가볍지만</b>(밀도 작다) <b>엄청나게 커서</b>(부피 크다) 질량이 크다. 반지름이 조금만 커져도 부피는 <em>세 번 곱한 만큼</em> 커진다!</div>`;
+   <div class="key"><span class="kt">핵심</span>목성형 행성은 <b>푹신한 기체</b>(밀도 작다)지만 <b>엄청나게 커서</b>(부피 크다) 질량이 크다. 반지름이 조금만 커져도 부피는 <em>세 번 곱한 만큼</em> 커진다!</div>`;
   root.querySelectorAll(".volopts .opt").forEach(b=>b.onclick=()=>{const v=+b.dataset.v,good=v===n*n*n;
    root.querySelectorAll(".volopts .opt").forEach(x=>x.classList.remove("ok","no"));b.classList.add(good?"ok":"no");
    root.querySelector("#vfb").innerHTML=good?`<div class="fb ok"><b>🎯 정답!</b> 반지름 ${n}배 → 가로 ${n} × 세로 ${n} × 높이 ${n}.</div>`
@@ -1263,11 +1265,11 @@ function mountSunsort(root,k){
 function mountMeet(root,k,c,onDone){
  /* 관제팀 분류 회의: 정답을 알려주기 전에, 모둠이 원자료만 보고 스스로 기준을 세워 두 팀으로 나눈다 */
  const M=S.meet=S.meet||{}; M.as=M.as||{}; M.cr=M.cr||[]; M.tx=M.tx||""; M.g=M.g||"";
- const CR=["반지름","질량","평균 밀도","위성 수","고리"];
+ const CR=["반지름","질량","위성 수","고리","표면 상태"];
  const tag=t=>t===1?"1팀":t===2?"2팀":"미정";
  function draw(){
   root.innerHTML=`<p class="s-body" style="margin:0 0 6px">아라호의 데이터 로그가 손상돼 행성 이름이 지워졌다. 남은 것은 <em>숫자뿐</em>. 관제팀(모둠)이 <b>직접 기준을 세워</b> 8개 행성을 두 팀으로 나눠라. 카드를 누를 때마다 <span style="color:var(--sun)">1팀</span> → <span style="color:var(--cyan)">2팀</span> → 미정으로 바뀐다.</p>
-  <div class="rawgrid">${RAW.map(x=>{const t=M.as[x.c]||0;return `<button class="rawcard ${t?'t'+t:''}" data-c="${x.c}"><span class="tm">${tag(t)}</span><h5>행성 ${x.c}</h5><dl><dt>반지름 (지구=1)</dt><dd>${x.p.r}</dd><dt>질량 (지구=1)</dt><dd>${x.p.m}</dd><dt>평균 밀도 (g/cm³)</dt><dd>${x.p.d}</dd><dt>위성 수</dt><dd>${x.p.sat}개</dd><dt>고리</dt><dd>${x.p.ring}</dd></dl></button>`;}).join("")}</div>
+  <div class="rawgrid">${RAW.map(x=>{const t=M.as[x.c]||0;return `<button class="rawcard ${t?'t'+t:''}" data-c="${x.c}"><span class="tm">${tag(t)}</span><h5>행성 ${x.c}</h5><dl><dt>반지름 (지구=1)</dt><dd>${x.p.r}</dd><dt>질량 (지구=1)</dt><dd>${x.p.m}</dd><dt>위성 수</dt><dd>${x.p.sat}개</dd><dt>고리</dt><dd>${x.p.ring}</dd><dt>표면 상태</dt><dd>${x.p.t==="rock"?"고체":"기체"}</dd></dl></button>`;}).join("")}</div>
   <div class="meetrow"><div>
    <label class="small" style="display:block">우리 관제팀(모둠) 번호 <select id="mg" style="width:auto;min-width:110px;padding:6px 10px;margin-left:6px"><option value="">선택</option>${[1,2,3,4,5,6,7,8].map(n=>`<option ${String(M.g)===String(n)?'selected':''}>${n}</option>`).join("")}</select></label>
    <p class="small" style="margin:10px 0 0">나눌 때 실제로 쓴 기준을 <b>두 가지 이상</b> 고르세요.</p>
@@ -1305,15 +1307,17 @@ function mountG2(root,k,onDone){
  const bins=()=>`<div class="hangars"><div class="hangar rock"><h4>🪨 지구형 격납고</h4><div class="got">${got.rock.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div><div class="hangar gas"><h4>🎈 목성형 격납고</h4><div class="got">${got.gas.map(n=>`<span>${n}</span>`).join("")||'<span class="small">비어 있음</span>'}</div></div></div>`;
  const card=(p,hide)=>`<div class="doc" style="background:#0a0f2c;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)"><h4 style="color:var(--cyan)">관측 자료 — ${hide?`행성 <b>${String.fromCharCode(65+idx)}</b> (정체 미공개)`:`<b style="color:var(--sun)">${p.n}</b>`}</h4>
    <table class="t" style="font-size:1.08rem"><tr><td>반지름 (지구=1)</td><td style="text-align:left"><b style="color:var(--sun)">${p.r}</b> <span class="small">${p.r>2?"지구보다 훨씬 크다":"지구와 비슷하거나 작다"}</span></td></tr>
-   <tr><td>평균 밀도</td><td style="text-align:left"><b style="color:var(--sun)">${p.d} g/cm³</b> <span class="small">${p.d>3?"암석처럼 꽉 찼다 (물의 3배↑)":"물(1.0)과 비슷한 밀도 → 기체"}</span></td></tr>
+   <tr><td>질량 (지구=1)</td><td style="text-align:left"><b style="color:var(--sun)">${p.m}</b> <span class="small">${p.m>2?"지구보다 훨씬 무겁다":"지구와 비슷하거나 가볍다"}</span></td></tr>
    <tr><td>위성 수</td><td style="text-align:left"><b style="color:var(--sun)">${p.sat}개</b></td></tr>
-   <tr><td>고리</td><td style="text-align:left"><b style="color:var(--sun)">${p.ring}</b></td></tr></table>
-   <p class="small" style="margin:8px 0 0">힌트: 밀도와 크기를 먼저 보세요. ‘크기가 크다’와 ‘밀도가 크다’는 다른 말! 밀도는 ‘얼마나 꽉 찼나’.</p></div>`;
+   <tr><td>고리</td><td style="text-align:left"><b style="color:var(--sun)">${p.ring}</b></td></tr>
+   <tr><td>표면 상태</td><td style="text-align:left"><b style="color:var(--sun)">${p.t==="rock"?"단단한 암석":"기체"}</b></td></tr></table>
+   <p class="small" style="margin:8px 0 0">힌트: 크기(반지름·질량)와 표면 상태를 먼저 보세요. 숫자는 지구를 1로 한 값!</p></div>`;
  function draw(){
-  if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>밀도·크기·위성·고리</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();if(onDone)onDone();return;}
+  if(idx>=q.length){root.innerHTML=`<div class="fb ok" style="text-align:center"><b style="font-size:1.3rem">분류 완료! 실수 ${miss}번 🎉</b><p>이름을 몰라도 <b>크기·질량·위성·고리·표면 상태</b>만 보면 팀을 가를 수 있다 — 이게 바로 논술 1번의 근거예요.</p></div>${bins()}`;if(!S.quiz[k]){S.quiz[k]=1;addPts(6);}else save();if(onDone)onDone();return;}
   const p=q[idx];
   const RS=[ // [문구, 이 행성에서 참인가, 어느 팀의 근거인가]
-    ["밀도가 크다 (암석)",p.d>3,"rock"],["밀도가 작다 (기체)",p.d<=3,"gas"],
+    ["표면이 단단한 암석",p.t==="rock","rock"],["표면이 기체",p.t==="gas","gas"],
+    ["질량이 작다",p.m<2,"rock"],["질량이 크다",p.m>=2,"gas"],
     ["크기가 작다",p.r<2,"rock"],["크기가 크다",p.r>=2,"gas"],
     ["위성이 없거나 적다",p.sat<=2,"rock"],["위성이 많다",p.sat>2,"gas"],
     ["고리가 없다",p.ring==="없음","rock"],["고리가 있다",p.ring==="있음","gas"]];
@@ -1327,7 +1331,7 @@ function mountG2(root,k,onDone){
     const fb=root.querySelector("#g2fb");
     if(picked.size<2){fb.innerHTML='<div class="fb no">근거를 <b>두 가지 이상</b> 고르세요 — 한 가지로는 분류가 아니라 추측!</div>';return;}
     const wrongFact=[...picked].filter(i=>!RS[i][1]); const otherTeam=[...picked].filter(i=>RS[i][1]&&RS[i][2]!==b.dataset.b);
-    if(wrongFact.length){miss++;fb.innerHTML=`<div class="fb no">🛰️ 자료와 다른 근거가 있어요: <b>${wrongFact.map(i=>RS[i][0]).join(", ")}</b> — 표의 숫자를 다시 보세요. (밀도 ${p.d}, 반지름 ${p.r}, 위성 ${p.sat}개, 고리 ${p.ring})</div>`;return;}
+    if(wrongFact.length){miss++;fb.innerHTML=`<div class="fb no">🛰️ 자료와 다른 근거가 있어요: <b>${wrongFact.map(i=>RS[i][0]).join(", ")}</b> — 표의 숫자를 다시 보세요. (반지름 ${p.r}, 질량 ${p.m}, 위성 ${p.sat}개, 고리 ${p.ring})</div>`;return;}
     if(b.dataset.b!==p.t||otherTeam.length){miss++;b.classList.add("no");
       fb.innerHTML=`<div class="fb no">🛰️ 고른 근거(${[...picked].map(i=>RS[i][0]).join(", ")})는 ${p.t==="rock"?"<b>지구형</b>":"<b>목성형</b>"}의 특징이에요. 근거와 격납고가 맞는지 다시 생각해 보세요.</div>`;setTimeout(()=>b.classList.remove("no"),400);return;}
     got[p.t].push(p.n);
@@ -1522,7 +1526,7 @@ function commsComposeHTML(mission,phase,opts){
     return `<div class="card" style="margin:${opts.compact?'10px 0 0':'0 0 16px'}"><h3 style="font-size:1.25rem">📡 귀환 교신 <span class="small">— ${mission}</span></h3>
      <p class="small">둘 중 <b>하나</b>만 보내도 임무가 종료됩니다. <b>둘 다</b> 보내면 보너스 +2점!</p>
      <div class="row2"><div><label class="small">❓ 새로 생긴 질문 (+3점) ${d1?'<span class="pill g">보냄</span>':''}</label><textarea id="cmText" style="min-height:90px" placeholder="예) 토성 고리는 왜 안 흩어질까?" ${d1?'disabled':''}></textarea></div>
-     <div><label class="small">💡 새롭게 알게 된 점 (+3점) ${d2?'<span class="pill g">보냄</span>':''}</label><textarea id="cmText2" style="min-height:90px" placeholder="예) 밀도가 작다고 가볍다는 뜻이 아니라는 걸 알았다." ${d2?'disabled':''}></textarea></div></div>
+     <div><label class="small">💡 새롭게 알게 된 점 (+3점) ${d2?'<span class="pill g">보냄</span>':''}</label><textarea id="cmText2" style="min-height:90px" placeholder="예) 목성형 행성은 표면이 땅이 아니라 기체라는 걸 알았다." ${d2?'disabled':''}></textarea></div></div>
      <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap"><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="cmAnon" style="width:20px;height:20px"> 익명으로 보내기</label>
      <button class="btn-p" id="cmSend" style="margin-left:auto">귀환 교신 발신</button></div><div id="cmMsg"></div></div>`;
   }
