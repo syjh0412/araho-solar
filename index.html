@@ -1054,7 +1054,7 @@ function renderHome(){
 }
 
 /* ═══════ 승무원실 — 캐릭터·장비·보급 ═══════ */
-const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["반지름 그래프 완성",4],["목성 속 지구 개수 예측 정답",2],["태양 사진 표면·대기 분류",3],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (최대 15건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
+const HOWPTS=[["카드 한 장 읽기",1],["퀴즈 정답",2],["격납고 분류 완료",6],["반지름 그래프 완성",4],["목성 속 지구 개수 예측 정답",2],["태양 사진 표면·대기 분류",3],["한 줄 논술 통과",5],["미션 요약 확인",2],["출발 전 교신",3],["귀환 교신 (질문 / 알게 된 점 각각)",3],["귀환 교신 둘 다 보내기 보너스",2],["다른 승무원 교신에 응답 (AI 확인 통과, 최대 50건)",2],["수배 파일 사건 종결",4],["논술 시험 문항 제출",8]];
 function renderCrew(){
  if(isT()){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">🧑‍🚀 승무원실 <span class="small">— 센터장 참고용</span></h2>
@@ -1763,10 +1763,10 @@ function commsComposeHTML(mission,phase,opts){
      <button class="btn-p" id="cmSend" style="margin-left:auto">귀환 교신 발신</button></div><div id="cmMsg"></div></div>`;
   }
   return `<div class="card" style="margin:${opts.compact?'10px 0 0':'0 0 16px'}"><h3 style="font-size:1.25rem">📡 ${opts.pick?"새 교신 보내기":phase+" 교신 보내기"} ${opts.pick?"":`<span class="small">— ${mission}</span>`}</h3>
-   <p class="small">이 주제에서 가장 궁금한 것 하나. 답을 모르는 질문일수록 좋은 교신입니다. ${opts.pick?"":"<b>보내야 임무가 시작됩니다.</b>"}</p>${pick}
+   <p class="small">이 주제에서 가장 궁금한 것 하나. 답을 모르는 질문일수록 좋은 교신입니다. ${opts.pick?"미션·단계마다 <b>첫 교신</b>에 +3점이 붙고, 그다음부터는 점수 없이 얼마든지 보낼 수 있어요.":"<b>보내야 임무가 시작됩니다.</b>"}</p>${pick}
    <textarea id="cmText" style="min-height:90px" placeholder="예) 혜성 꼬리는 왜 항상 태양 반대쪽을 향할까?"></textarea>
    <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap"><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="cmAnon" style="width:20px;height:20px"> 익명으로 보내기</label>
-   <button class="btn-p" id="cmSend" style="margin-left:auto">교신 발신 (+3점)</button></div><div id="cmMsg"></div></div>`;
+   <button class="btn-p" id="cmSend" style="margin-left:auto">${!opts.pick&&!(S.comms&&S.comms["q_"+mission+"_"+phase])?"교신 발신 (+3점)":"교신 발신"}</button></div><div id="cmMsg"></div></div>`;
 }
 function bindCompose(root,mission,phase,after){
   const b=root.querySelector("#cmSend"); if(!b)return;
@@ -1785,12 +1785,23 @@ function bindCompose(root,mission,phase,after){
       if(t1El)t1El.value=""; if(t2El)t2El.value="";
       m.innerHTML='<div class="fb ok"><b>📡 교신 수신 완료'+(gained?` (+${gained}점)`:'')+'.</b> '+(t2El?'둘 다 보냈다면 보너스까지 챙긴 거예요. ':'')+'교신 탭에서 응답을 확인하세요!</div>'; if(after)after();}
     catch(e){m.innerHTML='<div class="fb no">발신 실패: '+esc(e)+'</div>';}
-    b.disabled=false;b.textContent=t2El?"귀환 교신 발신":"교신 발신 (+3점)";};
+    b.disabled=false;b.textContent=t2El?"귀환 교신 발신":"교신 발신";};
 }
 let CM={mission:"",mine:false,noans:false,compose:false,open:{},cls:"",other:false};
+/* 응답 점수: AI 확인을 통과한 응답에 +2점, 최대 50건 (2026-10 변경: 15건 → 50건)
+   예전 기록은 15건까지만 점수가 붙었으므로 ans를 15로 맞춘 뒤 이어서 센다 */
+const ANS_CAP=50, ANS_PTS=2;
+function ansLeft(){S.comms=S.comms||{}; if(!S.comms.ansv2){if((S.comms.ans||0)>15)S.comms.ans=15;S.comms.ansv2=1;} return Math.max(0,ANS_CAP-(S.comms.ans||0));}
+function ansBtnLabel(){if(isT())return "응답 보내기"; const l=ansLeft(); return l>0?`응답 보내기 (+${ANS_PTS}점 · 남은 ${l}건)`:"응답 보내기 (점수는 다 모았어요 · 응답은 계속 환영!)";}
+function ansRubric(q,isK){
+  return (isK
+   ? "[과제] 친구가 쓴 '새롭게 알게 된 점'에 단 짧은 댓글을 검토한다. 논술이 아니므로 글의 짜임(주장→근거→결론)은 따지지 않는다.\n[친구의 글] "+q+"\n[수준]\n상: 친구 글의 내용과 관련된 과학 내용을 덧붙이거나, 무엇이 좋은지 이유를 들어 말함\n중: 친구 글과 관련 있고 틀린 곳은 없지만 짧음\n하: 친구 글과 상관없음, 'ㅇㅈ', '굿', 'ㅋㅋ'처럼 한두 마디뿐인 글, 장난, 과학적으로 틀린 내용"
+   : "[과제] 친구의 질문에 단 짧은 응답을 검토한다. 논술이 아니므로 글의 짜임(주장→근거→결론)은 따지지 않는다. 질문이 교과서 밖 내용이면 중1이 이해할 수 있는 수준에서 맞는지만 본다.\n[친구의 질문] "+q+"\n[수준]\n상: 질문에 맞는 내용이고 과학적으로 맞으며, 이유나 예를 들어 설명함\n중: 질문에 맞고 과학적으로 틀린 곳은 없지만 짧거나 이유가 부족함\n하: 질문과 상관없음, '몰라', '나도 궁금', 'ㅋㅋ' 같은 성의 없는 글, 질문을 그대로 되풀이함, 과학적으로 틀린 내용이 있음")
+   +"\n[피드백] good은 1개만. improve는 '중'이나 '하'일 때만 1개: 무엇을 더하거나 고치면 좋은지 힌트로(정답 문장을 통째로 쓰지 않는다). 틀린 내용이 있으면 무엇이 틀렸는지 먼저 짚는다. next는 빈 문자열.";
+}
 function renderComms(){
   app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">📡 교신 채널</h2>
-  <p class="small" style="margin:0 4px 10px">${isG()?`🎩 <b style="color:var(--violet)">참관 — ${esc(me.cls)}반 승무원들의 교신</b>이에요. 학생 이름은 가리고 보여 드려요.`:isT()?'센터장은 모든 반의 교신을 볼 수 있어요. 반을 골라 보세요.':(CM.other?`<b style="color:var(--violet)">🔭 다른 반 교신 구경 중</b> — 이름은 가려지고, 읽기만 할 수 있어요.`:`<b style="color:var(--cyan)">${esc(me?me.cls:"")}반 교신</b>이에요. 다른 반 교신은 <b>구경하기</b>로 볼 수 있어요.`)} 왼쪽 칸은 ❓ 질문, 오른쪽 칸은 💡 알게 된 점 — 칸 안에서 미션별로 나뉩니다. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — 응답 1건에 +2점.</p>
+  <p class="small" style="margin:0 4px 10px">${isG()?`🎩 <b style="color:var(--violet)">참관 — ${esc(me.cls)}반 승무원들의 교신</b>이에요. 학생 이름은 가리고 보여 드려요.`:isT()?'센터장은 모든 반의 교신을 볼 수 있어요. 반을 골라 보세요.':(CM.other?`<b style="color:var(--violet)">🔭 다른 반 교신 구경 중</b> — 이름은 가려지고, 읽기만 할 수 있어요.`:`<b style="color:var(--cyan)">${esc(me?me.cls:"")}반 교신</b>이에요. 다른 반 교신은 <b>구경하기</b>로 볼 수 있어요.`)} 왼쪽 칸은 ❓ 질문, 오른쪽 칸은 💡 알게 된 점 — 칸 안에서 미션별로 나뉩니다. 모르는 질문에 답해 보는 것도 훌륭한 훈련 — AI가 읽고 괜찮은 응답이면 +2점 (최대 50건).</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
    ${isT()?`<select id="cmCls" style="width:auto;padding:8px 12px"><option value="">모든 반</option>${CM.cls?`<option value="${esc(CM.cls)}" selected>${esc(CM.cls)}반</option>`:''}</select>`:''}
    <select id="cmMission" style="width:auto;padding:8px 12px"><option value="">모든 미션</option>${CH.map(c=>`<option value="${c.no}" ${CM.mission===c.no?'selected':''}>${c.no} ${c.title}</option>`).join("")}</select>
@@ -1816,13 +1827,13 @@ const CM_PH={"출발 전":["❓","출발 전 질문"],"귀환 후":["❓","귀�
 function cmCard(r){
   const ans=r.answers||[], open=CM.open&&CM.open[r.id], shown=open?ans:ans.slice(-2), ph=CM_PH[r.phase]||["❓",r.phase];
   const who=r.ro?`${esc(r.cls)}반 승무원`:r.name==="익명 승무원"?"익명":`${esc(r.cls)}반 ${esc(r.name)}`;
-  return `<div class="cmq ${ans.length?'done':'wait'} ${r.mine?'mine':''}" data-q="${esc(r.id)}">
+  return `<div class="cmq ${ans.length?'done':'wait'} ${r.mine?'mine':''}" data-q="${esc(r.id)}" data-k="${r.phase==="귀환 보고"?1:""}">
    <div class="cmmeta">${(!CM.mission&&r.phase!=="귀환 보고")?`<span class="cmph">${r.phase==="출발 전"?"출발 전":"귀환 후"}</span>`:''}<span>${who}</span><span>${esc((r.t||'').slice(5,16).replace('T',' '))}</span>${r.mine?'<span class="pill w" style="margin:0">내 교신</span>':''}<span class="cmn">${r.phase==="귀환 보고"?(ans.length?`댓글 ${ans.length}`:''):(ans.length?`응답 ${ans.length}`:'응답 기다림')}</span></div>
    <p class="cmtx">${esc(r.text)}</p>
    ${ans.length>shown.length?`<button class="cmmore" data-more="${esc(r.id)}">이전 응답 ${ans.length-shown.length}개 더 보기</button>`:''}
    ${shown.map(a=>`<div class="cma ${a.teacher?'t':''}"><b>${a.teacher?'🎖️ 센터장':'💬 '+(r.ro?(a.cls?esc(a.cls)+'반 ':'')+'승무원':esc(a.name))}</b> <span class="small">${esc((a.t||'').slice(5,16).replace('T',' '))}</span><div>${esc(a.text)}</div></div>`).join("")}
    ${r.ro?'':`<button class="cmrep" data-rep="${esc(r.id)}" data-lab="${r.phase==="귀환 보고"?"👍 댓글 달기":"응답하기"}">${r.phase==="귀환 보고"?"👍 댓글 달기":"응답하기"}</button>
-   <div class="cmbox" hidden><textarea class="ansIn" placeholder="아는 만큼, 근거와 함께"></textarea><button class="btn-s ansBtn" style="min-height:44px;width:100%;margin-top:6px">응답 보내기 (+2점)</button></div>`}</div>`;
+   <div class="cmbox" hidden><textarea class="ansIn" placeholder="아는 만큼, 근거와 함께"></textarea><button class="btn-s ansBtn" style="min-height:44px;width:100%;margin-top:6px">${ansBtnLabel()}</button><div class="ansFb"></div></div>`}</div>`;
 }
 async function loadComms(){
   const L=document.getElementById("cmList"), ST=document.getElementById("cmStat"); if(!L)return;
@@ -1850,11 +1861,36 @@ async function loadComms(){
     L.innerHTML=`<div class="cmboard two">${col("q","❓ 질문",rows.filter(isQ),true)}${col("k","💡 알게 된 점",rows.filter(r=>!isQ(r)),false)}</div>`;
     L.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{CM.open=CM.open||{};CM.open[b.dataset.more]=1;loadComms();});
     L.querySelectorAll("[data-rep]").forEach(b=>b.onclick=()=>{const bx=b.nextElementSibling;bx.hidden=!bx.hidden;b.textContent=bx.hidden?b.dataset.lab:"취소";if(!bx.hidden)bx.querySelector("textarea").focus();});
-    L.querySelectorAll(".ansBtn").forEach(b=>b.onclick=async()=>{const card=b.closest("[data-q]"),inp=card.querySelector(".ansIn"),t=inp.value.trim(); if(t.length<2)return toast("응답을 적어 주세요");
-      b.disabled=true; try{await commsAnswer(card.dataset.q,t); S.comms=S.comms||{}; S.comms.ans=(S.comms.ans||0)+1; if(S.comms.ans<=15)addPts(2); else save(); CM.open=CM.open||{};CM.open[card.dataset.q]=1; loadComms();}catch(e){toast("응답 실패: "+e);b.disabled=false;}});
+    L.querySelectorAll(".ansBtn").forEach(b=>b.onclick=()=>sendAnswer(b,false));
   }catch(e){L.innerHTML=`<div class="fb no">교신 채널 연결 실패: ${esc(e)}</div>`;}
 }
 
+
+/* 응답 보내기 — AI가 먼저 읽고 '하'면 고쳐 쓰게 한다. AI가 꺼져 있거나 연결이 안 되면 예전처럼 바로 보낸다 */
+async function sendAnswer(b,force){
+  const card=b.closest("[data-q]"),inp=card.querySelector(".ansIn"),out=card.querySelector(".ansFb"),t=inp.value.trim();
+  if(t.length<2)return toast("응답을 적어 주세요");
+  const left=ansLeft(), scoring=!isT()&&!isG()&&left>0;
+  let lvl=null;
+  b.disabled=true;
+  if(scoring&&AI_ON&&API&&!force){
+    const lab=b.textContent; b.textContent="🤖 AI가 응답을 읽는 중… (5~10초)"; if(out)out.innerHTML="";
+    try{const q=(card.querySelector(".cmtx")||{}).textContent||"";
+      const res=await post({action:'feedback',...me,item:'교신응답',rubric:ansRubric(q,card.dataset.k==="1"),text:t,score:''});
+      const fb=res&&res.fb; lvl=fb&&fb.level||null;
+      if(lvl==="하"){
+        b.textContent=lab; b.disabled=false;
+        out.innerHTML=`<div class="fb no" style="margin-top:8px"><b>🤖 조금만 고쳐 볼까요?</b><ul class="cklist">${(fb.improve||[]).map(g=>`<li class="n">${esc(g)}</li>`).join("")}</ul><div class="small">고쳐서 다시 보내면 +${ANS_PTS}점을 받을 수 있어요.</div><button class="cmmore ansForce" style="margin-top:6px">AI 판단이 틀린 것 같아요 — 점수 없이 그대로 보내기</button></div>`;
+        out.querySelector(".ansForce").onclick=()=>sendAnswer(b,true); inp.focus(); return;}
+    }catch(e){lvl=null;}
+  }
+  try{
+    await commsAnswer(card.dataset.q,t);
+    if(scoring&&!force){S.comms.ans=(S.comms.ans||0)+1; addPts(ANS_PTS); if(lvl==="상")setTimeout(()=>toast("🤖 근거까지 든 멋진 응답!"),700);}
+    else save();
+    CM.open=CM.open||{};CM.open[card.dataset.q]=1; loadComms();
+  }catch(e){toast("응답 실패: "+e);b.disabled=false;b.textContent=ansBtnLabel();}
+}
 
 /* ═══════ 자료실 ═══════ */
 const DOCS=[
