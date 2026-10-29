@@ -87,6 +87,7 @@ function handle(p){
   if(a==='tlogin')    return tlogin(p);
   if(a==='roster')    return roster(p);
   if(a==='logs')      return logs(p);
+  if(a==='legends')   return legends(p);
   throw new Error('알 수 없는 요청: '+a);
 }
 
@@ -294,6 +295,16 @@ function feedback(p){
     }catch(err){ lastErr = String(err); }
   }
   return {ok:false, error:'AI 응답 실패 '+lastErr};
+}
+
+/* ───────── 명예의 전당: 290점(아라호 레전드) 이상, 점수 높은 순 ───────── */
+function legends(p){
+  var s = sheet(SHEET_STUDENTS, ['key','반','번호','이름','점수','등급','진도','상태JSON','최근접속']);
+  var v = s.getDataRange().getValues(), full = pinOk(p), rows = [];
+  for(var i=1;i<v.length;i++){ var pts = Number(v[i][4]||0);
+    if(pts>=290) rows.push({cls:v[i][1], num:v[i][2], name: full ? String(v[i][3]) : maskName(v[i][3]), pts:pts}); }
+  rows.sort(function(a,b){ return b.pts-a.pts; });
+  return {ok:true, rows:rows.slice(0,60)};
 }
 
 /* ───────── 센터장 ───────── */

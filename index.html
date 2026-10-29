@@ -537,7 +537,8 @@ function logSrv(type,item,text,score,ai){ if(API&&me) post({action:'log',...me,t
 function addPts(n){if(isT()){save();return;}const b=S.pts;S.pts+=n;save();toast("+"+n+"점!");checkUnlock(b,S.pts);}
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),400);},1500);}
 /* 등급: 우주 비행사 경력 순서 */
-const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[90,"우주 비행사"],[140,"미션 스페셜리스트"],[190,"커맨더"]];
+/* 2026-10: 응답 한도를 50건으로 늘리며 커맨더 위 두 등급 추가 */
+const RANKS=[[0,"지상 훈련생"],[40,"우주 비행 후보생"],[90,"우주 비행사"],[140,"미션 스페셜리스트"],[190,"커맨더"],[240,"함대 사령관"],[290,"아라호 레전드"]];
 function rank(){let r=RANKS[0][1],next=RANKS[1]||null;for(let i=0;i<RANKS.length;i++){if(S.pts>=RANKS[i][0]){r=RANKS[i][1];next=RANKS[i+1]||null;}}return{r,next};}
 /* 장비: 점수를 모으면 우주복이 한 점씩 갖춰진다 */
 const ITEMS=[
@@ -549,7 +550,9 @@ const ITEMS=[
  {k:"patch",at:125,n:SCHOOL+" 미션 패치",e:"🏷️",d:SCHOOL_FULL+" 관제센터 공식 패치. 가슴에 단다."},
  {k:"robot",at:150,n:"반려 로봇 '아라'",e:"🤖",d:"아라호가 보내준 작은 친구. 계산이 빠르다."},
  {k:"visor",at:170,n:"황금 바이저",e:"✨",d:"태양빛을 막는 금 코팅. 베테랑의 상징."},
- {k:"cmd",at:190,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."}];
+ {k:"cmd",at:190,n:"커맨더 견장",e:"👑",d:"임무 전체를 지휘하는 자의 표식."},
+ {k:"cape",at:240,n:"사령관 망토",e:"🌟",d:"함대 전체를 이끄는 사령관만 두를 수 있는 별빛 망토."},
+ {k:"legend",at:290,n:"명예의 전당 헌액",e:"🏆",d:"아라호 레전드. 이름이 명예의 전당에 오르고, 온몸에 황금빛이 감돈다."}];
 const have=(k)=>{const it=ITEMS.find(i=>i.k===k);return it&&S.pts>=it.at;};
 /* 센터장 보급 쿠폰 (마이쭈) */
 /* 보급 쿠폰은 3개만 (2026-10 축소): 태양계 완주 · 논술 시험 제출 · 커맨더 승급 */
@@ -590,6 +593,8 @@ function astronautSVG(pts,suit,size,o){
    <radialGradient id="${uid}v" cx=".35" cy=".3"><stop offset="0" stop-color="${v2}" stop-opacity=".9"/><stop offset=".5" stop-color="${v1}" stop-opacity="${vo}"/><stop offset="1" stop-color="#0a0f2c" stop-opacity=".55"/></radialGradient>
    <linearGradient id="${uid}m" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#c9d0e3"/><stop offset="1" stop-color="#7e879f"/></linearGradient>
   </defs>
+  ${H("legend")?`<circle cx="120" cy="150" r="118" fill="#ffd166" opacity=".14"><animate attributeName="opacity" values=".08;.22;.08" dur="2.4s" repeatCount="indefinite"/></circle><circle cx="120" cy="150" r="96" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="3 9" opacity=".7"><animateTransform attributeName="transform" type="rotate" from="0 120 150" to="360 120 150" dur="24s" repeatCount="indefinite"/></circle>`:""}
+  ${H("cape")?`<path d="M84 112 q-34 70 -40 172 q38 14 76 6 q38 8 76 -6 q-6 -102 -40 -172z" fill="#3b1f6e" stroke="#ffd166" stroke-width="3"/><path d="M84 112 q-28 70 -32 168" stroke="#5b3a9e" stroke-width="6" fill="none" opacity=".7"/><g fill="#ffe9a8"><circle cx="70" cy="214" r="2.2"/><circle cx="168" cy="236" r="2"/><circle cx="62" cy="262" r="1.8"/><circle cx="178" cy="196" r="1.6"/><circle cx="150" cy="270" r="2"/></g>`:""}
   ${H("jet")?`<g><rect x="54" y="150" width="26" height="78" rx="9" fill="url(#${uid}m)"/><rect x="160" y="150" width="26" height="78" rx="9" fill="url(#${uid}m)"/><rect x="58" y="226" width="18" height="8" rx="3" fill="#3b4160"/><rect x="164" y="226" width="18" height="8" rx="3" fill="#3b4160"/>
     <path d="M60 234 q7 30 14 0z" fill="#ffb13b" opacity=".9"><animate attributeName="d" values="M60 234 q7 26 14 0z;M60 234 q7 44 14 0z;M60 234 q7 26 14 0z" dur="0.5s" repeatCount="indefinite"/></path><path d="M166 234 q7 30 14 0z" fill="#ffb13b" opacity=".9"><animate attributeName="d" values="M166 234 q7 40 14 0z;M166 234 q7 24 14 0z;M166 234 q7 40 14 0z" dur="0.45s" repeatCount="indefinite"/></path>
     <path d="M63 234 q4 18 8 0z" fill="#fff6d6"/><path d="M169 234 q4 18 8 0z" fill="#fff6d6"/></g>`:""}
@@ -1086,10 +1091,11 @@ function renderCrew(){
     <div class="small" style="margin-top:12px">장갑·부츠 ${have("gloves")?"":"<span class='pill'>15점에 지급</span>"}</div>${have("gloves")?sw("glove",GLOVES,sty().glove,"10px"):""}
     <div class="small" style="margin-top:12px">헬멧 바이저 ${have("helmet")?"":"<span class='pill'>50점에 지급</span>"}</div>${have("helmet")?sw("visor",VISORS,sty().visor,"50%",k=>k==="gold"&&!have("visor")):""}
    </div></div>
-  <div class="card" style="margin:0"><h3>장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 커맨더!"}</p>
+  <div class="card" style="margin:0"><h3>장비 보관함</h3><p class="small">${nextItem?`다음 장비 <b style="color:var(--sun)">${nextItem.e} ${nextItem.n}</b>까지 ${nextItem.at-S.pts}점`:"모든 장비를 갖췄다. 완전체 아라호 레전드!"}</p>
    <div style="display:grid;gap:8px">${ITEMS.map(it=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);margin:0;${have(it.k)?'border-color:var(--sun);border-style:solid':'opacity:.5'}"><span style="font-size:1.5rem">${it.e}</span><div style="flex:1"><b>${it.n}</b><div class="small">${esc(it.d)}</div></div><span class="pill ${have(it.k)?'g':''}">${have(it.k)?'보유':it.at+'점'}</span></div>`).join("")}</div></div>
   <div class="card" style="margin:0"><div id="cpnBox">${cpnHTML()}</div></div>
  </div>
+ <div class="card" style="margin-top:16px"><h3>🏆 명예의 전당 <span class="small">— 290점, 아라호 레전드에 오른 승무원</span></h3><div id="hofBox" class="small">불러오는 중…</div></div>
  <div class="row2"><div class="card"><h3>🎖️ 승급 경로</h3><p class="small">점수가 쌓이면 자동으로 승급합니다. 지금 ${S.pts}점 — ${next?`<b style="color:var(--sun)">${next[1]}</b>까지 ${next[0]-S.pts}점`:"최고 등급!"}</p>
    <div style="display:grid;gap:8px">${RANKS.map((x,i)=>`<div class="frame" style="display:flex;gap:12px;align-items:center;color:var(--fg);${i===ri?'border-color:var(--sun);border-style:solid;background:#ffb13b14':i<ri?'opacity:.75':'opacity:.5'}"><span class="pill ${i<=ri?'g':''}" style="min-width:64px;text-align:center">${x[0]}점</span><b style="font-family:var(--disp);font-size:1.1rem">${x[1]}</b>${i===ri?'<span class="pill w" style="margin-left:auto">현재</span>':i===ri+1?'<span class="pill" style="margin-left:auto">다음</span>':''}</div>`).join("")}</div></div>
   <div class="card"><h3>⭐ 점수는 이렇게 모여요</h3><table class="t" style="margin-top:6px"><tr><th style="text-align:left">활동</th><th>점수</th></tr>${HOWPTS.map(x=>`<tr><td style="text-align:left;color:var(--fg);font-weight:400">${x[0]}</td><td style="color:var(--sun);font-weight:700">+${x[1]}</td></tr>`).join("")}</table>
@@ -1098,6 +1104,24 @@ function renderCrew(){
  document.querySelectorAll(".stybtn").forEach(b=>b.onclick=()=>{S.sty=S.sty||{};S.sty[b.dataset.t]=b.dataset.v;save();render();});
  cpnBind(app);
  if(API&&me&&me.cls!=="T")call({action:'myCoupons',cls:me.cls,num:me.num}).then(r=>{COUP=r.coupons||{};const bx=document.getElementById("cpnBox");if(bx){bx.innerHTML=cpnHTML();cpnBind(bx);}}).catch(()=>{});
+ loadHof("hofBox");
+}
+/* 명예의 전당 — 290점(아라호 레전드) 이상. 서버(Code.gs)에 'legends'가 없으면 안내만 */
+const HOF_AT=290;
+function hofHTML(rows,note){
+  const mine=x=>me&&String(x.cls)===String(me.cls)&&String(x.num)===String(me.num);
+  const head=`<p class="small" style="margin:4px 0 10px">${HOF_AT}점을 모아 <b style="color:var(--sun)">아라호 레전드</b>가 되면 이곳에 이름이 오릅니다.${note?" "+note:""}</p>`;
+  if(!rows)return head;
+  if(!rows.length)return head+`<p class="small">아직 비어 있어요. 첫 번째 레전드는 누가 될까요?</p>`;
+  return head+`<div style="display:flex;flex-wrap:wrap;gap:10px">${rows.map((x,i)=>`<div class="frame" style="margin:0;display:flex;gap:8px;align-items:center;color:var(--fg);${mine(x)?'border-color:var(--sun);border-style:solid':''}"><span style="font-size:1.3rem">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏆'}</span><b>${esc(x.cls)}반 ${esc(x.name)}</b><span class="pill g">⭐ ${esc(x.pts)}</span>${mine(x)?'<span class="pill w">나</span>':''}</div>`).join("")}</div>`;
+}
+function loadHof(id){
+  const bx=document.getElementById(id); if(!bx)return;
+  if(!API){bx.innerHTML=hofHTML(null);return;}
+  call({action:'legends',pin:isT()?TPIN:''}).then(r=>{const b=document.getElementById(id);if(b)b.innerHTML=hofHTML(r.rows||[]);})
+   .catch(()=>{const b=document.getElementById(id);if(!b)return;
+     if(isT()&&TROWS){b.innerHTML=hofHTML(TROWS.filter(x=>Number(x.pts)>=HOF_AT).sort((a,c)=>c.pts-a.pts).map(x=>({cls:x.cls,num:x.num,name:x.name,pts:x.pts})),"<b>학생 화면에는 아직 안 보여요 — Apps Script를 새 버전으로 배포해 주세요.</b>");}
+     else b.innerHTML=hofHTML(null,"(명예의 전당은 곧 열려요)");});
 }
 
 /* ═══════ 학습 목록 ═══════ */
@@ -1655,8 +1679,9 @@ function renderTeacher(){
   ${setup}<div class="card" style="padding:0;overflow:hidden"><div style="overflow:auto;max-height:52vh"><table class="r" id="rtable"><tr><th>반</th><th>번호</th><th>이름</th><th class="c">점수</th><th>등급</th><th>진도 (01·02·03·04·보너스)</th><th class="c">논술 통과</th><th class="c">시험 제출</th><th>최근</th><th>콜사인</th></tr><tr><td colspan="10" class="small">불러오는 중…</td></tr></table></div></div>
   <div class="card"><h3>🍬 보급 신청 결재 <span class="small">— 지급하고 나서 ‘지급’을 누르세요</span></h3><div id="cpList"><p class="small">불러오는 중…</p></div></div>
   <div class="card"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0">🛰️ 관제팀 분류 회의 보드 <span class="small">— MISSION 02 모둠 탐구 결과 (반을 고른 뒤 불러오기)</span></h3><button class="btn-s" id="mbLoad" style="min-height:40px;margin-left:auto">불러오기</button><button class="btn-g" id="mbAns" style="min-height:40px">공식 분류 표시</button></div><div id="mboard"><p class="small">발표 직전에 ‘불러오기’를 눌러 전자칠판에 띄우세요. 공식 분류 표시는 정체 공개 뒤에 켜세요.</p></div></div>
+  <div class="card"><h3>🏆 명예의 전당 <span class="small">— 아라호 레전드(290점 이상)</span></h3><div id="thof" class="small">불러오는 중…</div></div>
   <div id="tdetail"></div>`;
- drawHud(); bindSec(app); loadCoupons();
+ drawHud(); bindSec(app); loadCoupons(); setTimeout(()=>loadHof("thof"),1500);
  document.getElementById("mbLoad").onclick=()=>loadMeetBoard();
  document.getElementById("mbAns").onclick=(e)=>{MB_ANS=!MB_ANS;e.target.textContent=MB_ANS?"공식 분류 숨기기":"공식 분류 표시";if(MB_ROWS)drawMeetBoard();};
  document.getElementById("tcls").onchange=e=>{TCLS=e.target.value;loadRoster();loadCoupons();};
