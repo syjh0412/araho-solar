@@ -120,6 +120,10 @@ body.deckmode nav#tabs,body.gate nav#tabs{display:none}
 .stg-top .ttl{font-family:var(--disp);font-size:1.1rem;color:var(--mut);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stg-top .num{font-variant-numeric:tabular-nums;color:var(--cyan);font-weight:700;font-size:1.05rem}
 .stg-top button{min-height:44px;padding:6px 14px}
+.rvbtn{min-height:40px;padding:4px 14px;font-size:.92rem}.rvbtn.on{border-color:var(--sun);color:var(--sun);background:#ffb13b14}
+.stg-top .rvbtn{margin-left:auto}.stg-top .rvbtn+.num{margin-left:0}
+.hintkey.rvmsg{color:var(--sun)}
+@media (max-width:700px){.stg-top .rvbtn{font-size:.8rem;padding:2px 8px}}
 .pbar{height:5px;background:#080c24}
 .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--cyan));transition:width .35s}
 .stg-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 28px 10px;display:flex}
@@ -1134,13 +1138,14 @@ function loadHof(id){
 
 /* ═══════ 학습 목록 ═══════ */
 function renderLearn(){
- app.innerHTML=`${hudBlock()}<h2 style="margin:18px 4px 4px;font-size:1.9rem">📚 미션 학습</h2>
+ app.innerHTML=`${hudBlock()}<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 4px 4px"><h2 style="font-size:1.9rem">📚 미션 학습</h2>${isT()||isG()?"":`<button class="btn-g rvbtn ${S.review?"on":""}" id="rvwL" style="margin-left:auto">🔁 복습 모드 ${S.review?"켜짐 — 공부한 카드도 빈칸이 다시 가려져요":"꺼짐"}</button>`}</div>
  <p class="small" style="margin:0 4px 12px">한 장은 6~9분. 전체 화면 슬라이드로 넘기며 배우고, 마지막 '한 줄 논술'로 마무리!</p>
  <div class="grid">${CH.map((c,i)=>{const p=chapProg(c);return `<button class="chap ${p.d>=p.total?'doneAll':''}" data-ch="${i}" style="background-image:url(img/${c.cover}.jpg)"><div class="in">
    <div class="k">${c.no}</div><h3>${c.title}</h3><span class="small">${c.sub}</span>
    <span class="dots">${c.slides.map((sl,j)=>`<i class="${slideDone(c,sl,j)?'on':''}"></i>`).join("")}</span>
    ${p.d>=p.total?'<span class="stamp" style="margin-top:8px">MISSION CLEAR</span>':`<span class="small" style="color:var(--cyan)">진행 ${p.d}/${p.total} ${p.d>0?"· 이어서 하기 ▶":"· 시작 ▶"}</span>`}</div></button>`;}).join("")}</div>`;
  drawHud();
+ const rvl=document.getElementById("rvwL"); if(rvl)rvl.onclick=()=>{S.review=!S.review;save();render();};
  document.querySelectorAll(".chap").forEach(b=>b.onclick=()=>{const ci=+b.dataset.ch;const c=CH[ci];deck={ch:ci,i:Math.min(S.slide[c.id]||0,c.slides.length-1)};render();});
 }
 
@@ -1193,7 +1198,7 @@ function renderSlide(){
    <textarea id="wt" placeholder="자료 속 말을 근거로, 완전한 문장으로 써 보세요.">${esc(w.t||"")}</textarea>
    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn-p" id="wchk" style="flex:1">관제센터 점검받기</button><button class="btn-s aibtn" id="wai" style="flex:1" hidden>🤖 AI 코치 피드백</button></div>
    <div id="wout">${w.ok?'<div class="fb ok"><b>✅ 통과한 논술이에요. 더 다듬어 다시 점검해도 좋아요!</b></div>':""}</div></div></div>`;}
- stage.innerHTML=`<div class="stg-top"><button class="btn-g" id="exit">✕ 나가기</button><span class="ttl">${c.no} · ${c.title}</span><span class="num">${i+1} / ${c.slides.length}</span></div>
+ stage.innerHTML=`<div class="stg-top"><button class="btn-g" id="exit">✕ 나가기</button><span class="ttl">${c.no} · ${c.title}</span>${isT()||isG()?"":`<button class="btn-g rvbtn ${S.review?"on":""}" id="rvw" title="이미 공부한 카드도 빈칸을 다시 가려서 복습해요">🔁 복습 모드 ${S.review?"켜짐":"꺼짐"}</button>`}<span class="num">${i+1} / ${c.slides.length}</span></div>
   <div class="pbar"><i style="width:${((i+1)/c.slides.length*100).toFixed(1)}%"></i></div>
   <div class="stg-body" id="stgbody"><div class="slide">${body}</div></div>
   <div class="stg-nav"><button class="btn-s prev" id="prev" ${i===0?"disabled":""}>◀ 이전</button><span class="hintkey">← → 키 · 스페이스 · 밀어서 넘기기</span><button class="btn-p next" id="next">${i===c.slides.length-1?"목록으로 🏁":"다음 ▶"}</button></div>`;
@@ -1214,9 +1219,16 @@ function renderSlide(){
    else if(sl.t==="hero"){ if(!(S.comms&&S.comms["q_"+c.no+"_출발 전"]))setLock("출발 전 교신(궁금한 것 하나)을 보내야 임무를 시작할 수 있어요"); else S.done[k]=1; }
    else if(sl.t==="clear"){ if(!(S.comms&&(S.comms["q_"+c.no+"_귀환 후"]||S.comms["q_"+c.no+"_귀환 보고"])))setLock("귀환 교신(질문 또는 알게 된 점)을 보내야 임무가 종료돼요"); else S.done[k]=1; }
    else S.done[k]=1;
+ }else if(S.review&&sl.t==="learn"){ /* 🔁 복습 모드 — 빈칸만 다시 가린다. 넘기기는 자유, 점수 없음 */
+   const els=[...stage.querySelectorAll(".s-body b, .s-body em")].filter(e=>e.classList.contains("tb")||!e.closest(".pcard,.cap,.figcap,.chain,.cklist,.frame,table"));
+   const lm=stage.querySelector(".hintkey"); let left=els.length;
+   const msg=()=>{if(lm){lm.className="hintkey rvmsg";lm.textContent=left?`🔁 복습 모드 · 빈칸 ${els.length-left}/${els.length} — 먼저 떠올려 보고 눌러서 확인`:"🔁 복습 끝! 다 떠올렸나요? ← → 로 넘기기";}};
+   els.forEach(e=>{e.classList.add("blank");e.setAttribute("role","button");e.onclick=(ev)=>{ev.stopPropagation();if(e.classList.contains("on"))return;e.classList.add("on");left--;msg();};});
+   if(els.length)msg();
  }
  const go=(d)=>{if(d>0&&locked){toast("🔒 "+lockWhy+" · 막히면 옆 승무원이나 센터장에게!");return;}const ni=deck.i+d;if(ni<0)return;if(ni>=c.slides.length){deck=null;view="learn";render();return;}deck.i=ni;render();};
  stage.querySelector("#exit").onclick=()=>{deck=null;view="learn";render();};
+ const rvw=stage.querySelector("#rvw"); if(rvw)rvw.onclick=()=>{S.review=!S.review;save();toast(S.review?"🔁 복습 모드 — 공부한 카드도 빈칸이 다시 가려져요":"복습 모드 끔");render();};
  stage.querySelector("#prev").onclick=()=>go(-1); stage.querySelector("#next").onclick=()=>go(1);
  const bodyEl=stage.querySelector("#stgbody"); let tx=null,ty=null;
  bodyEl.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
