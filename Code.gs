@@ -58,7 +58,7 @@ function conf(key){
   if(v.length < 2){
     s.appendRow(['GEMINI_KEY','', 'Google AI Studio(aistudio.google.com)에서 발급한 키를 B열에 붙여넣기']);
     s.appendRow(['PIN','0726','센터장 탭 입장 코드']);
-    s.appendRow(['MODEL','gemini-2.5-flash','피드백에 쓸 모델 (안 되면 gemini-2.0-flash)']);
+    s.appendRow(['MODEL','gemini-3.6-flash','피드백에 쓸 모델 (2026년 기준. 안 되면 AI Studio에서 지금 쓸 수 있는 flash 모델 이름으로)']);
     v = s.getDataRange().getValues();
   }
   for(var i=1;i<v.length;i++){ if(String(v[i][0]).trim()===key) return String(v[i][1]).trim(); }
@@ -322,7 +322,7 @@ var COACH_RULES_S2 =
 function feedback(p){
   var k = conf('GEMINI_KEY');
   if(!k) return {ok:false, error:'AI 키가 아직 설정되지 않았어요 (시트 설정 탭)'};
-  var models = [conf('MODEL')||'gemini-2.5-flash','gemini-2.0-flash','gemini-1.5-flash'];
+  var models = [conf('MODEL')||'gemini-3.6-flash','gemini-3.6-flash','gemini-2.5-flash'];
   var prompt = (S2 ? COACH_RULES_S2 : COACH_RULES)+
     "\n[채점 기준]\n"+(p.rubric||'')+"\n\n[학생 글]\n\"\"\"\n"+(p.text||'')+"\n\"\"\"\n\n"+
     '다음 JSON 형식으로만 답하라: {"level":"상|중|하","good":["구체적 칭찬 1~2개"],"improve":["가장 중요한 고칠 점부터 최대 2개. 빠진 평가 요소가 있으면 자료의 어디를 보라고 힌트"],"next":"학생이 바로 이어 쓸 수 있는 시작 문장 (빈칸 ___ 포함, 정답은 넣지 않음)"}';
