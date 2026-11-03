@@ -474,6 +474,7 @@ body.deckmode .toast{bottom:110px}
 .cmdiv{font-size:.88rem;font-weight:700;color:var(--mut);border-top:1px dashed var(--line2);padding-top:8px;margin:4px 0 8px}
 .cmdiv b{color:var(--cyan)}
 @media (max-width:760px){.cmboard.two .inner{display:block}}
+.vidlink{display:block;position:relative;background-size:cover;background-position:center;text-decoration:none}.vidlink span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:54px;border-radius:14px;background:#e00;color:#fff;font-size:1.7rem;display:grid;place-items:center}.vidlink em{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:#000b;color:#fff;font-style:normal;font-weight:700}
 </style>
 </head>
 <body class="gate">
@@ -848,7 +849,12 @@ const DIST_FIG=(()=>{const D=[["수성",0.4,"rock"],["금성",0.7,"rock"],["지�
  g+=`<path d="M${X(0.4)} 50 v-6 H${X(1.5)} v6" fill="none" stroke="#ffb13b" stroke-width="1.5"/><path d="M${(X(0.4)+X(1.5))/2} 44 L76 32" stroke="#ffb13b" stroke-width="1"/><text x="80" y="30" font-size="14" fill="#ffe0a8">수성 0.4 · 금성 0.7 · 지구 1.0 · 화성 1.5</text>`;
  return g+`</svg><p class="figcap">교과서 그림 2 · 태양에서 행성까지 상대적인 거리(지구 = 1) — 지구형은 태양 가까이(0.4~1.5), 목성형은 멀리(5.2~30.1)</p></div>`;})();
 const VIDEOS=[["i0A5PIkozWo","센터장 영상 · 태양계를 이루는 천체"],["J5przHKeTpI","센터장 영상 · 행성의 분류"],["y1q1-eUv8iI","센터장 영상 · 태양과 태양 활동"]];
-const videoBlock=(ids)=>`<div class="figs c${ids.length}">${ids.map(i=>`<div><div class="vid"><iframe src="https://www.youtube.com/embed/${VIDEOS[i][0]}?rel=0" title="${VIDEOS[i][1]}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div><p class="figcap">${VIDEOS[i][1]}</p></div>`).join("")}</div>`;
+const videoBlock=(ids)=>`<div class="figs c${ids.length}">${ids.map(i=>{const [id,cap]=VIDEOS[i];
+ /* 파일을 직접 연(file://) 경우 유튜브가 재생을 막으므로(오류 153) 썸네일을 눌러 유튜브에서 보게 한다 */
+ const v=location.protocol==="file:"
+  ?`<a class="vid vidlink" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener" style="background-image:url(https://i.ytimg.com/vi/${id}/hqdefault.jpg)"><span>▶</span><em>유튜브에서 보기</em></a>`
+  :`<iframe src="https://www.youtube.com/embed/${id}?rel=0" title="${cap}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>`;
+ return `<div>${v.startsWith("<a")?v:`<div class="vid">${v}</div>`}<p class="figcap">${cap} · <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">유튜브에서 열기 ↗</a></p></div>`;}).join("")}</div>`;
 
 /* ═══════ 학습 콘텐츠 ═══════ */
 const CH=[
