@@ -1911,11 +1911,23 @@ async function loadComms(){
 }
 
 
-/* 응답 보내기 — AI가 먼저 읽고 '하'면 고쳐 쓰게 한다. AI가 꺼져 있거나 연결이 안 되면 예전처럼 바로 보낸다 */
+/* 성의 없는 응답 거르기 — AI가 없거나 연결이 안 돼도 항상 먼저 확인한다 */
+function ansLazy(t){
+  const core=t.replace(/[\s.,!?~…·'"“”‘’()\-ㅋㅎㅠㅜ]/g,"");
+  if(core.length<6) return "조금 더 자세히 써 볼까요? <b>무엇이 · 왜</b> 그런지 한 문장으로 적어 주세요.";
+  if(/^(네|넹|넵|예|응|어|아니요|아니오|아뇨|아님|몰라요|모름|모르겠어요|있어요|없어요|있습니다|없습니다|맞아요|맞습니다|그렇다|아니다)/.test(core)&&core.length<10)
+    return "‘네/아니요’ 다음에 <b>그렇게 생각한 까닭</b>을 한 가지 덧붙여 주세요. (예: “네, ○○ 때문이에요.”)";
+  if(/([^0-9])\1{3,}/.test(core)||/^[a-zA-Z0-9]+$/.test(core)) return "질문에 맞는 내용을 문장으로 적어 주세요.";
+  return "";
+}
+/* 응답 보내기 — 먼저 성의 확인, 그다음 AI가 읽고 '하'면 고쳐 쓰게 한다. AI가 꺼져 있거나 연결이 안 되면 성의 확인만 하고 보낸다 */
 async function sendAnswer(b,force){
   const card=b.closest("[data-q]"),inp=card.querySelector(".ansIn"),out=card.querySelector(".ansFb"),t=inp.value.trim();
   if(t.length<2)return toast("응답을 적어 주세요");
   const left=ansLeft(), scoring=!isT()&&!isG()&&left>0;
+  const lazy=scoring&&!force?ansLazy(t):"";
+  if(lazy){ if(out)out.innerHTML=`<div class="fb no" style="margin-top:8px"><b>✍️ 조금만 더!</b> ${lazy}<div class="small">고쳐서 보내면 +${ANS_PTS}점이에요.</div><button class="cmmore ansForce" style="margin-top:6px">점수 없이 그대로 보내기</button></div>`;
+    const f=out&&out.querySelector(".ansForce"); if(f)f.onclick=()=>sendAnswer(b,true); inp.focus(); return; }
   let lvl=null;
   b.disabled=true;
   if(scoring&&AI_ON&&API&&!force){
