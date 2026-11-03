@@ -92,6 +92,9 @@ body.deckmode nav#tabs,body.gate nav#tabs{display:none}
 .hero .log{font-family:var(--disp);color:var(--cyan);font-size:1rem;letter-spacing:.1em;margin-bottom:8px}
 .flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .flow span{background:#080c24cc;border:1.5px solid var(--line);border-radius:12px;padding:8px 14px;font-size:.98rem}
+.s2go{display:inline-flex;align-items:center;gap:12px;margin-top:16px;padding:12px 20px;border-radius:16px;text-decoration:none;color:#04202a;font-weight:900;font-size:1.08rem;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 6px 22px #5fe3ff44;transition:transform .15s}
+.s2go:hover{transform:translateY(-2px)}.s2go small{display:block;font-weight:600;font-size:.82rem;opacity:.85}
+.s2go .ar{font-size:1.4rem}
 .flow b{color:var(--sun)}
 @media (max-width:860px){.hero{grid-template-columns:1fr;min-height:0}.hero>div{padding:28px 22px}}
 
@@ -499,6 +502,8 @@ const SCHOOL_EN = 'GOCHEON';            // 첫 화면 영문 표기 (예: 'GOCHE
 /* ③ 참관(공개수업) — 참관 선생님이 둘러볼 수 있는 반. 쓰기·저장은 안 되고 보기만. 끄려면 [] */
 const GUEST_CLS = ['1'];
 const SCHOOL_STORY = '고천(古川), 오래된 냇물은 흘러 바다에 닿는다 — 그리고 별들의 바다, 우주로. ';  // 첫 화면 이야기(학교 이름 풀이). 비워 둬도 된다.
+/* ④ 시즌 2(지구와 달) 주소 — 첫 화면에 '시즌 2로 가기' 버튼이 생긴다. 비워 두면 버튼이 숨는다. */
+const SEASON2_URL = 'https://syjh0412.github.io/araho-earthmoon/';
 
 /* ───────── 서버 통신 (힘탐정과 같은 방식: 읽기 JSONP, 쓰기 POST) ───────── */
 let seq=0;
@@ -996,6 +1001,7 @@ function renderGate(){
   <button class="btn-p" id="gGo" style="width:100%;margin-top:16px">관제센터 입장</button>
   <div id="gMsg" class="small" style="margin-top:10px">${API?(ROSTER_TRIED&&!hasR?"명단이 아직 없어 이름을 직접 입력합니다.":"기록은 센터장의 구글 시트에 자동 저장됩니다."):"⚠ 서버가 연결되지 않아 기록이 이 기기에만 저장됩니다."}</div>
   <button class="btn-g" id="gT" style="width:100%;margin-top:14px;min-height:44px">센터장으로 입장</button>
+  ${SEASON2_URL?`<a href="${esc(SEASON2_URL)}" class="tlink" style="display:block;text-align:center;margin-top:10px;text-decoration:none">🌍🌙 시즌 2 · 지구와 달의 운동으로 가기 →</a>`:""}
   ${GUEST_CLS.length?`<button class="tlink" id="gGuestOpen">🎩 참관 오셨나요? 둘러보기</button>
   <div id="gGuest" hidden class="guestbox"><h3>참관 둘러보기</h3><p class="small">쓰기는 되지 않는 <b>둘러보기 전용</b> 입장입니다. 미션 학습 슬라이드, 수배 파일, 논술 시험, 승무원실, 교신 채널을 자유롭게 둘러보실 수 있어요. 해 보신 활동은 저장되지 않습니다.</p>
    <div class="gcls">${[1,2,3,4,5,6,7,8].filter(c=>c<=Math.max(4,...GUEST_CLS.map(Number).filter(Boolean))).map(c=>GUEST_CLS.includes(String(c))?`<button class="gon" data-gc="${c}">${c}반 참관${GUEST_CLS.length===1?" — 오늘 공개수업":""}</button>`:`<button disabled title="오늘은 ${GUEST_CLS.join(", ")}반만 둘러볼 수 있어요">${c}반</button>`).join("")}</div></div>`:""}</div>`;
@@ -1040,7 +1046,8 @@ function renderHome(){
  app.innerHTML=`${hudBlock()}
  <div class="hero" style="margin-top:14px"><div><div class="log">${esc(SCHOOL_EN)} MISSION CONTROL · 2049</div><h1>아라호 관제센터</h1>
   <p class="lead"><b style="color:var(--sun)">아라</b>는 '바다'를 뜻하는 옛 우리말. ${SCHOOL_STORY}${esc(SCHOOL_FULL)} 관제센터가 쏘아 올린 태양계 탐사선 <b style="color:var(--sun)">아라호</b>가 발사대에 섰다. 너는 신입 훈련생. 탐사선이 보내오는 자료를 읽고, 판단하고, 글로 보고하라. 임무를 완수할수록 장비가 갖춰지고, 마지막엔 <b style="color:var(--cyan)">커맨더</b>가 된다.</p>
-  <div class="flow"><span>📚 <b>미션 학습</b> 5개 장</span><span>🔭 <b>수배 파일</b> 추리</span><span>✍️ <b>자격 논술 시험</b></span></div></div><div></div></div>
+  <div class="flow"><span>📚 <b>미션 학습</b> 5개 장</span><span>🔭 <b>수배 파일</b> 추리</span><span>✍️ <b>자격 논술 시험</b></span></div>
+  ${SEASON2_URL?`<a class="s2go" href="${esc(SEASON2_URL)}"><span style="font-size:1.6rem">🌍🌙</span><span>시즌 2 · 지구와 달의 운동으로 가기<small>같은 콜사인으로 입장 · 점수는 시즌 2에서 새로 시작</small></span><span class="ar">→</span></a>`:""}</div><div></div></div>
  <div class="row2">
   <div class="card"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
     <div style="flex:0 0 auto;filter:drop-shadow(0 10px 24px #0008);cursor:pointer" id="avatarGo">${isT()?directorSVG(150):astronautSVG(null,null,150)}</div>
