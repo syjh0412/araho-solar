@@ -341,7 +341,7 @@ function feedback(p){
       var txt = (((j.candidates||[])[0]||{}).content||{}).parts; txt = (txt||[]).map(function(x){return x.text||'';}).join('');
       var fb = JSON.parse(txt.replace(/^```json\s*|```\s*$/g,''));
       // 기록
-      try{ log({cls:p.cls,num:p.num,name:p.name,type:'AI피드백',item:p.item||'',text:p.text,score:p.score||'',ai:fb.level||'',aifb:JSON.stringify(fb)}); }catch(e){}
+      if(String(p.nolog||'')!=='1') try{ log({cls:p.cls,num:p.num,name:p.name,type:'AI피드백',item:p.item||'',text:p.text,score:p.score||'',ai:fb.level||'',aifb:JSON.stringify(fb)}); }catch(e){}
       return {ok:true, fb:fb, model:m};
     }catch(err){ lastErr = String(err); }
   }
